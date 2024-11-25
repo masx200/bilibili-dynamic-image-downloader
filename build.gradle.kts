@@ -58,7 +58,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.36")
 
     // https://mvnrepository.com/artifact/cn.hll520.linclient/BilibiliClient
-    implementation("com.github.masx200:BilibiliClient:1.1.0")
+    implementation("com.github.masx200:BilibiliClient:1.1.1")
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
