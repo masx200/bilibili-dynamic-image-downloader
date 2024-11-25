@@ -13,7 +13,7 @@ plugins {
 apply {
     plugin("maven-publish")
 }
-val artifact_id = "fast-and-mercury-router-reverse-proxy-server"
+val artifact_id = "bilibili-dynamic-image-downloader"
 afterEvaluate {
     publishing {
         publications {
@@ -39,7 +39,7 @@ afterEvaluate {
 //    applicationDefaultJvmArgs
 //}
 application {
-    mainClass.set("com.github.masx200.fast_and_mercury_router_reverse_proxy_server.ReverseProxyApplicationKt")
+    mainClass.set("com.github.masx200.bilibili_dynamic_image_downloader.IMAGEDOWNLOADERApplicationKt")
 }
 
 repositories {
@@ -48,6 +48,15 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    testImplementation("org.slf4j:slf4j-simple:1.7.36")
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation("org.slf4j:slf4j-api:1.7.36")
+
+    // https://mvnrepository.com/artifact/cn.hll520.linclient/BilibiliClient
+    implementation("cn.hll520.linclient:BilibiliClient:1.0.6")
+
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.ktor:ktor-server-cio-jvm")
@@ -67,6 +76,7 @@ dependencies {
     implementation("io.ktor:ktor-client-apache:$ktor_version")
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
     implementation("org.apache.httpcomponents:httpcore:4.4.16")
+    testImplementation(kotlin("test"))
 }
 tasks.named<JavaExec>("run") {
 //    mainClass.set("com.example.Main")
@@ -97,3 +107,4 @@ graalvmNative {
         }
     }
 }
+

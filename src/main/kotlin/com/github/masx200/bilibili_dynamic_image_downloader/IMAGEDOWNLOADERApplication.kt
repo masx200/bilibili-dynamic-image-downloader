@@ -1,4 +1,4 @@
-package com.github.masx200.fast_and_mercury_router_reverse_proxy_server
+package com.github.masx200.bilibili_dynamic_image_downloader
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
@@ -61,7 +61,7 @@ import org.mozilla.universalchardet.UniversalDetector
  */
 fun main(args: Array<String>) {
 
-    HelloCommand(name = "fast-and-mercury-router-reverse-proxy-server") {
+    HelloCommand(name = "bilibili-dynamic-image-downloader") {
         println(it)
         val server = embeddedServer(CIO, port = it.port.toInt(), module = createApp(it.upstream))
         // Starts the server and waits for the engine to stop and exits.
