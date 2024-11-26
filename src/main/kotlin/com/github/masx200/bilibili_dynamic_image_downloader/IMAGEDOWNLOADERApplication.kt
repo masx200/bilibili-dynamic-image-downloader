@@ -2,6 +2,7 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 
 import com.github.masx200.biliClient.BiliClientFactor
 import com.xenomachina.argparser.ArgParser
+import com.xenomachina.argparser.default
 import com.xenomachina.argparser.mainBody
 
 fun main(args: Array<String>) {
@@ -9,16 +10,20 @@ fun main(args: Array<String>) {
         println("bilibili-dynamic-image-downloader")
         // Creates a Netty server
         ArgParser(args).parseInto(::MyArgs).run {
+            println("offset_dynamic_id=${offset_dynamic_id}")
             println("cookie=${cookie}")
             println("host_uid=${host_uid}")
             val client = BiliClientFactor.getClient { requestBase ->
                 requestBase.setHeader("cookie", cookie)
             }
-            var offset: Long? = null
+            var offset: Long? = offset_dynamic_id.toLong()
             var hasMore = true
             while (hasMore) {
 
-                val list = client.dynamic().withHostUid(host_uid.toLong()).list(offset)
+                val list = if (offset != null && offset != 0L) client.dynamic().withHostUid(host_uid.toLong())
+                    .list(offset) else {
+                    client.dynamic().withHostUid(host_uid.toLong()).list()
+                }
 //            System.out.println(list)
                 System.out.println("是还有动态--> " + (list.getHasMore() == 1))
                 System.out.println("nextOffset--> " + (list.nextOffset))
@@ -58,4 +63,8 @@ class MyArgs(parser: ArgParser) {
         "-u", "--host_uid",
         help = "host_uid"
     )
+    val offset_dynamic_id by parser.storing(
+        "-o", "--offset_dynamic_id",
+        help = "offset_dynamic_id"
+    ).default("0")
 }
