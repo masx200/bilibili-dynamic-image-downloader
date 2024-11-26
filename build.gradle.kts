@@ -71,7 +71,7 @@ dependencies {
     implementation("io.netty:netty-common:4.1.115.Final")
 
     implementation("io.ktor:ktor-client-cio-jvm")
-    implementation("com.github.ajalt.clikt:clikt:3.5.0")
+
     implementation("org.jsoup:jsoup:1.18.1")
     implementation("com.googlecode.juniversalchardet:juniversalchardet:1.0.3")
     implementation("io.ktor:ktor-client-encoding:$ktor_version")
@@ -80,6 +80,10 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
     implementation("org.apache.httpcomponents:httpcore:4.4.16")
     testImplementation(kotlin("test"))
+
+    // https://mvnrepository.com/artifact/com.xenomachina/kotlin-argparser
+    implementation("com.xenomachina:kotlin-argparser:2.0.7")
+
 }
 tasks.named<JavaExec>("run") {
 //    mainClass.set("com.example.Main")

@@ -17,7 +17,7 @@ gradle buildFatJar
 #### 使用说明
 
 ```shell
-java --add-opens java.base/jdk.internal.misc=ALL-UNNAMED  -jar "bilibili-dynamic-image-downloader-all.jar"
+java --add-opens java.base/jdk.internal.misc=ALL-UNNAMED  -jar "bilibili-dynamic-image-downloader-all.jar" "--cookie=*****=****" "--host_uid=********"
 ```
 
 
@@ -26,5 +26,5 @@ java --add-opens java.base/jdk.internal.misc=ALL-UNNAMED  -jar "bilibili-dynamic
 Execute this command to run this sample:
 
 ```bash
-./gradlew run --args=""
+./gradlew run --args="--cookie=*****=**** --host_uid=********"
 ```
