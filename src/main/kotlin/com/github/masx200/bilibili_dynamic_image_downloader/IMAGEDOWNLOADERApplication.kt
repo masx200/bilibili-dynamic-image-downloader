@@ -39,9 +39,11 @@ fun createWriteStreamsIfNotEmpty(
  * @param args Command line arguments, containing parameters for program operation.
  */
 fun main(args: Array<String>) {
+    println("bilibili-dynamic-image-downloader")
+    println(args.contentToString())
     mainBody("bilibili-dynamic-image-downloader") {
-        println("bilibili-dynamic-image-downloader")
-        // Creates a Netty server
+
+    // Creates a Netty server
         ArgParser(args).parseInto(::MyArgs).run {
             printmyargs(this)
             val iteritems = getDynamicSequence(this)
@@ -210,7 +212,7 @@ class MyArgs(parser: ArgParser) {
     ).default("")
 
     override fun toString(): String {
-        return super.toString() + "MyArgs(cookie='$cookie', host_uid='$host_uid', offset_dynamic_id='$offset_dynamic_id', endwith_dynamic_id='$endwith_dynamic_id', file_dynamic_ids='$file_dynamic_ids', file_dynamic_images='$file_dynamic_images')"
+        return "MyArgs(cookie='$cookie', host_uid='$host_uid', offset_dynamic_id='$offset_dynamic_id', endwith_dynamic_id='$endwith_dynamic_id', file_dynamic_ids='$file_dynamic_ids', file_dynamic_images='$file_dynamic_images')"
     }
 
 }
