@@ -52,10 +52,10 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-    testImplementation("org.slf4j:slf4j-simple:1.7.36")
-    implementation("com.alibaba:fastjson:1.2.83")
+    testImplementation("org.slf4j:slf4j-simple:2.0.16")
+    implementation("com.alibaba:fastjson:2.0.53")
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation("org.slf4j:slf4j-api:1.7.36")
+    implementation("org.slf4j:slf4j-api:2.0.16")
 
     // https://mvnrepository.com/artifact/cn.hll520.linclient/BilibiliClient
     implementation("com.github.masx200:BilibiliClient:3d7d82df50")
