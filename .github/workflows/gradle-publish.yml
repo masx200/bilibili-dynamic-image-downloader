@@ -44,8 +44,8 @@ jobs:
       #
       - name: Build with Gradle 8.9
         run: gradle build
-      - name: buildFatJar with Gradle 8.9
-        run: gradle buildFatJar
+      - name: shadowJar with Gradle 8.9
+        run: gradle shadowJar
       - name: publish to maven repository
         run: gradle publish
         env:

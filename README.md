@@ -11,7 +11,7 @@ bilibili-dynamic-image-downloader
 #### 安装教程
 
 ```shell
-gradle buildFatJar
+gradle shadowJar
 ```
 
 #### 使用说明
@@ -30,16 +30,30 @@ Execute this command to run this sample:
 
 ```
 bilibili-dynamic-image-downloader
-usage: bilibili-dynamic-image-downloader [-h] [-c COOKIE] [-u HOST_UID]
+usage: bilibili-dynamic-image-downloader [-h] -c COOKIE -u HOST_UID
                                          [-o OFFSET_DYNAMIC_ID]
+                                         [-e ENDWITH_DYNAMIC_ID]
+
+required arguments:
+  -c COOKIE, --cookie COOKIE                cookie
+
+  -u HOST_UID, --host_uid HOST_UID          host_uid
+
 
 optional arguments:
-  -h, --help                              show this help message and exit
+  -h, --help                                show this help message and exit
 
-  -c COOKIE, --cookie COOKIE              cookie
-
-  -u HOST_UID, --host_uid HOST_UID        host_uid
-
-  -o OFFSET_DYNAMIC_ID,                   offset_dynamic_id
+  -o OFFSET_DYNAMIC_ID,                     offset_dynamic_id
   --offset_dynamic_id OFFSET_DYNAMIC_ID
+
+  -e ENDWITH_DYNAMIC_ID,                    endwith_dynamic_id
+  --endwith_dynamic_id ENDWITH_DYNAMIC_ID
 ```
+
+参数 COOKIE 是bilibili账号的cookie
+
+参数 HOST_UID是指定要下载的up主，即bilibili账号的uid
+
+参数 offset_dynamic_id是指定从此id之后的动态，不包含此id的动态
+
+参数 endwith_dynamic_id是指定到此id之前的动态，不包含此id的动态
