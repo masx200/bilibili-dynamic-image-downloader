@@ -14,28 +14,35 @@ fun main(args: Array<String>) {
             val client = BiliClientFactor.getClient { requestBase ->
                 requestBase.setHeader("cookie", cookie)
             }
+            var offset: Long? = null
+            var hasMore = true
+            while (hasMore) {
 
-            val list = client.dynamic().withHostUid(host_uid.toLong()).list()
+                val list = client.dynamic().withHostUid(host_uid.toLong()).list(offset)
 //            System.out.println(list)
-            System.out.println("是还有动态--> " + (list.getHasMore() == 1))
-            System.out.println("nextOffset--> " + (list.nextOffset))
-            // 动态集合
-            val items = list.getItems()
+                System.out.println("是还有动态--> " + (list.getHasMore() == 1))
+                System.out.println("nextOffset--> " + (list.nextOffset))
+                hasMore = list.getHasMore() == 1
+                offset = list.nextOffset
+                // 动态集合
+                val items = list.getItems()
 //            System.out.println(items)
-            if (items.size > 0) {
-                for (item in items) {
-                    println("id="+item.data.dynamic_id)
-                    println(item)
-                    if (item.detail != null) {
+                if (items.size > 0) {
+                    for (item in items) {
+                        println("id=" + item.data.dynamic_id)
+                        println(item)
+                        if (item.detail != null) {
 
-                        if (item.detail.pictures != null)
-                            item.detail.pictures.forEach {
-                                println(it.img_src)
-                            }
+                            if (item.detail.pictures != null)
+                                item.detail.pictures.forEach {
+                                    println(it.img_src)
+                                }
+                        }
                     }
-                }
 
+                }
             }
+
         }
     }
 
