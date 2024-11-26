@@ -20,6 +20,10 @@ gradle shadowJar
 java   -jar "bilibili-dynamic-image-downloader-all.jar" "--cookie=*****=****" "--host_uid=********" -o "*****"
 ```
 
+```shell
+java   -jar "bilibili-dynamic-image-downloader-all.jar"    -c "*****=*****"  -u "*********" -d "./file_dynamic_ids.txt" -i "./file_dynamic_images.txt"
+```
+
 ## Running
 
 Execute this command to run this sample:

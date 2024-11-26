@@ -1,10 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+val artifact_id = "bilibili-dynamic-image-downloader"
 //val ktor_version: String by project
 val logback_version: String by project
 val org_gradle_jvmargs: String by project
 group = "com.github.masx200"
-version = "1.0.4"
+version = "1.0.5"
 tasks.named<ShadowJar>("shadowJar") {
     manifest {
         attributes["Main-Class"] = "com.github.masx200.bilibili_dynamic_image_downloader.IMAGEDOWNLOADERApplicationKt"
@@ -22,7 +23,7 @@ plugins {
 apply {
     plugin("maven-publish")
 }
-val artifact_id = "bilibili-dynamic-image-downloader"
+
 afterEvaluate {
     publishing {
         publications {
