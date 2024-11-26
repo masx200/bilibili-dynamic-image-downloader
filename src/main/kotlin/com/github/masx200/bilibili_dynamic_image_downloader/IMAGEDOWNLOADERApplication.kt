@@ -5,6 +5,32 @@ import com.github.masx200.biliClient.model.dynamic.Dynamic
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 import com.xenomachina.argparser.mainBody
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+
+/**
+ * 根据文件路径创建BufferedWriter对象，仅当文件路径不为空时创建
+ *
+ * @param file_dynamic_ids ID文件路径，如果为空，则对应返回值为null
+ * @param file_dynamic_images 图像文件路径，如果为空，则对应返回值为null
+ * @return 一个Pair对象，包含两个可能为null的BufferedWriter对象，分别对应ID和图像文件的写入流
+ */
+fun createWriteStreamsIfNotEmpty(
+    file_dynamic_ids: String, file_dynamic_images: String
+): Pair<BufferedWriter?, BufferedWriter?> {
+    val idsWriter: BufferedWriter?
+    val imagesWriter: BufferedWriter?
+
+    if (file_dynamic_ids.isNotEmpty() && file_dynamic_images.isNotEmpty()) {
+        idsWriter = BufferedWriter(FileWriter(File(file_dynamic_ids)))
+        imagesWriter = BufferedWriter(FileWriter(File(file_dynamic_images)))
+    } else {
+        return Pair(null, null)
+    }
+
+    return Pair(idsWriter, imagesWriter)
+}
 
 /**
  * The entry point of the program.
@@ -19,20 +45,51 @@ fun main(args: Array<String>) {
         ArgParser(args).parseInto(::MyArgs).run {
             printmyargs(this)
             val iteritems = getDynamicSequence(this)
-            for (item in iteritems) {
-                println("id=" + item.data.dynamic_id)
-                println(item)
-                if (item.detail != null) {
 
-                    if (item.detail.pictures != null)
-                        item.detail.pictures.forEach {
-                            println(it.img_src)
-                        }
+            val (idsWriter, imagesWriter) = createWriteStreamsIfNotEmpty(file_dynamic_ids, file_dynamic_images)
+
+            if (idsWriter != null && imagesWriter != null) {
+                idsWriter.use { idsWriter ->
+                    imagesWriter.use { imagesWriter ->
+                        extracted(iteritems, idsWriter, imagesWriter)
+                    }
                 }
+            } else {
+                extracted(iteritems)
             }
+
         }
     }
 
+}
+
+fun extracted(iteritems: Sequence<Dynamic>, idsWriter: BufferedWriter? = null, imagesWriter: BufferedWriter? = null) {
+    for (item in iteritems) {
+
+        if (idsWriter != null) {
+
+            idsWriter.write(item.data.dynamic_id.toString())
+            idsWriter.newLine()
+
+        } else {
+            println("id=" + item.data.dynamic_id)
+        }
+
+        println(item)
+        if (item.detail != null) {
+
+            if (item.detail.pictures != null)
+                item.detail.pictures.forEach {
+
+                    if (imagesWriter != null) {
+                        imagesWriter.write(it.img_src)
+                        imagesWriter.newLine()
+                    } else {
+                        println(it.img_src)
+                    }
+                }
+        }
+    }
 }
 
 /**
@@ -43,18 +100,9 @@ fun main(args: Array<String>) {
  * @param options 包含参数的[MyArgs]对象，用于提取并打印参数信息
  */
 fun printmyargs(options: MyArgs) {
-    val cookie = options.cookie
-    val offset_dynamic_id = options.offset_dynamic_id
-    val host_uid = options.host_uid
 
-    val endwith_dynamic_id = options.endwith_dynamic_id
+    println(options.toString())
 
-    println("{")
-    println("offset_dynamic_id=${offset_dynamic_id}")
-    println("cookie=${cookie}")
-    println("host_uid=${host_uid}")
-    println("endwith_dynamic_id=${endwith_dynamic_id}")
-    println("}")
 }
 
 /**
@@ -79,27 +127,26 @@ fun getDynamicSequence(options: MyArgs): Sequence<Dynamic> {
         val client = BiliClientFactor.getClient { requestBase ->
             requestBase.setHeader("cookie", cookie)
         }
-        var offset: Long = offset_dynamic_id.toLong()
+        var offset: String = offset_dynamic_id
         var hasMore = true
         while (hasMore) {
 
-            val list = if (offset != 0L) client.dynamic().withHostUid(host_uid.toLong())
-                .list(offset) else {
+            val list = if (offset != "") client.dynamic().withHostUid(host_uid.toLong()).list(offset.toLong()) else {
                 client.dynamic().withHostUid(host_uid.toLong()).list()
             }
             //System.out.println(list)
             System.out.println("是还有动态--> " + (list.hasMore == 1))
             System.out.println("nextOffset--> " + (list.nextOffset))
             hasMore = list.hasMore == 1
-            offset = list.nextOffset
+            offset = list.nextOffset.toString()
             // 动态集合
             val items = list.items
 //            System.out.println(items)
-            if (items.size > 0) {
+            if (items.isNotEmpty()) {
                 for (item in items) {
                     val dynamicId = item.data.dynamic_id
 
-                    if (dynamicId.toString() == endwith_dynamic_id && endwith_dynamic_id != "0") {
+                    if (dynamicId.toString() == endwith_dynamic_id && endwith_dynamic_id != "") {
 
                         return@sequence
                     } else {
@@ -132,10 +179,22 @@ class MyArgs(parser: ArgParser) {
     val offset_dynamic_id by parser.storing(
         "-o", "--offset_dynamic_id",
         help = "offset_dynamic_id"
-    ).default("0")
+    ).default("")
 
     val endwith_dynamic_id by parser.storing(
         "-e", "--endwith_dynamic_id",
         help = "endwith_dynamic_id"
-    ).default("0")
+    ).default("")
+
+    val file_dynamic_ids by parser.storing(
+        "-d", "--file_dynamic_ids", help = "file_dynamic_ids"
+    ).default("")
+    val file_dynamic_images by parser.storing(
+        "-i", "--file_dynamic_images", help = "file_dynamic_images"
+    ).default("")
+
+    override fun toString(): String {
+        return super.toString() + "MyArgs(cookie='$cookie', host_uid='$host_uid', offset_dynamic_id='$offset_dynamic_id', endwith_dynamic_id='$endwith_dynamic_id', file_dynamic_ids='$file_dynamic_ids', file_dynamic_images='$file_dynamic_images')"
+    }
+
 }
