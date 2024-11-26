@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
                     .list(offset) else {
                     client.dynamic().withHostUid(host_uid.toLong()).list()
                 }
-//            System.out.println(list)
+                //System.out.println(list)
                 System.out.println("是还有动态--> " + (list.getHasMore() == 1))
                 System.out.println("nextOffset--> " + (list.nextOffset))
                 hasMore = list.getHasMore() == 1
