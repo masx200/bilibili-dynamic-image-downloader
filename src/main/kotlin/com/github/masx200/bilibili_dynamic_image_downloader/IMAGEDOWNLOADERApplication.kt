@@ -51,11 +51,11 @@ fun main(args: Array<String>) {
             if (idsWriter != null && imagesWriter != null) {
                 idsWriter.use { idsWriter ->
                     imagesWriter.use { imagesWriter ->
-                        extracted(iteritems, idsWriter, imagesWriter)
+                        processDynamicItems(iteritems, idsWriter, imagesWriter)
                     }
                 }
             } else {
-                extracted(iteritems)
+                processDynamicItems(iteritems)
             }
 
         }
@@ -63,34 +63,50 @@ fun main(args: Array<String>) {
 
 }
 
-fun extracted(iteritems: Sequence<Dynamic>, idsWriter: BufferedWriter? = null, imagesWriter: BufferedWriter? = null) {
+/**
+ * 处理动态项序列，根据提供的BufferedWriter对象将动态ID和图片链接写入文件或控制台
+ *
+ * @param iteritems 动态项序列，包含动态数据
+ * @param idsWriter 用于写入动态ID的BufferedWriter对象，如果为null，则输出到控制台
+ * @param imagesWriter 用于写入图片链接的BufferedWriter对象，如果为null，则输出到控制台
+ */
+fun processDynamicItems(
+    iteritems: Sequence<Dynamic>,
+    idsWriter: BufferedWriter? = null,
+    imagesWriter: BufferedWriter? = null
+) {
     for (item in iteritems) {
 
         if (idsWriter != null) {
-
+            // 将动态ID写入文件
             idsWriter.write(item.data.dynamic_id.toString())
             idsWriter.newLine()
-
         } else {
+            // 如果没有提供idsWriter，则将动态ID输出到控制台
             println("id=" + item.data.dynamic_id)
         }
 
+        // 输出当前处理的动态项
         println(item)
+
         if (item.detail != null) {
-
-            if (item.detail.pictures != null)
-                item.detail.pictures.forEach {
-
+            if (item.detail.pictures != null) {
+                // 遍历动态项中的图片链接
+                item.detail.pictures.forEach { picture ->
                     if (imagesWriter != null) {
-                        imagesWriter.write(it.img_src)
+                        // 将图片链接写入文件
+                        imagesWriter.write(picture.img_src)
                         imagesWriter.newLine()
                     } else {
-                        println(it.img_src)
+                        // 如果没有提供imagesWriter，则将图片链接输出到控制台
+                        println(picture.img_src)
                     }
                 }
+            }
         }
     }
 }
+
 
 /**
  * 打印[MyArgs]类中的参数信息
