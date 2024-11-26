@@ -79,11 +79,11 @@ fun processDynamicItems(
 
         if (idsWriter != null) {
             // 将动态ID写入文件
-            idsWriter.write(item.data.dynamic_id.toString())
+            idsWriter.write("https://t.bilibili.com/" + item.data.dynamic_id.toString())
             idsWriter.newLine()
         } else {
             // 如果没有提供idsWriter，则将动态ID输出到控制台
-            println("id=" + item.data.dynamic_id)
+            println("https://t.bilibili.com/" + item.data.dynamic_id)
         }
 
         // 输出当前处理的动态项
