@@ -55,7 +55,7 @@ application {
 repositories {
     mavenCentral()
     gradlePluginPortal()
-    maven{
+    maven {
         url = uri("https://jitpack.io")
     }
 }

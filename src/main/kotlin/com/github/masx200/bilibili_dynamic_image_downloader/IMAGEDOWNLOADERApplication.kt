@@ -51,7 +51,7 @@ fun main(args: Array<String>) {
     println(args.contentToString())
     mainBody("bilibili-dynamic-image-downloader") {
 
-    // Creates a Netty server
+        // Creates a Netty server
         ArgParser(args).parseInto(::MyArgs).run {
             printmyargs(this)
             val iteritems = getDynamicSequence(this)
@@ -105,23 +105,23 @@ fun processDynamicItems(
 
         // 输出当前处理的动态项
         println(item)
-
+        if (item.essay != null) {
+            item.essay.origin_image_urls.forEach { url ->
+                if (imagesWriter != null) {
+                    // 将图片链接写入文件
+                    imagesWriter.write(url)
+                    imagesWriter.newLine()
+                } else {
+                    // 如果没有提供imagesWriter，则将图片链接输出到控制台
+                    println(url)
+                }
+            }
+        }
         // 如果动态项的详细信息不为空，则进一步处理
         if (item.detail != null) {
 
             // 如果动态项包含文章信息，则处理图片链接
-            if (item.essay != null) {
-                item.essay.origin_image_urls.forEach { url ->
-                    if (imagesWriter != null) {
-                        // 将图片链接写入文件
-                        imagesWriter.write(url)
-                        imagesWriter.newLine()
-                    } else {
-                        // 如果没有提供imagesWriter，则将图片链接输出到控制台
-                        println(url)
-                    }
-                }
-            }
+
             // 如果动态项包含图片信息，则处理图片链接
             if (item.detail.pictures != null) {
                 // 遍历动态项中的图片链接
@@ -139,7 +139,6 @@ fun processDynamicItems(
         }
     }
 }
-
 
 
 /**
@@ -202,11 +201,11 @@ fun getDynamicSequence(options: MyArgs): Sequence<Dynamic> {
                     } else {
 
                         yield(item)
+                    }
                 }
             }
         }
     }
-}
 }
 
 /**

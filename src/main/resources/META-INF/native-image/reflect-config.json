@@ -1,20 +1,20 @@
-[{
+[
+  {
     "name": "com.github.masx200.biliClient.BiliResult"
   },
- 
   {
     "name": "kotlin.reflect.KTypeProjection"
   },
   {
     "name": "kotlin.reflect.jvm.internal.ReflectionFactoryImpl",
-    "allDeclaredConstructors":true
+    "allDeclaredConstructors": true
   },
   {
     "name": "kotlin.KotlinVersion",
     "allPublicMethods": true,
-    "allDeclaredFields":true,
-    "allDeclaredMethods":true,
-    "allDeclaredConstructors":true
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
   },
   {
     "name": "kotlin.KotlinVersion[]"
@@ -31,8 +31,8 @@
   {
     "name": "kotlin.internal.jdk8.JDK8PlatformImplementations",
     "allPublicMethods": true,
-    "allDeclaredFields":true,
-    "allDeclaredMethods":true,
-    "allDeclaredConstructors":true
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
   }
 ]
