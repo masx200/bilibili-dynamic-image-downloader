@@ -23,6 +23,14 @@ fun createWriteStreamsIfNotEmpty(
     val imagesWriter: BufferedWriter?
 
     if (file_dynamic_ids.isNotEmpty() && file_dynamic_images.isNotEmpty()) {
+
+        val directory1 = File(file_dynamic_images).parentFile
+        if (!directory1.exists())
+            directory1.mkdirs()
+
+        val directory2 = File(file_dynamic_ids).parentFile
+        if (!directory2.exists())
+            directory2.mkdirs()
         idsWriter = BufferedWriter(FileWriter(File(file_dynamic_ids)))
         imagesWriter = BufferedWriter(FileWriter(File(file_dynamic_images)))
     } else {
