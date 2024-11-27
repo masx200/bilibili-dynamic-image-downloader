@@ -100,6 +100,19 @@ fun processDynamicItems(
         println(item)
 
         if (item.detail != null) {
+
+            if (item.essay != null) {
+                item.essay.origin_image_urls.forEach { url ->
+                    if (imagesWriter != null) {
+                        // 将图片链接写入文件
+                        imagesWriter.write(url)
+                        imagesWriter.newLine()
+                    } else {
+                        // 如果没有提供imagesWriter，则将图片链接输出到控制台
+                        println(url)
+                    }
+                }
+            }
             if (item.detail.pictures != null) {
                 // 遍历动态项中的图片链接
                 item.detail.pictures.forEach { picture ->
