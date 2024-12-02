@@ -14,7 +14,7 @@ tasks.named<ShadowJar>("shadowJar") {
 }
 plugins {
     id("application")
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "8.3.5"
 //    id("io.ktor.plugin") version "3.0.1"
     id("org.graalvm.buildtools.native") version "0.10.3"
