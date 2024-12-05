@@ -184,8 +184,8 @@ fun getDynamicSequence(options: MyArgs): Sequence<Dynamic> {
                 client.dynamic().withHostUid(host_uid.toLong()).list()
             }
             //System.out.println(list)
-            System.out.println("是还有动态--> " + (list.hasMore == 1))
-            System.out.println("nextOffset--> " + (list.nextOffset))
+//            System.out.println("是还有动态--> " + (list.hasMore == 1))
+//            System.out.println("nextOffset--> " + (list.nextOffset))
             hasMore = list.hasMore == 1
             offset = list.nextOffset.toString()
             // 动态集合
@@ -195,7 +195,9 @@ fun getDynamicSequence(options: MyArgs): Sequence<Dynamic> {
                 for (item in items) {
                     val dynamicId = item.data.dynamic_id
 
-                    if (dynamicId.toString() == endwith_dynamic_id && endwith_dynamic_id != "") {
+                    if ((dynamicId.toString() == endwith_dynamic_id || dynamicId.toString()
+                            .toLong() < endwith_dynamic_id.toLong()) && endwith_dynamic_id != ""
+                    ) {
 
                         return@sequence
                     } else {
