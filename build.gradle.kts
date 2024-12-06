@@ -14,7 +14,7 @@ tasks.named<ShadowJar>("shadowJar") {
 }
 plugins {
     id("application")
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "8.3.5"
 //    id("io.ktor.plugin") version "3.0.1"
     id("org.graalvm.buildtools.native") version "0.10.3"
@@ -82,7 +82,7 @@ dependencies {
 
 //    implementation("io.ktor:ktor-client-cio-jvm")
 
-    implementation("org.jsoup:jsoup:1.18.1")
+    implementation("org.jsoup:jsoup:1.18.3")
     implementation("com.googlecode.juniversalchardet:juniversalchardet:1.0.3")
 //    implementation("io.ktor:ktor-client-encoding:$ktor_version")
 //    implementation("io.ktor:ktor-client-core:$ktor_version")
