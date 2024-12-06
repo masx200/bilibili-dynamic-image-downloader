@@ -195,8 +195,8 @@ fun getDynamicSequence(options: MyArgs): Sequence<Dynamic> {
                 for (item in items) {
                     val dynamicId = item.data.dynamic_id
 
-                    if ((dynamicId.toString() == endwith_dynamic_id || dynamicId.toString()
-                            .toLong() < endwith_dynamic_id.toLong()) && endwith_dynamic_id != ""
+                    if (endwith_dynamic_id != "" && (dynamicId.toString() == endwith_dynamic_id || dynamicId.toString()
+                            .toLong() < endwith_dynamic_id.toLong())
                     ) {
 
                         return@sequence
