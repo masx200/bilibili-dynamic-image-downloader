@@ -61,6 +61,14 @@ repositories {
 }
 
 dependencies {
+
+    implementation("com.alibaba.fastjson2:fastjson2:2.0.53")
+    implementation("com.alibaba.fastjson2:fastjson2-codegen:2.0.53") {
+        //exclude group: "com.alibaba.fastjson2", module: "fastjson2"
+    }
+    implementation("com.alibaba.fastjson2:fastjson2-kotlin:2.0.53") {
+        //exclude group: "com.alibaba.fastjson2", module: "fastjson2"
+    }
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     testImplementation("org.slf4j:slf4j-simple:2.0.16")
     implementation("com.alibaba:fastjson:2.0.53")
@@ -110,7 +118,7 @@ graalvmNative {
             buildArgs.add("--initialize-at-build-time=kotlin")
             buildArgs.add("--initialize-at-build-time=java.lang.Thread")
             buildArgs.add("--initialize-at-build-time=<culprit>")
-            buildArgs.add("""--initialize-at-build-time=kotlinx.coroutines.internal.LockFreeTaskQueueCore,kotlinx.coroutines.DefaultExecutorKt,kotlinx.coroutines.DefaultExecutor,kotlinx.coroutines.internal.LimitedDispatcher,kotlinx.coroutines.DebugKt,kotlinx.coroutines.scheduling.CoroutineScheduler,kotlinx.coroutines.CoroutineStart${'$'}WhenMappings""")
+            buildArgs.add("""--initialize-at-build-time=kotlinx.coroutines.internal.LockFreeTaskQueueCore,kotlinx.coroutines.DefaultExecutorKt,kotlinx.coroutines.DefaultExecutor,kotlinx.coroutines.internal.LimitedDispatcher,kotlinx.coroutines.DebugKt,kotlinx.coroutines.scheduling.CoroutineScheduler,kotlinx.coroutines.CoroutineStart${"$"}WhenMappings""")
             buildArgs.add("--initialize-at-build-time=ch.qos.logback")
 //            buildArgs.add("--initialize-at-build-time=io.ktor,kotlin")
             buildArgs.add("--initialize-at-build-time=kotlinx.coroutines.scheduling.TasksKt")
