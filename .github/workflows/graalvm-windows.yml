@@ -47,9 +47,17 @@ jobs:
       #
       - name: Build with Gradle 8.9
         run: gradle build
+        env:
+          MAVEN_PASSWORD: ${{secrets.MAVEN_PASSWORD}}
+          MAVEN_REPOSITORY: ${{secrets.MAVEN_REPOSITORY}}
+          MAVEN_USERNAME: ${{secrets.MAVEN_USERNAME}}
       - name: Run a gradle script
         run: |
           gradle nativeCompile
+          env:
+            MAVEN_PASSWORD: ${{secrets.MAVEN_PASSWORD}}
+            MAVEN_REPOSITORY: ${{secrets.MAVEN_REPOSITORY}}
+            MAVEN_USERNAME: ${{secrets.MAVEN_USERNAME}}
       - name: "Tar files"
         run: |
           cd  build/native/nativeCompile
