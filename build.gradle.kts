@@ -17,7 +17,7 @@ plugins {
     kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "8.3.5"
 //    id("io.ktor.plugin") version "3.0.1"
-    id("org.graalvm.buildtools.native") version "0.10.3"
+    id("org.graalvm.buildtools.native") version "0.10.4"
     id("maven-publish")
 }
 apply {
