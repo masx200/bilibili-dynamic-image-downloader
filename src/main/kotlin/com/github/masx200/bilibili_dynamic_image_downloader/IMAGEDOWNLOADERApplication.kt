@@ -2,6 +2,7 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 
 import com.github.masx200.biliClient.BiliClientFactor
 import com.github.masx200.biliClient.model.dynamic.Dynamic
+import com.github.masx200.biliClient.model.dynamic.Picture
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 import com.xenomachina.argparser.mainBody
@@ -96,20 +97,22 @@ fun processDynamicItems(
         // 根据idsWriter是否为null决定动态ID的输出方式
         if (idsWriter != null) {
             // 将动态ID写入文件
-            idsWriter.write("https://t.bilibili.com/" + item.data.dynamic_id.toString())
+            idsWriter.write("https://t.bilibili.com/" + item.data!!.dynamic_id.toString())
             idsWriter.newLine()
         } else {
             // 如果没有提供idsWriter，则将动态ID输出到控制台
-            println("https://t.bilibili.com/" + item.data.dynamic_id)
+            println("https://t.bilibili.com/" + item.data!!.dynamic_id)
         }
 
         // 输出当前处理的动态项
         println(item)
         if (item.essay != null) {
-            item.essay.origin_image_urls.forEach { url ->
+            item.essay!!.origin_image_urls!!.forEach { url ->
                 if (imagesWriter != null) {
                     // 将图片链接写入文件
-                    imagesWriter.write(url)
+                    if (url != null) {
+                        imagesWriter.write(url)
+                    }
                     imagesWriter.newLine()
                 } else {
                     // 如果没有提供imagesWriter，则将图片链接输出到控制台
@@ -123,16 +126,19 @@ fun processDynamicItems(
             // 如果动态项包含文章信息，则处理图片链接
 
             // 如果动态项包含图片信息，则处理图片链接
-            if (item.detail.pictures != null) {
+            if (item.detail!!.pictures != null) {
                 // 遍历动态项中的图片链接
-                item.detail.pictures.forEach { picture ->
+                (item.detail!!.pictures as Iterable<Picture?>).forEach { picture ->
+                    val str = picture!!.img_src
                     if (imagesWriter != null) {
                         // 将图片链接写入文件
-                        imagesWriter.write(picture.img_src)
+                        if (str != null) {
+                            imagesWriter.write(str)
+                        }
                         imagesWriter.newLine()
                     } else {
                         // 如果没有提供imagesWriter，则将图片链接输出到控制台
-                        println(picture.img_src)
+                        println(str)
                     }
                 }
             }
@@ -174,7 +180,7 @@ fun getDynamicSequence(options: MyArgs): Sequence<Dynamic> {
         val endwith_dynamic_id = options.endwith_dynamic_id
 
         val client = BiliClientFactor.getClient { requestBase ->
-            requestBase.setHeader("cookie", cookie)
+            requestBase!!.setHeader("cookie", cookie)
         }
         var offset: String = offset_dynamic_id
         var hasMore = true
@@ -186,14 +192,14 @@ fun getDynamicSequence(options: MyArgs): Sequence<Dynamic> {
             //System.out.println(list)
 //            System.out.println("是还有动态--> " + (list.hasMore == 1))
 //            System.out.println("nextOffset--> " + (list.nextOffset))
-            hasMore = list.hasMore == 1
+            hasMore = list.hasMore == 1L
             offset = list.nextOffset.toString()
             // 动态集合
             val items = list.items
 //            System.out.println(items)
             if (items.isNotEmpty()) {
                 for (item in items) {
-                    val dynamicId = item.data.dynamic_id
+                    val dynamicId = item!!.data!!.dynamic_id
 
                     if (endwith_dynamic_id != "" && (dynamicId.toString() == endwith_dynamic_id || dynamicId.toString()
                             .toLong() < endwith_dynamic_id.toLong())
