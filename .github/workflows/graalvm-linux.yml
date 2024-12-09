@@ -6,9 +6,9 @@ name: gradle graalvm native image linux
 on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -37,7 +37,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
           components: "native-image"
-#      - run: java -version
+      #      - run: java -version
       # Runs a set of commands using the runners shell
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
@@ -51,12 +51,12 @@ jobs:
           MAVEN_REPOSITORY: ${{secrets.MAVEN_REPOSITORY}}
           MAVEN_USERNAME: ${{secrets.MAVEN_USERNAME}}
       - name: Run a gradle script
-        run: |
-          gradle nativeCompile
-          env:
-            MAVEN_PASSWORD: ${{secrets.MAVEN_PASSWORD}}
-            MAVEN_REPOSITORY: ${{secrets.MAVEN_REPOSITORY}}
-            MAVEN_USERNAME: ${{secrets.MAVEN_USERNAME}}
+        env:
+          MAVEN_PASSWORD: ${{secrets.MAVEN_PASSWORD}}
+          MAVEN_REPOSITORY: ${{secrets.MAVEN_REPOSITORY}}
+          MAVEN_USERNAME: ${{secrets.MAVEN_USERNAME}}
+        run: gradle nativeCompile
+
       - name: "Tar files"
         run: |
           cd  build/native/nativeCompile
