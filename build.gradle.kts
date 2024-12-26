@@ -140,3 +140,18 @@ graalvmNative {
     }
 }
 
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            // 强制使用特定版本的依赖
+            force("ch.qos.logback:logback-core:1.5.13")
+
+            // 或者你可以使用每个依赖的 group 和 version
+            eachDependency {
+                if (requested.group == "ch.qos.logback" && requested.name == "logback-core") {
+                    useVersion("1.5.13")
+                }
+            }
+        }
+    }
+}
