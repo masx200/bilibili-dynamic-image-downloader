@@ -41,6 +41,7 @@ usage: bilibili-dynamic-image-downloader [-h] -c COOKIE -u HOST_UID
                                          [-e ENDWITH_DYNAMIC_ID]
                                          [-d FILE_DYNAMIC_IDS]
                                          [-i FILE_DYNAMIC_IMAGES]
+                                         [-s DOWNLOAD_STATE_FILE]
 
 required arguments:
   -c COOKIE, --cookie COOKIE                  cookie
@@ -62,16 +63,33 @@ optional arguments:
 
   -i FILE_DYNAMIC_IMAGES,                     file_dynamic_images
   --file_dynamic_images FILE_DYNAMIC_IMAGES
+  
+  -s DOWNLOAD_STATE_FILE,                     download_state_file
+  --download_state_file DOWNLOAD_STATE_FILE  
 ```
 
-参数 COOKIE 是bilibili账号的cookie
+参数 `COOKIE` 是bilibili账号的cookie
 
-参数 HOST_UID是指定要下载的up主，即bilibili账号的uid
+参数 `HOST_UID`是指定要下载的up主，即bilibili账号的uid
 
-参数 offset_dynamic_id是指定从此id之后的动态，不包含此id的动态
+参数 `offset_dynamic_id`是指定从此id之后的动态，不包含此id的动态
 
-参数 endwith_dynamic_id是指定到此id之前的动态，不包含此id的动态
+参数 `endwith_dynamic_id`是指定到此id之前的动态，不包含此id的动态
 
-参数 file_dynamic_ids是指定一个文件，文件中每行一个动态id，在文件中写入动态id
+参数 `file_dynamic_ids`是指定一个文件，文件中每行一个动态id，在文件中写入动态id
 
-参数 file_dynamic_images是指定一个文件，文件中每行一个动态图片，在文件中写入动态图片地址
+参数 `file_dynamic_images`是指定一个文件，文件中每行一个动态图片，在文件中写入动态图片地址
+
+参数 `download_state_file` 是指定一个文件,使用sqlite格式，保存了下载进度的成功和失败的记录
+
+## 状态保存功能
+
+由于可能因为网络卡顿,或者被服务器反爬限速, 导致程序中断。
+
+程序支持状态保存功能，可以在程序中断后恢复下载进度。状态信息会保存到 `DOWNLOAD_STATE_FILE`参数指定的文件，例如为
+`download_state.sqlite` 文件中。
+
+### 使用方法
+
+1. 运行程序时，程序会自动读取之前保存的状态文件。
+2. 下载过程中，程序会定期保存当前的状态到文件中。
