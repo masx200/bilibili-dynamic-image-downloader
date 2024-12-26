@@ -106,6 +106,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.xenomachina/kotlin-argparser
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
+    implementation("ch.qos.logback:logback-core:1.5.13")
 
 }
 tasks.named<JavaExec>("run") {
