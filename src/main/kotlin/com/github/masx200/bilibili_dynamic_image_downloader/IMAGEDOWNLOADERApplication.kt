@@ -1,5 +1,6 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
+import com.github.masx200.biliClient.model.dynamic.Dynamic
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 
@@ -20,17 +21,25 @@ fun main(args: Array<String>) {
      */
     fun printmyargs(options: MyArgs) {
 
-        println(options.toString())
+        println("args:" + options.toString())
 
     }
     println("bilibili-dynamic-image-downloader")
-    println(args.contentToString())
+    println("args:" + args.contentToString())
     mainBody("bilibili-dynamic-image-downloader") {
 
         // Creates a Netty server
         ArgParser(args).parseInto(::MyArgs).run {
             printmyargs(this)
-            val iteritems = getDynamicSequence(this)
+
+
+            val iteritems: Sequence<Dynamic> =
+                if (this.download_state_file != "") {
+
+
+                    getDynamicSequenceWithDOWNLOAD_STATE_FILE(this)
+                } else {
+                    getDynamicSequence(this); }
 
             val (idsWriter, imagesWriter) = createWriteStreamsIfNotEmpty(file_dynamic_ids, file_dynamic_images)
 
@@ -48,6 +57,5 @@ fun main(args: Array<String>) {
     }
 
 }
-
 
 

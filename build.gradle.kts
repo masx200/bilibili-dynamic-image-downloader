@@ -103,7 +103,7 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
     implementation("org.apache.httpcomponents:httpcore:4.4.16")
     testImplementation(kotlin("test"))
-
+    implementation("org.xerial:sqlite-jdbc:3.36.0.3")
     // https://mvnrepository.com/artifact/com.xenomachina/kotlin-argparser
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
     implementation("ch.qos.logback:logback-core:1.5.13")

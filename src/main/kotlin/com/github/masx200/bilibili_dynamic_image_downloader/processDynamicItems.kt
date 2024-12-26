@@ -21,6 +21,8 @@ fun processDynamicItems(
     idsWriter: BufferedWriter? = null,
     imagesWriter: BufferedWriter? = null
 ) {
+
+
     // 遍历动态项目序列
     for (item in iteritems) {
 
@@ -38,16 +40,17 @@ fun processDynamicItems(
         println(item)
         if (item.essay != null) {
             item.essay!!.origin_image_urls!!.forEach { url ->
-                if (imagesWriter != null) {
-                    // 将图片链接写入文件
-                    if (url != null) {
-                        imagesWriter.write(url)
-                    }
-                    imagesWriter.newLine()
-                } else {
-                    // 如果没有提供imagesWriter，则将图片链接输出到控制台
-                    println(url)
-                }
+                url?.let { printorwriteimageurl(it, imagesWriter) }
+//                if (imagesWriter != null) {
+//                    // 将图片链接写入文件
+//                    if (url != null) {
+//                        imagesWriter.write(url)
+//                    }
+//                    imagesWriter.newLine()
+//                } else {
+//                    // 如果没有提供imagesWriter，则将图片链接输出到控制台
+//                    println(url)
+//                }
             }
         }
         // 如果动态项的详细信息不为空，则进一步处理
@@ -57,19 +60,28 @@ fun processDynamicItems(
 
             // 如果动态项包含图片信息，则处理图片链接
             if (item.detail!!.pictures != null) {
-                // 遍历动态项中的图片链接
-                (item.detail!!.pictures as Iterable<Picture?>).forEach { picture ->
-                    val str = picture!!.img_src
-                    if (imagesWriter != null) {
-                        // 将图片链接写入文件
-                        if (str != null) {
-                            imagesWriter.write(str)
-                        }
-                        imagesWriter.newLine()
-                    } else {
-                        // 如果没有提供imagesWriter，则将图片链接输出到控制台
-                        println(str)
+                val pictures = item.detail!!.pictures
+
+
+                if (pictures is Iterable<Picture?>) {
+                    pictures.forEach { picture ->
+                        val str = picture!!.img_src
+
+                        str?.let { printorwriteimageurl(it, imagesWriter) }
                     }
+                // 遍历动态项中的图片链接
+//                (item.detail!!.pictures as Iterable<Picture?>)
+
+//                    if (imagesWriter != null) {
+//                        // 将图片链接写入文件
+//                        if (str != null) {
+//                            imagesWriter.write(str)
+//                        }
+//                        imagesWriter.newLine()
+//                    } else {
+//                        // 如果没有提供imagesWriter，则将图片链接输出到控制台
+//                        println(str)
+//                    }
                 }
             }
         }
