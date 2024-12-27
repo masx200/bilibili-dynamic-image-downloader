@@ -35,8 +35,8 @@ fun getDynamicSequence(options: MyArgs): Sequence<Dynamic> {
             //System.out.println(list)
 //            System.out.println("是还有动态--> " + (list.hasMore == 1))
 //            System.out.println("nextOffset--> " + (list.nextOffset))
-            hasMore = list?.hasMore == 1L
-            offset = list?.nextOffset.toString()
+            hasMore = list?.has_more== 1L
+            offset = list?.next_offset.toString()
             // 动态集合
             val items = list?.items
 //            System.out.println(items)
