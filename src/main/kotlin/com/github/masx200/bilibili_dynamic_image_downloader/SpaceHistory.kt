@@ -9,10 +9,11 @@ class SpaceHistory(consumer: (SpaceHistory) -> Unit) :
     var userId: String? = null
 
     @Column(index = true)
-    var dynamicId: String? = null
+    var dynamicType: Long? = null
 
     @Column(index = true)
-    var earliestDynamicId: String? = null
+    var dynamicId: String? = null
+
 
     // Kotlin主构造函数可以直接初始化父类
     init {
@@ -20,6 +21,8 @@ class SpaceHistory(consumer: (SpaceHistory) -> Unit) :
     }
 
     override fun toString(): String {
-        return "SpaceHistory(userId=$userId, dynamicId=$dynamicId, earliestDynamicId=$earliestDynamicId)"
+        return "SpaceHistory(userId=$userId, dynamicId=$dynamicId, dynamicType=$dynamicType)"
     }
 }
+
+
