@@ -9,13 +9,13 @@ class DynamicRanges(consumer: (DynamicRanges) -> Unit) :
     var userId: String? = null
 
     @Column(index = true)
-    var ENDWITH_DYNAMIC_ID: String? = null
+    var ENDWITH_DYNAMIC_ID: Long? = null
 
     @Column(index = true)
-    var offset_dynamic_id: String? = null
+    var offset_dynamic_id: Long? = null
 
     @Column(index = true)
-    var earliestDynamicId: String? = null
+    var earliestDynamicId: Long? = null
 
     // Kotlin主构造函数可以直接初始化父类
     init {

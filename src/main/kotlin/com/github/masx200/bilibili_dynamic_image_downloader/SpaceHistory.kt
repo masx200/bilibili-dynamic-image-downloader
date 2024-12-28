@@ -12,7 +12,7 @@ class SpaceHistory(consumer: (SpaceHistory) -> Unit) :
     var dynamicType: Long? = null
 
     @Column(index = true)
-    var dynamicId: String? = null
+    var dynamicId: Long? = null
 
 
     // Kotlin主构造函数可以直接初始化父类

@@ -6,7 +6,7 @@ import com.github.artbits.jsqlite.DataSupport
 class DynamicPictures(consumer: (DynamicPictures) -> Unit) :
     DataSupport<DynamicPictures>(consumer as ((DynamicPictures) -> Unit)?) {
     @Column(index = true)
-    var dynamicId: String? = null
+    var dynamicId: Long? = null
 
     @Column(index = true)
     var pictureSrc: String? = null

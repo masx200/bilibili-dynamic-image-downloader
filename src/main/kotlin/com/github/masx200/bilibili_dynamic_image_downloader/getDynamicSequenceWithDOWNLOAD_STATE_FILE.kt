@@ -18,7 +18,14 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs) {
             SpaceHistory::class.java, DynamicPictures::class.java,
             DynamicRanges::class.java
         )
+//        db.findOne<DynamicRanges>(DynamicRanges::class.java){
+//
+//        }
 //全量同步
+//        修改DynamicRanges
+//        val dynamicRanges = db.select<DynamicRanges>().where {
+//            DynamicRanges::userId.eq(options.host_uid)
+//        }.toList()
         //增量同步
     }
 
