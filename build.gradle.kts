@@ -5,7 +5,7 @@ val artifact_id = "bilibili-dynamic-image-downloader"
 val logback_version: String by project
 val org_gradle_jvmargs: String by project
 group = "com.github.masx200"
-version = "1.2.0"
+version = "2.2.0"
 tasks.named<ShadowJar>("shadowJar") {
     manifest {
         attributes["Main-Class"] = "com.github.masx200.bilibili_dynamic_image_downloader.IMAGEDOWNLOADERApplicationKt"

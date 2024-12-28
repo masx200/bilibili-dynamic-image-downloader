@@ -10,6 +10,8 @@ class DynamicPictures(consumer: (DynamicPictures) -> Unit) :
 
     @Column(index = true)
     var pictureSrc: String? = null
+    @Column(index = true)
+    var userId: String? = null
 
     // Kotlin主构造函数可以直接初始化父类
     init {
@@ -17,6 +19,6 @@ class DynamicPictures(consumer: (DynamicPictures) -> Unit) :
     }
 
     override fun toString(): String {
-        return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc)"
+        return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc, userId=$userId)"
     }
 }
