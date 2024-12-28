@@ -25,4 +25,12 @@ class DynamicRanges(consumer: (DynamicRanges) -> Unit) :
     override fun toString(): String {
         return "DynamicRanges(userId=$userId, ENDWITH_DYNAMIC_ID=$ENDWITH_DYNAMIC_ID, earliestDynamicId=$earliestDynamicId, offset_dynamic_id=$offset_dynamic_id)"
     }
+
+    companion object {
+        const val userId = "userId"
+        const val ENDWITH_DYNAMIC_ID = "ENDWITH_DYNAMIC_ID"
+        const val earliestDynamicId = "earliestDynamicId"
+        const val offset_dynamic_id =
+            "offset_dynamic_id"
+    }
 }

@@ -24,4 +24,11 @@ class DynamicPictures(consumer: (DynamicPictures) -> Unit) :
     override fun toString(): String {
         return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc, userId=$userId, dynamicType=$dynamicType)"
     }
+
+    companion object {
+        const val dynamicId = "dynamicId"
+        const val pictureSrc = "pictureSrc"
+        const val userId = "userId"
+        const val dynamicType = "dynamicType"
+    }
 }

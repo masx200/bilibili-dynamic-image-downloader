@@ -23,6 +23,13 @@ class SpaceHistory(consumer: (SpaceHistory) -> Unit) :
     override fun toString(): String {
         return "SpaceHistory(userId=$userId, dynamicId=$dynamicId, dynamicType=$dynamicType)"
     }
+
+    companion object {
+        const val userId = "userId"
+        const val dynamicId = "dynamicId"
+        const val dynamicType = "dynamicType"
+
+    }
 }
 
 
