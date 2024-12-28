@@ -10,6 +10,7 @@ class DynamicPictures(consumer: (DynamicPictures) -> Unit) :
 
     @Column(index = true)
     var pictureSrc: String? = null
+
     @Column(index = true)
     var userId: String? = null
 

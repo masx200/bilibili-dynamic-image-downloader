@@ -69,7 +69,7 @@ fun processDynamicItems(
 
                         str?.let { printorwriteimageurl(it, imagesWriter) }
                     }
-                // 遍历动态项中的图片链接
+                    // 遍历动态项中的图片链接
 //                (item.detail!!.pictures as Iterable<Picture?>)
 
 //                    if (imagesWriter != null) {

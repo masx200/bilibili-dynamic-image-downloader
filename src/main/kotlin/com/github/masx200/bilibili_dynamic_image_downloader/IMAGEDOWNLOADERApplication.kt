@@ -20,11 +20,11 @@ fun main(args: Array<String>) {
      */
     fun printmyargs(options: MyArgs) {
 
-        println("args:"  + options.toString())
+        println("args:" + options.toString())
 
     }
     println("bilibili-dynamic-image-downloader")
-    println("args:" + "Array:"+ args.contentToString())
+    println("args:" + "Array:" + args.contentToString())
     mainBody("bilibili-dynamic-image-downloader") {
 
         // Creates a Netty server

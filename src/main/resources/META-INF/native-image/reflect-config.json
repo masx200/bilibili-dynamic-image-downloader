@@ -1,6 +1,7 @@
 [
   {
-    "name": "com.github.masx200.biliClient.BiliResult",  "allPublicConstructors": true
+    "name": "com.github.masx200.biliClient.BiliResult",
+    "allPublicConstructors": true
   },
   {
     "name": "kotlin.reflect.KTypeProjection"
