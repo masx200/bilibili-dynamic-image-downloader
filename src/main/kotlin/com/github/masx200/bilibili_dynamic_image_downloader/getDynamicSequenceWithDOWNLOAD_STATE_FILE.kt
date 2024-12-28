@@ -18,7 +18,8 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs) {
             SpaceHistory::class.java, DynamicPictures::class.java,
             DynamicRanges::class.java
         )
-
+//全量同步
+        //增量同步
     }
 
 

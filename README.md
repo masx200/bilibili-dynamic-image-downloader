@@ -16,20 +16,31 @@ gradle shadowJar
 
 #### 使用说明
 
-```shell
-java   -jar "bilibili-dynamic-image-downloader-all.jar" "--cookie=*****=****" "--host_uid=********" -o "*****"
-```
+[//]: # (```shell)
+
+[//]: # (java   -jar "bilibili-dynamic-image-downloader-all.jar" "--cookie=*****=****" "--host_uid=********" -o "*****")
+
+[//]: # (```)
+
+[//]: # ()
+
+[//]: # (```shell)
+
+[//]: # (java   -jar "bilibili-dynamic-image-downloader-all.jar"    -c "*****=*****"  -u "*********" -d "./file_dynamic_ids.txt" -i "./file_dynamic_images.txt")
+
+[//]: # (```)
 
 ```shell
-java   -jar "bilibili-dynamic-image-downloader-all.jar"    -c "*****=*****"  -u "*********" -d "./file_dynamic_ids.txt" -i "./file_dynamic_images.txt"
-```
+java   -jar "bilibili-dynamic-image-downloader-all.jar" "--cookie=*****=****" "--host_uid=********" -s "*****"  -o "*****" -e "*****"
+````
+
 
 ## Running
 
 Execute this command to run this sample:
 
 ```bash
-./gradlew run --args="--cookie=*****=**** --host_uid=******** -o *****"
+./gradlew run --args="--cookie=*****=**** --host_uid=******** -o *****   -s *****"
 ```
 
 # Usage
@@ -39,16 +50,16 @@ bilibili-dynamic-image-downloader
 usage: bilibili-dynamic-image-downloader [-h] -c COOKIE -u HOST_UID
                                          [-o OFFSET_DYNAMIC_ID]
                                          [-e ENDWITH_DYNAMIC_ID]
-                                
-                                         [-s DOWNLOAD_STATE_FILE]
+                                         -s DOWNLOAD_STATE_FILE
 
 required arguments:
   -c COOKIE, --cookie COOKIE                  cookie
 
   -u HOST_UID, --host_uid HOST_UID            host_uid
 
- -s DOWNLOAD_STATE_FILE,                     download_state_file
-  --download_state_file DOWNLOAD_STATE_FILE  
+  -s DOWNLOAD_STATE_FILE,                     download_state_file
+  --download_state_file DOWNLOAD_STATE_FILE
+
 
 optional arguments:
   -h, --help                                  show this help message and exit
