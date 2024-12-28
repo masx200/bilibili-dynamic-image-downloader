@@ -43,6 +43,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs) {
         }
 
     } finally {
+//        println(  data1.connector())
         data1.connector().close()
     }
 //    Database.close
