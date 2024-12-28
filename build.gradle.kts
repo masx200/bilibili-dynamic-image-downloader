@@ -64,7 +64,13 @@ repositories {
         }
     }
 }
+repositories {
+    maven { url = uri("https://www.jitpack.io") }
+}
 
+dependencies {
+    implementation("com.github.artbits:sqlite-java:1.0.8")
+}
 dependencies {
 
     implementation("com.alibaba.fastjson2:fastjson2:2.0.53")
@@ -81,7 +87,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.16")
 
     // https://mvnrepository.com/artifact/cn.hll520.linclient/bilibiliclient
-    implementation("com.github.masx200:bilibiliclient:1.5.0")
+    implementation("com.github.masx200:bilibiliclient:1.5.1")
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

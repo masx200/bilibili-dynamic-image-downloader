@@ -1,6 +1,5 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
-import com.github.masx200.biliClient.model.dynamic.Dynamic
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 
@@ -21,7 +20,7 @@ fun main(args: Array<String>) {
      */
     fun printmyargs(options: MyArgs) {
 
-        println("args:" + options.toString())
+        println("args:" + "Array:" + options.toString())
 
     }
     println("bilibili-dynamic-image-downloader")
@@ -33,25 +32,26 @@ fun main(args: Array<String>) {
             printmyargs(this)
 
 
-            val iteritems: Sequence<Dynamic> =
-                if (this.download_state_file != "") {
+//            val iteritems: Sequence<Dynamic> =
+//                if (this.download_state_file != "") {
+//
 
-
-                    getDynamicSequenceWithDOWNLOAD_STATE_FILE(this)
-                } else {
-                    getDynamicSequence(this); }
-
-            val (idsWriter, imagesWriter) = createWriteStreamsIfNotEmpty(file_dynamic_ids, file_dynamic_images)
-
-            if (idsWriter != null && imagesWriter != null) {
-                idsWriter.use { idsWriter ->
-                    imagesWriter.use { imagesWriter ->
-                        processDynamicItems(iteritems, idsWriter, imagesWriter)
-                    }
-                }
-            } else {
-                processDynamicItems(iteritems)
-            }
+            return@run getDynamicSequenceWithDOWNLOAD_STATE_FILE(this)
+//                } else {
+//                    TODO()
+//                    getDynamicSequence(this); }
+//
+////            val (idsWriter, imagesWriter) = createWriteStreamsIfNotEmpty(file_dynamic_ids, file_dynamic_images)
+//
+//            if (idsWriter != null && imagesWriter != null) {
+//                idsWriter.use { idsWriter ->
+//                    imagesWriter.use { imagesWriter ->
+//                        processDynamicItems(iteritems, idsWriter, imagesWriter)
+//                    }
+//                }
+//            } else {
+//                processDynamicItems(iteritems)
+//            }
 
         }
     }

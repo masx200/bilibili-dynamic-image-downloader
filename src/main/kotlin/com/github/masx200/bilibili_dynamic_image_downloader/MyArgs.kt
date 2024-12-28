@@ -30,18 +30,20 @@ class MyArgs(parser: ArgParser) {
         help = "endwith_dynamic_id"
     ).default("")
 
-    val file_dynamic_ids by parser.storing(
-        "-d", "--file_dynamic_ids", help = "file_dynamic_ids"
-    ).default("")
-    val file_dynamic_images by parser.storing(
-        "-i", "--file_dynamic_images", help = "file_dynamic_images"
-    ).default("")
+    //    val file_dynamic_ids by parser.storing(
+//        "-d", "--file_dynamic_ids", help = "file_dynamic_ids"
+//    ).default("")
+//    val file_dynamic_images by parser.storing(
+//        "-i", "--file_dynamic_images", help = "file_dynamic_images"
+//    ).default("")
     val download_state_file: String by parser.storing(
         "-s", "--download_state_file", help = "download_state_file"
-    ).default("")
+    )//.default("")
 
     override fun toString(): String {
-        return "MyArgs(cookie='$cookie', host_uid='$host_uid', offset_dynamic_id='$offset_dynamic_id', endwith_dynamic_id='$endwith_dynamic_id', file_dynamic_ids='$file_dynamic_ids', file_dynamic_images='$file_dynamic_images', download_state_file='$download_state_file')"
+        return "MyArgs(cookie='$cookie', host_uid='$host_uid', offset_dynamic_id='$offset_dynamic_id', endwith_dynamic_id='$endwith_dynamic_id', " +
+//        file_dynamic_ids='$file_dynamic_ids', file_dynamic_images='$file_dynamic_images',
+                "download_state_file='$download_state_file')"
     }
 
 }
