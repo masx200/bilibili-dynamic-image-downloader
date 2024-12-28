@@ -69,6 +69,9 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.jetbrains.exposed/exposed-core
+    implementation("org.jetbrains.exposed:exposed-core:0.57.0")
+
     implementation("com.github.artbits:sqlite-java:1.0.8")
 }
 dependencies {

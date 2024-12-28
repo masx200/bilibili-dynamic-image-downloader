@@ -26,10 +26,12 @@ class DynamicPictures(consumer: (DynamicPictures) -> Unit) :
         return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc, userId=$userId, dynamicType=$dynamicType)"
     }
 
-    companion object {
-        const val dynamicId = "dynamicId"
-        const val pictureSrc = "pictureSrc"
-        const val userId = "userId"
-        const val dynamicType = "dynamicType"
-    }
+
+}
+
+object DynamicPicturesSchema : DataSupportTable() {
+    val dynamicId = long("dynamicId")
+    val pictureSrc = text("pictureSrc")
+    val userId = text("userId")
+    val dynamicType = long("dynamicType")
 }

@@ -1,5 +1,4 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
-
 import com.github.artbits.jsqlite.Column
 import com.github.artbits.jsqlite.DataSupport
 
@@ -26,11 +25,14 @@ class DynamicRanges(consumer: (DynamicRanges) -> Unit) :
         return "DynamicRanges(userId=$userId, ENDWITH_DYNAMIC_ID=$ENDWITH_DYNAMIC_ID, earliestDynamicId=$earliestDynamicId, offset_dynamic_id=$offset_dynamic_id)"
     }
 
-    companion object {
-        const val userId = "userId"
-        const val ENDWITH_DYNAMIC_ID = "ENDWITH_DYNAMIC_ID"
-        const val earliestDynamicId = "earliestDynamicId"
-        const val offset_dynamic_id =
-            "offset_dynamic_id"
-    }
+
+}
+
+object DynamicRangesSchema : DataSupportTable() {
+    val userId = text("userId")
+    val ENDWITH_DYNAMIC_ID = long("ENDWITH_DYNAMIC_ID")
+    val earliestDynamicId = long("earliestDynamicId")
+    val offset_dynamic_id = long(
+        "offset_dynamic_id"
+    )
 }

@@ -24,12 +24,13 @@ class SpaceHistory(consumer: (SpaceHistory) -> Unit) :
         return "SpaceHistory(userId=$userId, dynamicId=$dynamicId, dynamicType=$dynamicType)"
     }
 
-    companion object {
-        const val userId = "userId"
-        const val dynamicId = "dynamicId"
-        const val dynamicType = "dynamicType"
 
-    }
 }
 
 
+object SpaceHistorySchema : DataSupportTable() {
+    val userId = text("userId")
+    val dynamicId = long("dynamicId")
+    val dynamicType = long("dynamicType")
+
+}
