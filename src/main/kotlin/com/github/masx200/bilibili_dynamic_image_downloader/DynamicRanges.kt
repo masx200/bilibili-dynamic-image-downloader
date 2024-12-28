@@ -28,11 +28,3 @@ class DynamicRanges(consumer: (DynamicRanges) -> Unit) :
 
 }
 
-object DynamicRangesSchema : DataSupportTable() {
-    val userId = text("userId")
-    val ENDWITH_DYNAMIC_ID = long("ENDWITH_DYNAMIC_ID")
-    val earliestDynamicId = long("earliestDynamicId")
-    val offset_dynamic_id = long(
-        "offset_dynamic_id"
-    )
-}

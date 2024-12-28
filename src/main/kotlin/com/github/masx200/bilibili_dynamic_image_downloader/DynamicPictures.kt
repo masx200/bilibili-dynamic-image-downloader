@@ -29,9 +29,3 @@ class DynamicPictures(consumer: (DynamicPictures) -> Unit) :
 
 }
 
-object DynamicPicturesSchema : DataSupportTable() {
-    val dynamicId = long("dynamicId")
-    val pictureSrc = text("pictureSrc")
-    val userId = text("userId")
-    val dynamicType = long("dynamicType")
-}

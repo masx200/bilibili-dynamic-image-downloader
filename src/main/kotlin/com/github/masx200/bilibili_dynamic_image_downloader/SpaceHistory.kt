@@ -28,9 +28,3 @@ class SpaceHistory(consumer: (SpaceHistory) -> Unit) :
 }
 
 
-object SpaceHistorySchema : DataSupportTable() {
-    val userId = text("userId")
-    val dynamicId = long("dynamicId")
-    val dynamicType = long("dynamicType")
-
-}
