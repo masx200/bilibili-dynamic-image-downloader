@@ -94,6 +94,12 @@ internal class Core(path: String) : DB {
                         reflect.getDBColumnsWithType(BiConsumer { column: String?, type: String? ->
                             classColumns.put(column!!, type!!)
                         })
+//                        println(
+//                            dbColumns
+//                        )
+//                        println(
+//                            classColumns
+//                        )
                         if (tableColumnTypeMap == null) {
                             statement.executeUpdate(SQLTemplate.create(tClass))
                         } else {

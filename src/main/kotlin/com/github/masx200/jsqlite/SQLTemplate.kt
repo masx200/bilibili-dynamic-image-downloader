@@ -131,26 +131,27 @@ internal object SQLTemplate {
         return String.format(format, *objects)
     }
 
-    fun alterTableColumn(string: String, string1: String?, string2: String?): String? {
-        println(
-            """
-                alterTableColumn()
-                string: $string
-                string1: $string1
-                string2: $string2
-                """.trimIndent()
-        )
-        TODO()
+    fun alterTableColumn(table_name: String, column_name: String?, column_type: String?): String? {
+        return "alter table $table_name alter column $column_name $column_type"
+//        println(
+//            """
+//                alterTableColumn()
+//                string: $string
+//                string1: $string1
+//                string2: $string2
+//                """.trimIndent()
+//        )
+//        TODO()
     }
 
-    fun dropTableColumn(p0: String, p1: String): String? {
-        println(
-            """
-                dropTableColumn()
-                p0: $p0
-                p1: $p1
-                """.trimIndent()
-        )
-        TODO()
+    fun dropTableColumn(table_name: String, column_name: String): String? {
+//        println(
+//            """
+//                dropTableColumn()
+//                p0: $table_name
+//                p1: $column_name
+//                """.trimIndent()
+//        )
+        return "ALTER TABLE $table_name DROP COLUMN $column_name;"
     }
 }
