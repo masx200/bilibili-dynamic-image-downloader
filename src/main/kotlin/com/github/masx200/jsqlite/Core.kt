@@ -107,6 +107,7 @@ internal class Core(path: String) : DB {
                         if (tableColumnTypeMap == null) {
                             statement.executeUpdate(SQLTemplate.create(tClass))
                         } else {
+//                            println(tableColumnTypeMap)
                             reflect.getDBColumnsWithType { column: String?, type: String? ->
 
                                 if (tableColumnTypeMap.getOrDefault(column, null) == null) {
