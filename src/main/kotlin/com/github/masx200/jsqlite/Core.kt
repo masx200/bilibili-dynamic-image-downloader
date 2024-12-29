@@ -27,11 +27,17 @@ import java.sql.SQLException
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Consumer
-data class TableInfo(
+
+data class TableReflectResult(
+    var tableInfo: TableReflectInfo,
+    var reflectInfo: TableReflectInfo
+)
+data class TableReflectInfo(
     val tablesMapTypes: HashMap<String?, HashMap<String?, String?>?>,
     val tablesMapPrimaryKeys: HashMap<String?, String?>,
     val tablesMapisAutoIncrement: HashMap<String?, HashMap<String?, Boolean?>?>,
-    val indexMap: HashMap<String?, String?>
+    val indexMapColumns: HashMap<String?, String?>,
+    val indexMapTables: HashMap<String?, String?>
 )
 internal class Core(path: String) : DB {
     private val lock = ReentrantLock()
