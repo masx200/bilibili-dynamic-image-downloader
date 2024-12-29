@@ -1,7 +1,8 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
 //import java.sql.DriverManager
-import com.github.artbits.jsqlite.DB
+//import com.github.masx200.jsqlite.DB.connect
+import com.github.masx200.jsqlite.DB.connect
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -11,7 +12,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs) {
     var data1 = Database.connect("jdbc:sqlite:$dbFile", "org.sqlite.JDBC")
 //    println(data1)
     try {
-        val db2 = DB.connect(dbFile)
+        val db2 = connect(dbFile)
 //        db2.findOne<DynamicRanges>( DynamicRanges::class.java,"dynamicranges.userId = '10013290'")
 //        println(db2)
 //

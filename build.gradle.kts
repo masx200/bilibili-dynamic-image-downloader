@@ -13,6 +13,7 @@ tasks.named<ShadowJar>("shadowJar") {
     }
 }
 plugins {
+    id("java")
     id("application")
     kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "8.3.5"
@@ -51,7 +52,24 @@ afterEvaluate {
 application {
     mainClass.set("com.github.masx200.bilibili_dynamic_image_downloader.IMAGEDOWNLOADERApplicationKt")
 }
-
+sourceSets {
+    main {
+        java {
+            setSrcDirs(listOf("src/main/kotlin"))
+        }
+        resources {
+            setSrcDirs(listOf("src/main/resources"))
+        }
+    }
+    test {
+        java {
+            setSrcDirs(listOf("src/test/kotlin"))
+        }
+        resources {
+            setSrcDirs(listOf("src/test/resources"))
+        }
+    }
+}
 repositories {
     mavenCentral()
     gradlePluginPortal()
@@ -69,6 +87,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.google.code.gson:gson:2.10.1")
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     implementation("org.xerial:sqlite-jdbc:3.47.1.0")
 // https://mvnrepository.com/artifact/org.jetbrains.exposed/exposed-jdbc
@@ -77,7 +96,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.exposed/exposed-core
     implementation("org.jetbrains.exposed:exposed-core:0.57.0")
 
-    implementation("com.github.artbits:sqlite-java:1.0.8")
+//    implementation("com.github.artbits:sqlite-java:1.0.8")
 }
 dependencies {
 
@@ -154,6 +173,9 @@ graalvmNative {
     }
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
 allprojects {
     configurations.all {
         resolutionStrategy {

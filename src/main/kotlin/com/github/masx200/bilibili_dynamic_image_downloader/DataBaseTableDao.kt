@@ -1,7 +1,7 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
-import com.github.artbits.jsqlite.DB
-import com.github.artbits.jsqlite.DataSupport
+import com.github.masx200.jsqlite.DB
+import com.github.masx200.jsqlite.DataSupport
 //import com.sun.tools.javac.tree.TreeInfo.args
 import org.jetbrains.exposed.sql.Op
 

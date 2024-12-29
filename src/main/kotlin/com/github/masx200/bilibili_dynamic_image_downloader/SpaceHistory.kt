@@ -1,8 +1,10 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
-import com.github.artbits.jsqlite.Column
-import com.github.artbits.jsqlite.DataSupport
+import com.github.masx200.jsqlite.Column
+import com.github.masx200.jsqlite.DataSupport
+import com.github.masx200.jsqlite.Table
 
+@Table(name = "spacehistory")
 class SpaceHistory(consumer: (SpaceHistory) -> Unit) :
     DataSupport<SpaceHistory>(consumer as ((SpaceHistory) -> Unit)?) {
     @Column(index = true)
