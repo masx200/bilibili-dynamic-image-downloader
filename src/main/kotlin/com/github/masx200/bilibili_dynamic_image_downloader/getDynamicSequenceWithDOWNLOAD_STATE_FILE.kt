@@ -4,7 +4,6 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 //import com.github.masx200.jsqlite.DB.connect
 import com.github.masx200.jsqlite.DB.connect
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs) {
@@ -35,10 +34,14 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs) {
 //        }.toList()
             //增量同步
             transaction(data1) {
-                println(dynamicRangesTable.findOne(Op.build {
+                println(dynamicRangesTable.findOne({
                     (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
 //eq()
                 }))
+//                println(dynamicRangesTable.findOne(Op.build {
+//                    (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
+////eq()
+//                }))
 //
             }
         }
