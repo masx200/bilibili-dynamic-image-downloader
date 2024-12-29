@@ -28,10 +28,6 @@ import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Consumer
 
-data class TableReflectResult(
-    var tableInfo: TableReflectInfo,
-    var reflectInfo: TableReflectInfo
-)
 data class TableReflectInfo(
     val tablesMapTypes: HashMap<String?, HashMap<String?, String?>?>,
     val tablesMapPrimaryKeys: HashMap<String?, String?>,
@@ -148,6 +144,8 @@ internal class Core(path: String) : DB {
                             }
                         }
                     }
+                    val indexMapColumnsTemp=indexMapColumns.toMutableMap()
+
                     for (tClass in classes) {
                         val tableName = getTableNameFromClass(tClass)
                         val tableColumnTypeMap = tablesMapTypes.getOrDefault(tableName, null)
@@ -212,7 +210,6 @@ internal class Core(path: String) : DB {
                             }
                         }
 
-                        val indexMapColumnsTemp=indexMapColumns.toMutableMap()
 
                         reflect.getIndexList { index: String?, column: String? ->
                             try {
