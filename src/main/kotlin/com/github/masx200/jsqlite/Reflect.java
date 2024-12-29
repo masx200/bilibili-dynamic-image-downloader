@@ -16,6 +16,7 @@
 
 package com.github.masx200.jsqlite;
 
+import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
 import java.lang.reflect.Field;
@@ -63,7 +64,7 @@ final class Reflect<T> {
             } catch (NoSuchMethodException e) {
                 // 如果没有无参构造函数，则使用带 Consumer 参数的构造函数
                 try {
-                    t = tClass.getConstructor(Function1.class).newInstance((Function1<T, Object>) (c -> null));
+                    t = tClass.getConstructor(Function1.class).newInstance((Function1<T, Unit>) (c -> Unit.INSTANCE));
                 } catch (NoSuchMethodException e2) {
                     t = tClass.getConstructor(Consumer.class).newInstance((Consumer<T>) (c -> {
                     }));
