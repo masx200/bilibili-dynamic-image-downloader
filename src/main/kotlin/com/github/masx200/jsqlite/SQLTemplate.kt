@@ -42,7 +42,7 @@ internal object SQLTemplate {
     }
 
     fun drop(tClass: Class<*>): String {
-        return `$`("drop table %s;", tClass.getSimpleName().lowercase(Locale.getDefault()))
+        return `$`("drop table %s;", getTableNameFromClass(tClass))
     }
 
     fun <T> insert(t: T?): String {
@@ -56,12 +56,12 @@ internal object SQLTemplate {
         })
         columnsString.deleteCharAt(columnsString.length - 1)
         valueString.deleteCharAt(valueString.length - 1)
-        val tableName = t!!.javaClass.getSimpleName().lowercase(Locale.getDefault())
+        val tableName = getTableNameFromClass(t!!.javaClass)
         return `$`("insert into %s (%s) values (%s);", tableName, columnsString, valueString)
     }
 
     fun <T> update(t: T?, options: Options): String {
-        val tableName = t!!.javaClass.getSimpleName().lowercase(Locale.getDefault())
+        val tableName = getTableNameFromClass(t!!.javaClass)
         val whereString = if (options.wherePredicate != null) `$`("where %s ", options.wherePredicate) else ""
         val setString = StringBuffer()
         Reflect<T?>(t).getDBColumnsWithValue(BiConsumer { column: String?, value: Any? ->
@@ -80,7 +80,7 @@ internal object SQLTemplate {
     }
 
     fun <T> delete(tClass: Class<T?>, options: Options): String {
-        val deleteString = `$`("delete from %s ", tClass.getSimpleName().lowercase(Locale.getDefault()))
+        val deleteString = `$`("delete from %s ", getTableNameFromClass(tClass))
         val whereString = if (options.wherePredicate != null) `$`("where %s ", options.wherePredicate) else ""
         val SQLBuilder = StringBuilder()
         return SQLBuilder
@@ -117,7 +117,7 @@ internal object SQLTemplate {
     }
 
     fun <T> query(tClass: Class<T?>, options: Options?): String {
-        return query<Any?>(tClass.getSimpleName().lowercase(Locale.getDefault()), options)
+        return query<Any?>(getTableNameFromClass(tClass), options)
     }
 
     fun createIndex(tClass: Class<*>, column: String?): String {
