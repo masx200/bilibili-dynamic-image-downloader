@@ -34,15 +34,43 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs) {
 //        }.toList()
             //增量同步
             transaction(data1) {
-                println(dynamicRangesTable.findOne({
+//                println(DynamicRanges())
+                val oldranges = (dynamicRangesTable.findOne {
                     (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
 //eq()
-                }))
+                })
+                println(oldranges)
+                if (oldranges == null) {
+                    dynamicRangesTable.insert(DynamicRanges {
+                        it.userId = options.host_uid
+                        if (options.endwith_dynamic_id != "") {
+                            it.ENDWITH_DYNAMIC_ID = options.endwith_dynamic_id.toLong()
+                        }
+                        if (options.offset_dynamic_id != "") {
+                            it.offset_dynamic_id = options.offset_dynamic_id.toLong()
+                        }
+
+                    })
+
+                } else {
+//                    println(oldranges)
+                    if (options.offset_dynamic_id != "") {
+                        oldranges.offset_dynamic_id = options.offset_dynamic_id.toLong()
+                    }
+                    if (options.endwith_dynamic_id != "") {
+                        oldranges.ENDWITH_DYNAMIC_ID = options.endwith_dynamic_id.toLong()
+                    }
+                    dynamicRangesTable.update(oldranges)
+                }
 //                println(dynamicRangesTable.findOne(Op.build {
 //                    (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
 ////eq()
 //                }))
 //
+                println((dynamicRangesTable.findOne {
+                    (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
+//eq()
+                }))
             }
         }
 

@@ -5,8 +5,10 @@ import com.github.masx200.jsqlite.DataSupport
 import com.github.masx200.jsqlite.Table
 
 @Table(name = "dynamicpictures")
-class DynamicPictures(consumer: (DynamicPictures) -> Unit) :
-    DataSupport<DynamicPictures>(consumer as ((DynamicPictures) -> Unit)?) {
+class DynamicPictures(consumer: ((DynamicPictures) -> Unit)) :
+    DataSupport<DynamicPictures>(consumer) {
+    constructor() : this({})
+
     @Column(index = true)
     var dynamicId: Long? = null
 
@@ -25,7 +27,7 @@ class DynamicPictures(consumer: (DynamicPictures) -> Unit) :
     }
 
     override fun toString(): String {
-        return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc, userId=$userId" + ")"
+        return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc, userId=$userId" + ")" + super.toString()
 //                ", dynamicType=$dynamicType)"
     }
 

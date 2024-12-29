@@ -9,7 +9,9 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder
 class DataBaseTableDao<T : DataSupport<T>>(
     var database: DB, var entityClass: Class<T>,
 ) {
-
+    fun insert(data1: T) {
+        database.insert<T>(data1)
+    }
     fun findOne(id: Long): T? {
 
         return database.findOne<T>(entityClass, id)
@@ -24,4 +26,13 @@ class DataBaseTableDao<T : DataSupport<T>>(
 //        println(predicate)
         return database.findOne<T>(entityClass, predicate)
     }
+
+    // 新增的 update 方法
+    fun update(data: T) {
+        if (data.id == null) {
+            throw IllegalArgumentException("The entity must have an id to be updated.")
+        }
+        database.update(data)
+    }
+
 }

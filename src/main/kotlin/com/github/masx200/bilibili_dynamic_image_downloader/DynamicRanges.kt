@@ -5,8 +5,10 @@ import com.github.masx200.jsqlite.DataSupport
 import com.github.masx200.jsqlite.Table
 
 @Table(name = "dynamicranges")
-class DynamicRanges(consumer: (DynamicRanges) -> Unit) :
-    DataSupport<DynamicRanges>(consumer as ((DynamicRanges) -> Unit)?) {
+class DynamicRanges(consumer: ((DynamicRanges) -> Unit)) :
+    DataSupport<DynamicRanges>(consumer) {
+    constructor() : this({})
+
     @Column(index = true)
     var userId: String? = null
 
@@ -25,7 +27,7 @@ class DynamicRanges(consumer: (DynamicRanges) -> Unit) :
     }
 
     override fun toString(): String {
-        return "DynamicRanges(userId=$userId, ENDWITH_DYNAMIC_ID=$ENDWITH_DYNAMIC_ID, earliestDynamicId=$earliestDynamicId, offset_dynamic_id=$offset_dynamic_id)"
+        return "DynamicRanges(userId=$userId, ENDWITH_DYNAMIC_ID=$ENDWITH_DYNAMIC_ID, earliestDynamicId=$earliestDynamicId, offset_dynamic_id=$offset_dynamic_id)" + super.toString()
     }
 
 

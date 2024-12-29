@@ -5,8 +5,10 @@ import com.github.masx200.jsqlite.DataSupport
 import com.github.masx200.jsqlite.Table
 
 @Table(name = "spacehistory")
-class SpaceHistory(consumer: (SpaceHistory) -> Unit) :
-    DataSupport<SpaceHistory>(consumer as ((SpaceHistory) -> Unit)?) {
+class SpaceHistory(consumer: ((SpaceHistory) -> Unit)) :
+    DataSupport<SpaceHistory>(consumer) {
+    constructor() : this({})
+
     @Column(index = true)
     var userId: String? = null
 
@@ -23,7 +25,7 @@ class SpaceHistory(consumer: (SpaceHistory) -> Unit) :
     }
 
     override fun toString(): String {
-        return "SpaceHistory(userId=$userId, dynamicId=$dynamicId, dynamicType=$dynamicType)"
+        return "SpaceHistory(userId=$userId, dynamicId=$dynamicId, dynamicType=$dynamicType)" + super.toString()
     }
 
 

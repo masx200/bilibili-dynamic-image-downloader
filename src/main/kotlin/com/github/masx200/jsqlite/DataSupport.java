@@ -23,9 +23,12 @@ import static com.github.masx200.jsqlite.Core.gson;
 
 public class DataSupport<T> {
 
-    Long id;
-    Long createdAt;
-    Long updatedAt;
+    public Long id;
+    public Long createdAt;
+    public Long updatedAt;
+
+    public DataSupport() {
+    }
 
     public DataSupport(Consumer<T> consumer) {
         Optional.of(consumer).ifPresent(c -> c.accept((T) this));
@@ -56,4 +59,12 @@ public class DataSupport<T> {
         System.out.println(toJson());
     }
 
+    @Override
+    public String toString() {
+        return "DataSupport{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

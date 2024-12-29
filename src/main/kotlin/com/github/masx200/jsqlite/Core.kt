@@ -26,7 +26,6 @@ import java.sql.DriverManager
 import java.sql.SQLException
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
-import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 internal class Core(path: String) : DB {
@@ -81,7 +80,7 @@ internal class Core(path: String) : DB {
                                 val index = set.getString("INDEX_NAME")
                                 val column = set.getString("COLUMN_NAME")
                                 Optional.ofNullable<String?>(index)
-                                    .ifPresent(Consumer { i: String? -> indexMap.put(index, column) })
+                                    .ifPresent({ i: String? -> indexMap.put(index, column) })
                             }
                         }
                     }
@@ -91,7 +90,7 @@ internal class Core(path: String) : DB {
                         val dbColumns = tableColumnTypeMap?.keys?.toSet()
                         val reflect: Reflect<*> = Reflect<Any?>(tClass)
                         val classColumns = mutableMapOf<String, String>()
-                        reflect.getDBColumnsWithType(BiConsumer { column: String?, type: String? ->
+                        reflect.getDBColumnsWithType({ column: String?, type: String? ->
                             classColumns.put(column!!, type!!)
                         })
 //                        println(
@@ -103,7 +102,7 @@ internal class Core(path: String) : DB {
                         if (tableColumnTypeMap == null) {
                             statement.executeUpdate(SQLTemplate.create(tClass))
                         } else {
-                            reflect.getDBColumnsWithType(BiConsumer { column: String?, type: String? ->
+                            reflect.getDBColumnsWithType({ column: String?, type: String? ->
 
                                 if (tableColumnTypeMap.getOrDefault(column, null) == null) {
                                     try {
@@ -130,7 +129,7 @@ internal class Core(path: String) : DB {
                                 }
                             }
                         }
-                        reflect.getIndexList(BiConsumer { index: String?, column: String? ->
+                        reflect.getIndexList({ index: String?, column: String? ->
                             try {
                                 if (indexMap.get(index) != null) {
                                     indexMap.remove(index, column)
@@ -250,7 +249,7 @@ internal class Core(path: String) : DB {
     override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, consumer: Consumer<Options?>?): MutableList<T?> {
         val options = if (consumer != null) Options() else null
         Optional.ofNullable<Consumer<Options?>?>(consumer)
-            .ifPresent(Consumer { c: Consumer<Options?>? -> c!!.accept(options) })
+            .ifPresent({ c: Consumer<Options?>? -> c!!.accept(options) })
         val sql = SQLTemplate.query<T?>(tClass, options)
         try {
             connection!!.createStatement().use { statement ->
@@ -258,12 +257,13 @@ internal class Core(path: String) : DB {
                     val list: MutableList<T?> = ArrayList<T?>()
                     while (resultSet.next()) {
                         val t = Reflect.toEntity<T?>(tClass, options, resultSet)
-                        Optional.ofNullable<T?>(t).ifPresent(Consumer { e: T? -> list.add(e) })
+                        Optional.ofNullable<T?>(t).ifPresent({ e: T? -> list.add(e) })
                     }
                     return list
                 }
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             throw RuntimeException(e)
         }
     }
@@ -271,7 +271,7 @@ internal class Core(path: String) : DB {
     override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, ids: MutableList<Long?>?): MutableList<T?> {
         val builder = StringBuilder(ids.toString())
         builder.deleteCharAt(0).deleteCharAt(builder.length - 1)
-        return find<T?>(tClass, Consumer { options: Options? -> options!!.where("id in(?)", builder) })
+        return find<T?>(tClass, { options: Options? -> options!!.where("id in(?)", builder) })
     }
 
     override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, vararg ids: Long?): MutableList<T?> {
@@ -283,7 +283,7 @@ internal class Core(path: String) : DB {
     }
 
     override fun <T : DataSupport<T?>?> findOne(tClass: Class<T?>, predicate: String?, vararg args: Any?): T? {
-        val list = find<T?>(tClass, Consumer { options: Options? -> options!!.where(predicate, *args) })
+        val list = find<T?>(tClass, { options: Options? -> options!!.where(predicate, *args) })
         return if (!list.isEmpty()) list.get(0) else null
     }
 
@@ -294,7 +294,7 @@ internal class Core(path: String) : DB {
     override fun <T : DataSupport<T?>?> first(tClass: Class<T?>, predicate: String?, vararg args: Any?): T? {
         val list = find<T?>(
             tClass,
-            Consumer { options: Options? -> options!!.where(predicate, *args).order("id", Options.ASC) })
+            { options: Options? -> options!!.where(predicate, *args).order("id", Options.ASC) })
         return if (!list.isEmpty()) list.get(0) else null
     }
 
@@ -305,7 +305,7 @@ internal class Core(path: String) : DB {
     override fun <T : DataSupport<T?>?> last(tClass: Class<T?>, predicate: String?, vararg args: Any?): T? {
         val list = find<T?>(
             tClass,
-            Consumer { options: Options? -> options!!.where(predicate, *args).order("id", Options.DESC) })
+            { options: Options? -> options!!.where(predicate, *args).order("id", Options.DESC) })
         return if (!list.isEmpty()) list.get(0) else null
     }
 

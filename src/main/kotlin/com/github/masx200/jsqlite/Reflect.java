@@ -16,6 +16,8 @@
 
 package com.github.masx200.jsqlite;
 
+import kotlin.jvm.functions.Function1;
+
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.util.HashMap;
@@ -53,8 +55,21 @@ final class Reflect<T> {
                     columnsMap.put(column, true);
                 }
             }
-            T t = tClass.getConstructor(Consumer.class).newInstance((Consumer<T>) (c -> {
-            }));
+            T t;
+            try {
+                // 尝试使用无参构造函数创建对象
+                t = tClass.getConstructor().newInstance();
+            } catch (NoSuchMethodException e) {
+                // 如果没有无参构造函数，则使用带 Consumer 参数的构造函数
+                try {
+                    t = tClass.getConstructor(Function1.class).newInstance((Function1<T, Object>) (c -> null));
+                } catch (NoSuchMethodException e2) {
+                    t = tClass.getConstructor(Consumer.class).newInstance((Consumer<T>) (c -> {
+                    }));
+                }
+
+            }
+
             Reflect<T> reflect = new Reflect<>(t);
             for (Field field : reflect.fieldMap.values()) {
                 String name = field.getName();
@@ -98,6 +113,7 @@ final class Reflect<T> {
             }
             return reflect.get();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
