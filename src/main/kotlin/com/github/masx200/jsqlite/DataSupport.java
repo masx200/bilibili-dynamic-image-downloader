@@ -22,8 +22,32 @@ import java.util.function.Consumer;
 import static com.github.masx200.jsqlite.Core.gson;
 
 public class DataSupport<T> {
-
+    @Column(autoIncrement = true, primaryKey = true)
     public Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
     public Long createdAt;
     public Long updatedAt;
 

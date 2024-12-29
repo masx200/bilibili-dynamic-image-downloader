@@ -9,6 +9,8 @@ class SpaceHistory(consumer: ((SpaceHistory) -> Unit)) :
     DataSupport<SpaceHistory>(consumer) {
     constructor() : this({})
 
+    //    @Column(autoIncrement = true, primaryKey = true)
+//    var id: Long? = null;
     @Column(index = true)
     var userId: String? = null
 

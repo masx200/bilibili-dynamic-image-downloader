@@ -9,6 +9,9 @@ class DynamicRanges(consumer: ((DynamicRanges) -> Unit)) :
     DataSupport<DynamicRanges>(consumer) {
     constructor() : this({})
 
+    //
+//    @Column(autoIncrement = true, primaryKey = true)
+//    var id: Long? = null;
     @Column(index = true)
     var userId: String? = null
 

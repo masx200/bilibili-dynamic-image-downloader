@@ -13,5 +13,8 @@ public @interface Column {
 
     boolean ignore() default false;
 
+    boolean primaryKey() default false;
     boolean json() default false;
+
+    boolean autoIncrement() default false;
 }

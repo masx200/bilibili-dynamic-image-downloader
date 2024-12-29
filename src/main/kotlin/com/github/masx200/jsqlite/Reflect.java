@@ -120,6 +120,21 @@ final class Reflect<T> {
         }
     }
 
+    static boolean isPrimaryKey(Field field) {
+        if (field.isAnnotationPresent(Column.class)) {
+            Column column = field.getAnnotation(Column.class);
+            return column.primaryKey();
+        }
+        return false;
+    }
+
+    static boolean isAutoIncrement(Field field) {
+        if (field.isAnnotationPresent(Column.class)) {
+            Column column = field.getAnnotation(Column.class);
+            return column.autoIncrement();
+        }
+        return false;
+    }
     static boolean isIgnore(Field field) {
         if (field.isAnnotationPresent(Column.class)) {
             Column column = field.getAnnotation(Column.class);
@@ -159,7 +174,7 @@ final class Reflect<T> {
                 field.setAccessible(true);
                 // 忽略静态字段
                 if (!isIgnore(field) && (!Modifier.isStatic(field.getModifiers()))) {
-                    fieldMap.put(field.getName().toLowerCase(), field);
+                    fieldMap.putIfAbsent(field.getName().toLowerCase(), field);
                 }
             }
             clazz = clazz.getSuperclass();

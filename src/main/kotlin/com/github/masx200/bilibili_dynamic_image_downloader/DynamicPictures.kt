@@ -9,6 +9,9 @@ class DynamicPictures(consumer: ((DynamicPictures) -> Unit)) :
     DataSupport<DynamicPictures>(consumer) {
     constructor() : this({})
 
+    //
+//    @Column(autoIncrement = true, primaryKey = true)
+//    var id: Long? = null;
     @Column(index = true)
     var dynamicId: Long? = null
 

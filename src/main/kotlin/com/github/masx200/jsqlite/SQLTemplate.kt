@@ -18,13 +18,36 @@
  */
 package com.github.masx200.jsqlite
 
+import com.github.masx200.jsqlite.Reflect.isAutoIncrement
+import com.github.masx200.jsqlite.Reflect.isPrimaryKey
 import java.util.*
 import java.util.function.BiConsumer
 
 internal object SQLTemplate {
     fun create(tClass: Class<*>): String {
-        val columnsString = StringBuffer("id integer primary key,")
-        Reflect<Any?>(tClass).getDBColumnsWithType(BiConsumer { column: String?, type: String? ->
+
+
+        val reflect = Reflect<Any?>(tClass)
+//        println(reflect.fieldMap)
+//        reflect.fieldMap.forEach { (key, value) ->
+//            println("$key -> $value,isPrimaryKey:${isPrimaryKey(value)}")
+//
+//            println("$key -> $value,isAutoIncrement:${isAutoIncrement(value)}")
+//
+//        }
+        val field = reflect.fieldMap["id"]
+        val columnsString = StringBuffer(
+            "id integer " + when {
+
+                isPrimaryKey(field) -> "primary key"
+                else -> ""
+            } + " " + when {
+
+                isAutoIncrement(field) -> "autoincrement"
+                else -> ""
+            } + ","
+        )
+        reflect.getDBColumnsWithType(BiConsumer { column: String?, type: String? ->
             if (column != "id") {
                 columnsString.append(column).append(" ").append(type).append(",")
             }
