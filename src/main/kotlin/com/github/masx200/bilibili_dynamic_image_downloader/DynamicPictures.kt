@@ -3,10 +3,11 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 import com.github.masx200.jsqlite.Column
 import com.github.masx200.jsqlite.DataSupport
 import com.github.masx200.jsqlite.Table
+import java.util.function.Consumer
 
 @Table(name = "dynamicpictures")
 class DynamicPictures(consumer: ((DynamicPictures) -> Unit)) :
-    DataSupport<DynamicPictures>(consumer) {
+    DataSupport<DynamicPictures>(Consumer(consumer)) {
     constructor() : this({})
 
     //

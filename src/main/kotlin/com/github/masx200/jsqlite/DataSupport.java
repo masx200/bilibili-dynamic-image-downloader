@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 import static com.github.masx200.jsqlite.Core.gson;
 
-public class DataSupport<T> {
+public class DataSupport<T extends DataSupport<T>> {
     @Column(autoIncrement = true, primaryKey = true)
     public Long id;
 
@@ -54,10 +54,13 @@ public class DataSupport<T> {
     public DataSupport() {
     }
 
+    @SuppressWarnings("unchecked")
     public DataSupport(Consumer<T> consumer) {
+
         Optional.of(consumer).ifPresent(c -> c.accept((T) this));
     }
 
+    @SuppressWarnings("unchecked")
     public final T set(Consumer<T> consumer) {
         consumer.accept((T) this);
         return (T) this;
