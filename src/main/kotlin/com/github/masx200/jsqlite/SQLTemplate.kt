@@ -144,7 +144,7 @@ internal object SQLTemplate {
 //                string2: $string2
 //                """.trimIndent()
 //        )
-//        TODO()
+//
     }
 
     fun dropTableColumn(table_name: String, column_name: String): String? {
