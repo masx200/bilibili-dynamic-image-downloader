@@ -19,6 +19,7 @@ package com.github.masx200.jsqlite;
 import kotlin.jvm.functions.Function1;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -155,7 +156,8 @@ final class Reflect<T> {
         while (clazz != null) {
             for (Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
-                if (!isIgnore(field)) {
+                // 忽略静态字段
+                if (!isIgnore(field) && (!Modifier.isStatic(field.getModifiers()))) {
                     fieldMap.put(field.getName().toLowerCase(), field);
                 }
             }

@@ -28,6 +28,15 @@ class DataBaseTableDao<T : DataSupport<T>>(
     }
 
     // 新增的 update 方法
+    fun update(data: T, block: SqlExpressionBuilder.() -> Op<Boolean>) {
+        val condition = Op.build(block)
+
+//        println(database)
+//        println(entityClass)
+        val predicate = condition.toString() //
+        database.update(data, predicate)
+    }
+    // 新增的 update 方法
     fun update(data: T) {
         if (data.id == null) {
             throw IllegalArgumentException("The entity must have an id to be updated.")
