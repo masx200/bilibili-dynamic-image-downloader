@@ -69,7 +69,7 @@ internal class Core(path: String) : DB {
                         val tableName = result.getString("name")
                         metaData.getColumns(null, null, tableName, null).use { set ->
                             while (set.next()) {
-                                val column = set.getString("COLUMN_NAME")
+                                val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
                                 val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
                                 tableColumnTypeMap.put(column, type)
                             }
@@ -80,7 +80,12 @@ internal class Core(path: String) : DB {
                                 val index = set.getString("INDEX_NAME")
                                 val column = set.getString("COLUMN_NAME")
                                 Optional.ofNullable<String?>(index)
-                                    .ifPresent({ i: String? -> indexMap.put(index, column) })
+                                    .ifPresent { i: String? ->
+                                        indexMap.put(
+                                            index.lowercase(Locale.getDefault()),
+                                            column.lowercase(Locale.getDefault())
+                                        )
+                                    }
                             }
                         }
                     }
@@ -90,9 +95,9 @@ internal class Core(path: String) : DB {
                         val dbColumns = tableColumnTypeMap?.keys?.toSet()
                         val reflect: Reflect<*> = Reflect<Any?>(tClass)
                         val classColumns = mutableMapOf<String, String>()
-                        reflect.getDBColumnsWithType({ column: String?, type: String? ->
+                        reflect.getDBColumnsWithType { column: String?, type: String? ->
                             classColumns.put(column!!, type!!)
-                        })
+                        }
 //                        println(
 //                            dbColumns
 //                        )
@@ -102,24 +107,41 @@ internal class Core(path: String) : DB {
                         if (tableColumnTypeMap == null) {
                             statement.executeUpdate(SQLTemplate.create(tClass))
                         } else {
-                            reflect.getDBColumnsWithType({ column: String?, type: String? ->
+                            reflect.getDBColumnsWithType { column: String?, type: String? ->
 
                                 if (tableColumnTypeMap.getOrDefault(column, null) == null) {
                                     try {
-                                        statement.executeUpdate(SQLTemplate.addTableColumn(tableName, column, type))
+                                        column?.let {
+                                            statement.executeUpdate(
+                                                SQLTemplate.addTableColumn(
+                                                    tableName,
+                                                    it,
+                                                    type
+                                                )
+                                            )
+                                        }
                                     } catch (e: SQLException) {
+                                        e.printStackTrace()
                                         throw RuntimeException(e)
                                     }
                                 }
 //检查列类型并修改：在遍历类的列时，如果数据库中的列类型与类中的列类型不同，则执行 alterTableColumn 操作来修改列类型。
                                 else if (tableColumnTypeMap[column] != type) {
                                     try {
-                                        statement.executeUpdate(SQLTemplate.alterTableColumn(tableName, column, type))
+                                        column?.let {
+                                            statement.executeUpdate(
+                                                SQLTemplate.alterTableColumn(
+                                                    tableName,
+                                                    it,
+                                                    type
+                                                )
+                                            )
+                                        }
                                     } catch (e: SQLException) {
                                         throw RuntimeException(e)
                                     }
                                 }
-                            })
+                            }
 //                            删除多余字段：在遍历数据库中的列时，如果数据库中的列在类中不存在，则执行 dropTableColumn 操作来删除该列。
                             dbColumns?.filter { !classColumns.contains(it) }?.forEach { column ->
                                 try {
@@ -129,7 +151,7 @@ internal class Core(path: String) : DB {
                                 }
                             }
                         }
-                        reflect.getIndexList({ index: String?, column: String? ->
+                        reflect.getIndexList { index: String?, column: String? ->
                             try {
                                 if (indexMap.get(index) != null) {
                                     indexMap.remove(index, column)
@@ -139,7 +161,7 @@ internal class Core(path: String) : DB {
                             } catch (e: SQLException) {
                                 throw RuntimeException(e)
                             }
-                        })
+                        }
                     }
                     indexMap.forEach { (index: String?, _: String?) ->
                         try {
@@ -151,6 +173,7 @@ internal class Core(path: String) : DB {
                 }
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             throw RuntimeException(e)
         }
     }
@@ -249,7 +272,7 @@ internal class Core(path: String) : DB {
     override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, consumer: Consumer<Options?>?): MutableList<T?> {
         val options = if (consumer != null) Options() else null
         Optional.ofNullable<Consumer<Options?>?>(consumer)
-            .ifPresent({ c: Consumer<Options?>? -> c!!.accept(options) })
+            .ifPresent { c: Consumer<Options?>? -> c!!.accept(options) }
         val sql = SQLTemplate.query<T?>(tClass, options)
         try {
             connection!!.createStatement().use { statement ->
@@ -257,7 +280,7 @@ internal class Core(path: String) : DB {
                     val list: MutableList<T?> = ArrayList<T?>()
                     while (resultSet.next()) {
                         val t = Reflect.toEntity<T?>(tClass, options, resultSet)
-                        Optional.ofNullable<T?>(t).ifPresent({ e: T? -> list.add(e) })
+                        Optional.ofNullable<T?>(t).ifPresent { e: T? -> list.add(e) }
                     }
                     return list
                 }
@@ -271,7 +294,7 @@ internal class Core(path: String) : DB {
     override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, ids: MutableList<Long?>?): MutableList<T?> {
         val builder = StringBuilder(ids.toString())
         builder.deleteCharAt(0).deleteCharAt(builder.length - 1)
-        return find<T?>(tClass, { options: Options? -> options!!.where("id in(?)", builder) })
+        return find<T?>(tClass) { options: Options? -> options!!.where("id in(?)", builder) }
     }
 
     override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, vararg ids: Long?): MutableList<T?> {
@@ -283,7 +306,7 @@ internal class Core(path: String) : DB {
     }
 
     override fun <T : DataSupport<T?>?> findOne(tClass: Class<T?>, predicate: String?, vararg args: Any?): T? {
-        val list = find<T?>(tClass, { options: Options? -> options!!.where(predicate, *args) })
+        val list = find<T?>(tClass) { options: Options? -> options!!.where(predicate, *args) }
         return if (!list.isEmpty()) list.get(0) else null
     }
 
@@ -293,8 +316,8 @@ internal class Core(path: String) : DB {
 
     override fun <T : DataSupport<T?>?> first(tClass: Class<T?>, predicate: String?, vararg args: Any?): T? {
         val list = find<T?>(
-            tClass,
-            { options: Options? -> options!!.where(predicate, *args).order("id", Options.ASC) })
+            tClass
+        ) { options: Options? -> options!!.where(predicate, *args).order("id", Options.ASC) }
         return if (!list.isEmpty()) list.get(0) else null
     }
 
@@ -304,8 +327,8 @@ internal class Core(path: String) : DB {
 
     override fun <T : DataSupport<T?>?> last(tClass: Class<T?>, predicate: String?, vararg args: Any?): T? {
         val list = find<T?>(
-            tClass,
-            { options: Options? -> options!!.where(predicate, *args).order("id", Options.DESC) })
+            tClass
+        ) { options: Options? -> options!!.where(predicate, *args).order("id", Options.DESC) }
         return if (!list.isEmpty()) list.get(0) else null
     }
 

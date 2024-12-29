@@ -156,7 +156,7 @@ final class Reflect<T> {
             for (Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
                 if (!isIgnore(field)) {
-                    fieldMap.put(field.getName(), field);
+                    fieldMap.put(field.getName().toLowerCase(), field);
                 }
             }
             clazz = clazz.getSuperclass();
@@ -165,7 +165,7 @@ final class Reflect<T> {
 
     void setValue(String fieldName, Object value) {
         try {
-            Field field = fieldMap.getOrDefault(fieldName, null);
+            Field field = fieldMap.getOrDefault(fieldName.toLowerCase(), null);
             if (field != null) {
                 field.set(t, value);
             }
@@ -176,7 +176,7 @@ final class Reflect<T> {
 
     Object getValue(String fieldName) {
         try {
-            Field field = fieldMap.getOrDefault(fieldName, null);
+            Field field = fieldMap.getOrDefault(fieldName.toLowerCase(), null);
             return (field != null) ? field.get(t) : null;
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -184,12 +184,12 @@ final class Reflect<T> {
     }
 
     Class<?> getType(String fieldName) {
-        Field field = fieldMap.getOrDefault(fieldName, null);
+        Field field = fieldMap.getOrDefault(fieldName.toLowerCase(), null);
         return field.getType();
     }
 
     String getDatabaseType(String fieldName) {
-        switch (getType(fieldName).getSimpleName().toLowerCase()) {
+        switch (getType(fieldName.toLowerCase()).getSimpleName().toLowerCase()) {
             case "int":
             case "integer":
             case "byte":
@@ -212,7 +212,7 @@ final class Reflect<T> {
 
     Object getDBValue(Field field) {
         try {
-            String fieldName = field.getName();
+            String fieldName = field.getName().toLowerCase();
             Field dbField = fieldMap.getOrDefault(fieldName, null);
             Object dbValue = (dbField != null) ? dbField.get(t) : null;
             if (dbField != null && dbValue != null) {
@@ -243,10 +243,10 @@ final class Reflect<T> {
     void getDBColumnsWithType(BiConsumer<String, String> consumer) {
         for (Field field : fieldMap.values()) {
             if (isJson(field)) {
-                consumer.accept(field.getName(), "text");
+                consumer.accept(field.getName().toLowerCase(), "text");
                 continue;
             }
-            consumer.accept(field.getName(), getDatabaseType(field.getName()));
+            consumer.accept(field.getName().toLowerCase(), getDatabaseType(field.getName()));
         }
     }
 
@@ -254,7 +254,7 @@ final class Reflect<T> {
         String table = getTableNameFromClass(tClass);
         fieldMap.values().forEach(field -> {
             if (isIndex(field)) {
-                String column = field.getName();
+                String column = field.getName().toLowerCase();
                 String index = String.format("idx_%s_%s", table, column);
                 consumer.accept(index, column);
             }

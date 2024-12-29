@@ -13,7 +13,7 @@ class DynamicRanges(consumer: ((DynamicRanges) -> Unit)) :
     var userId: String? = null
 
     @Column(index = true)
-    var ENDWITH_DYNAMIC_ID: Long? = null
+    var endwith_dynamic_id: Long? = null
 
     @Column(index = true)
     var offset_dynamic_id: Long? = null
@@ -27,7 +27,7 @@ class DynamicRanges(consumer: ((DynamicRanges) -> Unit)) :
     }
 
     override fun toString(): String {
-        return "DynamicRanges(userId=$userId, ENDWITH_DYNAMIC_ID=$ENDWITH_DYNAMIC_ID, earliestDynamicId=$earliestDynamicId, offset_dynamic_id=$offset_dynamic_id)" + super.toString()
+        return "DynamicRanges(userId=$userId, endwith_dynamic_id=$endwith_dynamic_id, earliestDynamicId=$earliestDynamicId, offset_dynamic_id=$offset_dynamic_id)" + super.toString()
     }
 
 

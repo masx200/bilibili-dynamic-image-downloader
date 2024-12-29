@@ -34,8 +34,11 @@ internal object SQLTemplate {
         return `$`("create table %s (%s);", tableName, columnsString)
     }
 
-    fun addTableColumn(tableName: String?, column: String?, type: String?): String {
-        return `$`("alter table %s add column %s %s;", tableName, column, type)
+    fun addTableColumn(tableName: String?, column: String, type: String?): String {
+//        if (column != null) {
+        return `$`("alter table %s add column %s %s;", tableName, column.lowercase(Locale.getDefault()), type)
+//        }
+//        throw IllegalArgumentException("column can not be null")
     }
 
     fun drop(tClass: Class<*>): String {
@@ -131,8 +134,8 @@ internal object SQLTemplate {
         return String.format(format, *objects)
     }
 
-    fun alterTableColumn(table_name: String, column_name: String?, column_type: String?): String? {
-        return "alter table $table_name alter column $column_name $column_type"
+    fun alterTableColumn(table_name: String, column_name: String, column_type: String?): String? {
+        return "alter table $table_name alter column ${column_name.lowercase(Locale.getDefault())} $column_type"
 //        println(
 //            """
 //                alterTableColumn()
@@ -152,6 +155,6 @@ internal object SQLTemplate {
 //                p1: $column_name
 //                """.trimIndent()
 //        )
-        return "ALTER TABLE $table_name DROP COLUMN $column_name;"
+        return "ALTER TABLE $table_name DROP COLUMN ${column_name.lowercase(Locale.getDefault())} ;"
     }
 }
