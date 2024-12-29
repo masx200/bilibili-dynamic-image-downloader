@@ -98,3 +98,11 @@ optional arguments:
 
 1. 运行程序时，程序会自动读取之前保存的状态文件。
 2. 下载过程中，程序会定期保存当前的状态到文件中。
+
+## 鸣谢
+
+https://github.com/artbits/sqlite-java
+
+https://github.com/JetBrains/Exposed
+
+https://github.com/lengpucheng/BilibiliClient
