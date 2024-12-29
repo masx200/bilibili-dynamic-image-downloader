@@ -517,4 +517,108 @@ internal class Core(path: String) : DB {
         @JvmField
         val gson: Gson = Gson()
     }
+
+
+    fun getTablesInfo(vararg classes: Class<*>): TableReflectInfo {
+        // 存储表名和其列类型映射的Map
+        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+
+        // 存储表名和其主键列名映射的Map
+        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        // 存储表名和其列是否自动增长映射的Map
+        val tablesMapisAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
+        // 存储索引名和列名映射的Map
+        val indexMapColumns = HashMap<String?, String?>()
+        val indexMapTables = HashMap<String?, String?>()
+        var tableNameSet = HashSet<String>()
+        for (tClass in classes) {
+            val tableName = getTableNameFromClass(tClass)
+            tableNameSet.add(tableName)
+        }
+
+
+        val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
+        try {
+
+
+            connection!!.createStatement().use { statement ->
+                statement.executeQuery(s).use { result ->
+                    val metaData = connection!!.metaData
+                    while (result.next()) {
+                        val tableColumnTypeMap = HashMap<String?, String?>()
+                        val tableColumnTypeMapisAutoIncrement = HashMap<String?, Boolean?>()
+                        val tableName = result.getString("name")
+                        if (tableNameSet.contains(tableName)) {
+                            metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
+                                while (primaryKeySet.next()) {
+                                    val primaryKeyColumn =
+                                        primaryKeySet.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+//                                println("Column $primaryKeyColumn in table $tableName is a primary key")
+                                    tablesMapPrimaryKeys.put(tableName, primaryKeyColumn)
+                                }
+
+                            }
+                            metaData.getColumns(null, null, tableName, null).use { set ->
+//                            println(set.metaData.isAutoIncrement())
+
+
+                                while (set.next()) {
+                                    val isAutoIncrement =
+                                        set.getString("IS_AUTOINCREMENT").lowercase(Locale.getDefault())
+
+//                                println(
+//                                    """
+//                                        ${set.getString("TABLE_NAME")}
+//                                        ${set.getString("COLUMN_NAME")}
+//                                        ${set.getString("TYPE_NAME")}
+//                                        ${set.getString("IS_AUTOINCREMENT")}
+//                                        """.trimIndent()
+//                                )
+                                    val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+                                    val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
+                                    tableColumnTypeMap.put(column, type)
+                                    tableColumnTypeMapisAutoIncrement.put(column, isAutoIncrement == "yes")
+                                }
+                            }
+                            tablesMapTypes.put(tableName, tableColumnTypeMap)
+                            tablesMapisAutoIncrement.put(tableName, tableColumnTypeMapisAutoIncrement)
+                            metaData.getIndexInfo(null, null, tableName, false, false).use { set ->
+                                while (set.next()) {
+//                                println(set.getString("TABLE_NAME"))
+                                    val index = set.getString("INDEX_NAME")
+                                    val column = set.getString("COLUMN_NAME")
+                                    if (index != null) {
+                                        indexMapTables.put(
+                                            index.lowercase(Locale.getDefault()),
+                                            tableName.lowercase(Locale.getDefault())
+                                        )
+                                    }
+                                    Optional.ofNullable<String?>(index)
+                                        .ifPresent { i: String? ->
+                                            indexMapColumns.put(
+                                                index.lowercase(Locale.getDefault()),
+                                                column.lowercase(Locale.getDefault())
+                                            )
+                                        }
+                                }
+                            }
+                        }
+                    }
+                    // val indexMapColumnsTemp = indexMapColumns.toMutableMap()
+
+                    return TableReflectInfo(
+                        tablesMapTypes,
+                        tablesMapPrimaryKeys,
+                        tablesMapisAutoIncrement,
+                        indexMapColumns,
+                        indexMapTables
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw RuntimeException(e)
+        }
+    }
+
 }
