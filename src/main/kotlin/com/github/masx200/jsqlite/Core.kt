@@ -211,10 +211,13 @@ internal class Core(path: String) : DB {
                                 }
                             }
                         }
+
+                        val indexMapColumnsTemp=indexMapColumns.toMutableMap()
+
                         reflect.getIndexList { index: String?, column: String? ->
                             try {
-                                if (indexMapColumns.get(index) != null) {
-                                    indexMapColumns.remove(index, column)
+                                if (indexMapColumnsTemp.get(index) != null) {
+                                    indexMapColumnsTemp.remove(index, column)
                                 } else {
                                     statement.executeUpdate(SQLTemplate.createIndex(tClass, column))
                                 }
@@ -223,7 +226,7 @@ internal class Core(path: String) : DB {
                             }
                         }
                     }
-                    indexMapColumns.forEach { (index: String?, _: String?) ->
+                    indexMapColumnsTemp.forEach { (index: String?, _: String?) ->
                         try {
                             statement.executeUpdate(SQLTemplate.dropIndex<Any?>(index))
                         } catch (e: SQLException) {
