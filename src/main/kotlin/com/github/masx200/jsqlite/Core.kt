@@ -58,6 +58,11 @@ internal class Core(path: String) : DB {
 
     override fun tables(vararg classes: Class<*>) {
         val tablesMap = HashMap<String?, HashMap<String?, String?>?>()
+
+
+        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+
+        val tablesMapisAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
         val indexMap = HashMap<String?, String?>()
         val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
         try {
@@ -66,15 +71,41 @@ internal class Core(path: String) : DB {
                     val metaData = connection!!.metaData
                     while (result.next()) {
                         val tableColumnTypeMap = HashMap<String?, String?>()
+                        val tableColumnTypeMapisAutoIncrement = HashMap<String?, Boolean?>()
                         val tableName = result.getString("name")
+
+                        metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
+                            while (primaryKeySet.next()) {
+                                val primaryKeyColumn =
+                                    primaryKeySet.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+//                                println("Column $primaryKeyColumn in table $tableName is a primary key")
+                                tablesMapPrimaryKeys.put(tableName, primaryKeyColumn)
+                            }
+
+                        }
                         metaData.getColumns(null, null, tableName, null).use { set ->
+//                            println(set.metaData.isAutoIncrement())
+
+
                             while (set.next()) {
+                                val isAutoIncrement = set.getString("IS_AUTOINCREMENT").lowercase(Locale.getDefault())
+
+//                                println(
+//                                    """
+//                                        ${set.getString("TABLE_NAME")}
+//                                        ${set.getString("COLUMN_NAME")}
+//                                        ${set.getString("TYPE_NAME")}
+//                                        ${set.getString("IS_AUTOINCREMENT")}
+//                                        """.trimIndent()
+//                                )
                                 val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
                                 val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
                                 tableColumnTypeMap.put(column, type)
+                                tableColumnTypeMapisAutoIncrement.put(column, isAutoIncrement == "yes")
                             }
                         }
                         tablesMap.put(tableName, tableColumnTypeMap)
+                        tablesMapisAutoIncrement.put(tableName, tableColumnTypeMapisAutoIncrement)
                         metaData.getIndexInfo(null, null, tableName, false, false).use { set ->
                             while (set.next()) {
                                 val index = set.getString("INDEX_NAME")
