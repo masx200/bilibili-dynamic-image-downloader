@@ -30,7 +30,7 @@ import static com.github.masx200.jsqlite.GetTableNameFromClassKt.getTableNameFro
 
 final class Reflect<T> {
 
-    private final Map<String, Field> fieldMap = new LinkedHashMap<>();
+    final Map<String, Field> fieldMap = new LinkedHashMap<>();
     private Class<?> tClass;
     private T t;
 

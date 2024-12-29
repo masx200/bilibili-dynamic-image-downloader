@@ -88,11 +88,17 @@ internal class Core(path: String) : DB {
                     for (tClass in classes) {
                         val tableName = getTableNameFromClass(tClass)
                         val tableColumnTypeMap = tablesMap.getOrDefault(tableName, null)
+                        val dbColumns = tableColumnTypeMap?.keys?.toSet()
                         val reflect: Reflect<*> = Reflect<Any?>(tClass)
+                        val classColumns = mutableMapOf<String, String>()
+                        reflect.getDBColumnsWithType(BiConsumer { column: String?, type: String? ->
+                            classColumns.put(column!!, type!!)
+                        })
                         if (tableColumnTypeMap == null) {
                             statement.executeUpdate(SQLTemplate.create(tClass))
                         } else {
                             reflect.getDBColumnsWithType(BiConsumer { column: String?, type: String? ->
+
                                 if (tableColumnTypeMap.getOrDefault(column, null) == null) {
                                     try {
                                         statement.executeUpdate(SQLTemplate.addTableColumn(tableName, column, type))
@@ -100,7 +106,23 @@ internal class Core(path: String) : DB {
                                         throw RuntimeException(e)
                                     }
                                 }
+//检查列类型并修改：在遍历类的列时，如果数据库中的列类型与类中的列类型不同，则执行 alterTableColumn 操作来修改列类型。
+                                else if (tableColumnTypeMap[column] != type) {
+                                    try {
+                                        statement.executeUpdate(SQLTemplate.alterTableColumn(tableName, column, type))
+                                    } catch (e: SQLException) {
+                                        throw RuntimeException(e)
+                                    }
+                                }
                             })
+//                            删除多余字段：在遍历数据库中的列时，如果数据库中的列在类中不存在，则执行 dropTableColumn 操作来删除该列。
+                            dbColumns?.filter { !classColumns.contains(it) }?.forEach { column ->
+                                try {
+                                    column?.let { statement.executeUpdate(SQLTemplate.dropTableColumn(tableName, it)) }
+                                } catch (e: SQLException) {
+                                    throw RuntimeException(e)
+                                }
+                            }
                         }
                         reflect.getIndexList(BiConsumer { index: String?, column: String? ->
                             try {

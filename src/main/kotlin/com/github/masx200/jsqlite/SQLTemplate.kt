@@ -1,135 +1,156 @@
 /**
  * Copyright 2023 Zhang Guanhu
- * <p>
+ *
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.github.masx200.jsqlite
 
-package com.github.masx200.jsqlite;
+import java.util.*
+import java.util.function.BiConsumer
 
-import java.util.Objects;
-import java.util.Optional;
-
-import static com.github.masx200.jsqlite.GetTableNameFromClassKt.getTableNameFromClass;
-
-final class SQLTemplate {
-
-    static <T> String create(Class<T> tClass) {
-        StringBuffer columnsString = new StringBuffer("id integer primary key,");
-        new Reflect<>(tClass).getDBColumnsWithType((column, type) -> {
-            if (!Objects.equals(column, "id")) {
-                columnsString.append(column).append(" ").append(type).append(",");
+internal object SQLTemplate {
+    fun create(tClass: Class<*>): String {
+        val columnsString = StringBuffer("id integer primary key,")
+        Reflect<Any?>(tClass).getDBColumnsWithType(BiConsumer { column: String?, type: String? ->
+            if (column != "id") {
+                columnsString.append(column).append(" ").append(type).append(",")
             }
-        });
-        columnsString.deleteCharAt(columnsString.length() - 1);
-        String tableName = getTableNameFromClass(tClass);
-        return $("create table %s (%s);", tableName, columnsString);
+        })
+        columnsString.deleteCharAt(columnsString.length - 1)
+        val tableName = getTableNameFromClass(tClass)
+        return `$`("create table %s (%s);", tableName, columnsString)
     }
 
-    static String addTableColumn(String tableName, String column, String type) {
-        return $("alter table %s add column %s %s;", tableName, column, type);
+    fun addTableColumn(tableName: String?, column: String?, type: String?): String {
+        return `$`("alter table %s add column %s %s;", tableName, column, type)
     }
 
-    static <T> String drop(Class<T> tClass) {
-        return $("drop table %s;", tClass.getSimpleName().toLowerCase());
+    fun drop(tClass: Class<*>): String {
+        return `$`("drop table %s;", tClass.getSimpleName().lowercase(Locale.getDefault()))
     }
 
-    static <T> String insert(T t) {
-        StringBuffer columnsString = new StringBuffer();
-        StringBuffer valueString = new StringBuffer();
-        new Reflect<>(t).getDBColumnsWithValue((column, value) -> {
-            if (!Objects.equals(column, "id")) {
-                columnsString.append(column).append(",");
-                valueString.append(value).append(",");
+    fun <T> insert(t: T?): String {
+        val columnsString = StringBuffer()
+        val valueString = StringBuffer()
+        Reflect<T?>(t).getDBColumnsWithValue(BiConsumer { column: String?, value: Any? ->
+            if (column != "id") {
+                columnsString.append(column).append(",")
+                valueString.append(value).append(",")
             }
-        });
-        columnsString.deleteCharAt(columnsString.length() - 1);
-        valueString.deleteCharAt(valueString.length() - 1);
-        String tableName = t.getClass().getSimpleName().toLowerCase();
-        return $("insert into %s (%s) values (%s);", tableName, columnsString, valueString);
+        })
+        columnsString.deleteCharAt(columnsString.length - 1)
+        valueString.deleteCharAt(valueString.length - 1)
+        val tableName = t!!.javaClass.getSimpleName().lowercase(Locale.getDefault())
+        return `$`("insert into %s (%s) values (%s);", tableName, columnsString, valueString)
     }
 
-    static <T> String update(T t, Options options) {
-        String tableName = t.getClass().getSimpleName().toLowerCase();
-        String whereString = (options.wherePredicate != null) ? $("where %s ", options.wherePredicate) : "";
-        StringBuffer setString = new StringBuffer();
-        new Reflect<>(t).getDBColumnsWithValue((column, value) -> {
-            if (value != null && !Objects.equals(column, "id")) {
-                setString.append(column).append(" = ").append(value).append(",");
+    fun <T> update(t: T?, options: Options): String {
+        val tableName = t!!.javaClass.getSimpleName().lowercase(Locale.getDefault())
+        val whereString = if (options.wherePredicate != null) `$`("where %s ", options.wherePredicate) else ""
+        val setString = StringBuffer()
+        Reflect<T?>(t).getDBColumnsWithValue(BiConsumer { column: String?, value: Any? ->
+            if (value != null && column != "id") {
+                setString.append(column).append(" = ").append(value).append(",")
             }
-        });
-        setString.deleteCharAt(setString.length() - 1);
-        StringBuilder SQLBuilder = new StringBuilder();
+        })
+        setString.deleteCharAt(setString.length - 1)
+        val SQLBuilder = StringBuilder()
         return SQLBuilder
-                .append($("update %s set %s ", tableName, setString))
-                .append(whereString)
-                .append(";")
-                .deleteCharAt(SQLBuilder.length() - 2)
-                .toString();
+            .append(`$`("update %s set %s ", tableName, setString))
+            .append(whereString)
+            .append(";")
+            .deleteCharAt(SQLBuilder.length - 2)
+            .toString()
     }
 
-    static <T> String delete(Class<T> tClass, Options options) {
-        String deleteString = $("delete from %s ", tClass.getSimpleName().toLowerCase());
-        String whereString = (options.wherePredicate != null) ? $("where %s ", options.wherePredicate) : "";
-        StringBuilder SQLBuilder = new StringBuilder();
+    fun <T> delete(tClass: Class<T?>, options: Options): String {
+        val deleteString = `$`("delete from %s ", tClass.getSimpleName().lowercase(Locale.getDefault()))
+        val whereString = if (options.wherePredicate != null) `$`("where %s ", options.wherePredicate) else ""
+        val SQLBuilder = StringBuilder()
         return SQLBuilder
-                .append(deleteString)
-                .append(whereString)
-                .append(";")
-                .deleteCharAt(SQLBuilder.length() - 2)
-                .toString();
+            .append(deleteString)
+            .append(whereString)
+            .append(";")
+            .deleteCharAt(SQLBuilder.length - 2)
+            .toString()
     }
 
-    static <T> String query(String table, Options options) {
+    fun <T> query(table: String?, options: Options?): String {
         if (options == null) {
-            return $("select * from %s;", table);
+            return `$`("select * from %s;", table)
         }
-        String fromString = $("from %s ", table);
-        String selectString = $("select %s ", Optional.ofNullable(options.selectColumns).orElse("*"));
-        String whereString = (options.wherePredicate != null) ? $("where %s ", options.wherePredicate) : "";
-        String groupString = (options.groupColumns != null) ? $("group by %s ", options.groupColumns) : "";
-        String orderString = (options.orderColumns != null) ? $("order by %s ", options.orderColumns) : "";
-        String limitString = (options.limitSize != null) ? $("limit %d ", options.limitSize) : "";
-        String offsetString = (options.offsetSize != null) ? $("offset %d ", options.offsetSize) : "";
-        StringBuilder SQLBuilder = new StringBuilder();
+        val fromString = `$`("from %s ", table)
+        val selectString = `$`("select %s ", Optional.ofNullable<String?>(options.selectColumns).orElse("*"))
+        val whereString = if (options.wherePredicate != null) `$`("where %s ", options.wherePredicate) else ""
+        val groupString = if (options.groupColumns != null) `$`("group by %s ", options.groupColumns) else ""
+        val orderString = if (options.orderColumns != null) `$`("order by %s ", options.orderColumns) else ""
+        val limitString = if (options.limitSize != null) `$`("limit %d ", options.limitSize) else ""
+        val offsetString = if (options.offsetSize != null) `$`("offset %d ", options.offsetSize) else ""
+        val SQLBuilder = StringBuilder()
         return SQLBuilder
-                .append(selectString)
-                .append(fromString)
-                .append(whereString)
-                .append(groupString)
-                .append(orderString)
-                .append(limitString)
-                .append(offsetString)
-                .append(";")
-                .deleteCharAt(SQLBuilder.length() - 2)
-                .toString();
+            .append(selectString)
+            .append(fromString)
+            .append(whereString)
+            .append(groupString)
+            .append(orderString)
+            .append(limitString)
+            .append(offsetString)
+            .append(";")
+            .deleteCharAt(SQLBuilder.length - 2)
+            .toString()
     }
 
-    static <T> String query(Class<T> tClass, Options options) {
-        return query(tClass.getSimpleName().toLowerCase(), options);
+    fun <T> query(tClass: Class<T?>, options: Options?): String {
+        return query<Any?>(tClass.getSimpleName().lowercase(Locale.getDefault()), options)
     }
 
-    static <T> String createIndex(Class<T> tClass, String column) {
-        String table = getTableNameFromClass(tClass);
-        String index = $("idx_%s_%s", table, column);
-        return $("create index %s on %s(%s)", index, table, column);
+    fun createIndex(tClass: Class<*>, column: String?): String {
+        val table = getTableNameFromClass(tClass)
+        val index = `$`("idx_%s_%s", table, column)
+        return `$`("create index %s on %s(%s)", index, table, column)
     }
 
-    static <T> String dropIndex(String index) {
-        return $("drop index %s", index);
+    fun <T> dropIndex(index: String?): String {
+        return `$`("drop index %s", index)
     }
 
-    private static String $(String format, Object... objects) {
-        return String.format(format, objects);
+    private fun `$`(format: String, vararg objects: Any?): String {
+        return String.format(format, *objects)
     }
 
+    fun alterTableColumn(string: String, string1: String?, string2: String?): String? {
+        println(
+            """
+                alterTableColumn()
+                string: $string
+                string1: $string1
+                string2: $string2
+                """.trimIndent()
+        )
+        TODO()
+    }
+
+    fun dropTableColumn(p0: String, p1: String): String? {
+        println(
+            """
+                dropTableColumn()
+                p0: $p0
+                p1: $p1
+                """.trimIndent()
+        )
+        TODO()
+    }
 }
