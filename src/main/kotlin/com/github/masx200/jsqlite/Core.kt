@@ -27,7 +27,12 @@ import java.sql.SQLException
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Consumer
-
+data class TableInfo(
+    val tablesMapTypes: HashMap<String?, HashMap<String?, String?>?>,
+    val tablesMapPrimaryKeys: HashMap<String?, String?>,
+    val tablesMapisAutoIncrement: HashMap<String?, HashMap<String?, Boolean?>?>,
+    val indexMap: HashMap<String?, String?>
+)
 internal class Core(path: String) : DB {
     private val lock = ReentrantLock()
 
@@ -55,15 +60,25 @@ internal class Core(path: String) : DB {
             throw RuntimeException(e)
         }
     }
-
+    /**
+     * 根据给定的类更新或创建数据库表结构
+     * 此函数检查数据库中的现有表结构，并根据提供的类更新或创建相应的表
+     * 它会比较数据库中的表结构和类的结构，进行必要的列添加、修改或删除，以及索引的更新
+     *
+     * @param classes 可变参数，代表需要更新或创建表结构的类
+     */
     override fun tables(vararg classes: Class<*>) {
-        val tablesMap = HashMap<String?, HashMap<String?, String?>?>()
+        // 存储表名和其列类型映射的Map
+        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
 
-
+        // 存储表名和其主键列名映射的Map
         val tablesMapPrimaryKeys = HashMap<String?, String?>()
-
+        // 存储表名和其列是否自动增长映射的Map
         val tablesMapisAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
-        val indexMap = HashMap<String?, String?>()
+        // 存储索引名和列名映射的Map
+        val indexMapColumns = HashMap<String?, String?>()
+        val indexMapTables = HashMap<String?, String?>()
+
         val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
         try {
             connection!!.createStatement().use { statement ->
@@ -104,15 +119,22 @@ internal class Core(path: String) : DB {
                                 tableColumnTypeMapisAutoIncrement.put(column, isAutoIncrement == "yes")
                             }
                         }
-                        tablesMap.put(tableName, tableColumnTypeMap)
+                        tablesMapTypes.put(tableName, tableColumnTypeMap)
                         tablesMapisAutoIncrement.put(tableName, tableColumnTypeMapisAutoIncrement)
                         metaData.getIndexInfo(null, null, tableName, false, false).use { set ->
                             while (set.next()) {
+//                                println(set.getString("TABLE_NAME"))
                                 val index = set.getString("INDEX_NAME")
                                 val column = set.getString("COLUMN_NAME")
+                                if (index != null){
+                                    indexMapTables.put(
+                                        index.lowercase(Locale.getDefault()),
+                                        tableName.lowercase(Locale.getDefault())
+                                    )
+                                }
                                 Optional.ofNullable<String?>(index)
                                     .ifPresent { i: String? ->
-                                        indexMap.put(
+                                        indexMapColumns.put(
                                             index.lowercase(Locale.getDefault()),
                                             column.lowercase(Locale.getDefault())
                                         )
@@ -122,7 +144,7 @@ internal class Core(path: String) : DB {
                     }
                     for (tClass in classes) {
                         val tableName = getTableNameFromClass(tClass)
-                        val tableColumnTypeMap = tablesMap.getOrDefault(tableName, null)
+                        val tableColumnTypeMap = tablesMapTypes.getOrDefault(tableName, null)
                         val dbColumns = tableColumnTypeMap?.keys?.toSet()
                         val reflect: Reflect<*> = Reflect<Any?>(tClass)
                         val classColumns = mutableMapOf<String, String>()
@@ -185,8 +207,8 @@ internal class Core(path: String) : DB {
                         }
                         reflect.getIndexList { index: String?, column: String? ->
                             try {
-                                if (indexMap.get(index) != null) {
-                                    indexMap.remove(index, column)
+                                if (indexMapColumns.get(index) != null) {
+                                    indexMapColumns.remove(index, column)
                                 } else {
                                     statement.executeUpdate(SQLTemplate.createIndex(tClass, column))
                                 }
@@ -195,7 +217,7 @@ internal class Core(path: String) : DB {
                             }
                         }
                     }
-                    indexMap.forEach { (index: String?, _: String?) ->
+                    indexMapColumns.forEach { (index: String?, _: String?) ->
                         try {
                             statement.executeUpdate(SQLTemplate.dropIndex<Any?>(index))
                         } catch (e: SQLException) {
