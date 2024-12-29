@@ -38,7 +38,7 @@ fun main(args: Array<String>) {
 
             return@run getDynamicSequenceWithDOWNLOAD_STATE_FILE(this)
 //                } else {
-//                    TODO()
+//
 //                    getDynamicSequence(this); }
 //
 ////            val (idsWriter, imagesWriter) = createWriteStreamsIfNotEmpty(file_dynamic_ids, file_dynamic_images)
