@@ -12,6 +12,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: String) {
     val dbFile = options.download_state_file
     var data1 = Database.connect("jdbc:sqlite:$dbFile", "org.sqlite.JDBC")
+
+    var listeners = mutableListOf<() -> Unit>()
 //    println(data1)
     try {
         val db2 = connect(dbFile)
@@ -23,14 +25,14 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
         DataBaseTableDao(db2, DynamicPictures::class.java)
 
         db2.use { db ->
-            registerEventListenerForIdentifier(db, "select")
+            listeners.add { registerEventListenerForIdentifier(db, "select") }
 
-            registerEventListenerForIdentifier(db, "create")
-            registerEventListenerForIdentifier(db, "alter")
-            registerEventListenerForIdentifier(db, "delete")
-            registerEventListenerForIdentifier(db, "drop")
-            registerEventListenerForIdentifier(db, "insert")
-            registerEventListenerForIdentifier(db, "update")
+            listeners.add { registerEventListenerForIdentifier(db, "create") }
+            listeners.add { registerEventListenerForIdentifier(db, "alter") }
+            listeners.add { registerEventListenerForIdentifier(db, "delete") }
+            listeners.add { registerEventListenerForIdentifier(db, "drop") }
+            listeners.add { registerEventListenerForIdentifier(db, "insert") }
+            listeners.add { registerEventListenerForIdentifier(db, "update") }
 //        println(db)
             var strings = db.tables(
                 SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
@@ -127,13 +129,21 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
     } finally {
 //        println(  data1.connector())
         data1.connector().close()
+
+
+        listeners.forEach { it() }
     }
 
 }
 
-fun registerEventListenerForIdentifier(db: DB, identifier: String) {
+fun registerEventListenerForIdentifier(db: DB, identifier: String): () -> Unit {
     var asyncEventBus = db.getAsyncEventBus(identifier)
-    asyncEventBus.register(MyEventListener({
+    var myEventListener = MyEventListener({
         System.out.println("$identifier:" + "Received event:" + it.message)
-    }))
+    })
+    asyncEventBus.register(myEventListener)
+
+    return fun() {
+        asyncEventBus.unregister(myEventListener)
+    }
 }
