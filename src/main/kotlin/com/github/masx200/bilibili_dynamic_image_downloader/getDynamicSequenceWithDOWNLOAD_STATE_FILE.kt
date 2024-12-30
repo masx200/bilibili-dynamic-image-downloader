@@ -24,6 +24,9 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
             db.tables(
                 SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
             )
+            db.dropUnusedColumns(
+                SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
+            )
 
             for (klass in listOf(SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java)) {
 

@@ -28,6 +28,8 @@ public interface DB extends AutoCloseable {
 
     boolean checkTableDifferenceInPrimaryKeyAndAutoIncrement(Class<?> classes);
 
+    void dropUnusedColumns(Class<?>... classes);
+
     void tables(Class<?>... classes);
 
     void drop(Class<?>... classes);

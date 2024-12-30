@@ -131,6 +131,100 @@ internal class Core(var path: String) : DB {
         return classInfo.primaryKey != dbInfo.primaryKey || classInfo.isAutoIncrement != dbInfo.isAutoIncrement
     }
 
+    /**
+     * 无法删除主键!!!!!!!
+     * */
+    override fun dropUnusedColumns(vararg classes: Class<*>) {
+        // 存储表名和其列类型映射的Map
+        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+
+        // 存储表名和其主键列名映射的Map
+        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        // 存储表名和其列是否自动增长映射的Map
+
+
+        val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
+        try {
+            connection!!.createStatement().use { statement ->
+                statement.executeQuery(s).use { result ->
+                    val metaData = connection!!.metaData
+                    while (result.next()) {
+                        val tableColumnTypeMap = HashMap<String?, String?>()
+
+                        val tableName = result.getString("name")
+
+                        metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
+                            while (primaryKeySet.next()) {
+                                val primaryKeyColumn =
+                                    primaryKeySet.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+//                                println("Column $primaryKeyColumn in table $tableName is a primary key")
+                                tablesMapPrimaryKeys.put(tableName, primaryKeyColumn)
+                            }
+
+                        }
+                        metaData.getColumns(null, null, tableName, null).use { set ->
+//                            println(set.metaData.isAutoIncrement())
+
+
+                            while (set.next()) {
+
+
+//                             
+                                val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+                                val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
+                                tableColumnTypeMap.put(column, type)
+
+                            }
+                        }
+                        tablesMapTypes.put(tableName, tableColumnTypeMap)
+
+
+                    }
+
+                    for (tClass in classes) {
+                        val tableName = getTableNameFromClass(tClass)
+                        val tableColumnTypeMap = tablesMapTypes.getOrDefault(tableName, null)
+                        val dbColumns = tableColumnTypeMap?.keys?.filter {
+
+                            tablesMapPrimaryKeys.get(tableName) != it
+                        }?.toSet()
+                        val reflect: Reflect<*> = Reflect<Any?>(tClass)
+                        val classColumns = mutableMapOf<String, String>()
+                        reflect.getDBColumnsWithType { column: String?, type: String? ->
+                            classColumns.put(column!!, type!!)
+                        }
+//                        println(
+//                            dbColumns
+//                        )
+//                        println(
+//                            classColumns
+//                        )
+                        if (tableColumnTypeMap == null) {
+                            throw RuntimeException("table $tableName not found")
+                        } else {
+//                            println(tableColumnTypeMap)
+
+//                            删除多余字段：在遍历数据库中的列时，如果数据库中的列在类中不存在，则执行 dropTableColumn 操作来删除该列。
+                            dbColumns?.filter { !classColumns.contains(it) }?.forEach { column ->
+                                try {
+                                    column?.let { statement.executeUpdate(SQLTemplate.dropTableColumn(tableName, it)) }
+                                } catch (e: SQLException) {
+                                    throw RuntimeException(e)
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw RuntimeException(e)
+        }
+    }
+
     fun getTableInfoFromDatabase(value: Class<*>): PrimaryKeyAndAutoIncrementInfo? {
         val tableName = value.let { getTableNameFromClass(it) }
         var tablesInfo = getTablesInfo(value)
@@ -214,14 +308,7 @@ internal class Core(var path: String) : DB {
                             while (set.next()) {
                                 val isAutoIncrement = set.getString("IS_AUTOINCREMENT").lowercase(Locale.getDefault())
 
-//                                println(
-//                                    """
-//                                        ${set.getString("TABLE_NAME")}
-//                                        ${set.getString("COLUMN_NAME")}
-//                                        ${set.getString("TYPE_NAME")}
-//                                        ${set.getString("IS_AUTOINCREMENT")}
-//                                        """.trimIndent()
-//                                )
+//                             
                                 val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
                                 val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
                                 tableColumnTypeMap.put(column, type)
@@ -256,7 +343,7 @@ internal class Core(var path: String) : DB {
                     for (tClass in classes) {
                         val tableName = getTableNameFromClass(tClass)
                         val tableColumnTypeMap = tablesMapTypes.getOrDefault(tableName, null)
-                        val dbColumns = tableColumnTypeMap?.keys?.toSet()
+//                        val dbColumns = tableColumnTypeMap?.keys?.toSet()
                         val reflect: Reflect<*> = Reflect<Any?>(tClass)
                         val classColumns = mutableMapOf<String, String>()
                         reflect.getDBColumnsWithType { column: String?, type: String? ->
@@ -308,13 +395,13 @@ internal class Core(var path: String) : DB {
                                 }
                             }
 //                            删除多余字段：在遍历数据库中的列时，如果数据库中的列在类中不存在，则执行 dropTableColumn 操作来删除该列。
-                            dbColumns?.filter { !classColumns.contains(it) }?.forEach { column ->
-                                try {
-                                    column?.let { statement.executeUpdate(SQLTemplate.dropTableColumn(tableName, it)) }
-                                } catch (e: SQLException) {
-                                    throw RuntimeException(e)
-                                }
-                            }
+//                            dbColumns?.filter { !classColumns.contains(it) }?.forEach { column ->
+//                                try {
+//                                    column?.let { statement.executeUpdate(SQLTemplate.dropTableColumn(tableName, it)) }
+//                                } catch (e: SQLException) {
+//                                    throw RuntimeException(e)
+//                                }
+//                            }
                         }
 
 
@@ -694,14 +781,7 @@ internal class Core(var path: String) : DB {
                                     val isAutoIncrement =
                                         set.getString("IS_AUTOINCREMENT").lowercase(Locale.getDefault())
 
-//                                println(
-//                                    """
-//                                        ${set.getString("TABLE_NAME")}
-//                                        ${set.getString("COLUMN_NAME")}
-//                                        ${set.getString("TYPE_NAME")}
-//                                        ${set.getString("IS_AUTOINCREMENT")}
-//                                        """.trimIndent()
-//                                )
+//                             
                                     val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
                                     val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
                                     tableColumnTypeMap.put(column, type)
@@ -729,7 +809,3 @@ internal class Core(var path: String) : DB {
 
 }
 
-data class PrimaryKeyAndAutoIncrementInfo(
-    var primaryKey: String,
-    var isAutoIncrement: Boolean
-)
