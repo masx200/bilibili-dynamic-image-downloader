@@ -15,6 +15,10 @@
  */
 package com.github.masx200.jsqlite;
 
+//import lombok.NonNull;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -26,22 +30,22 @@ public interface DB extends AutoCloseable {
     @Override
     void close();
 
-    List<String> findDifferenceTypeColumns(Class<?> classes);
+    List<String> findDifferenceTypeColumns(@NotNull Class<?> classes);
 
 
-    List<String> createColumns(Class<?> classes, String... columnNames);
+    List<String> createColumns(@NotNull Class<?> classes, String... columnNames);
 
-    List<String> dropColumns(Class<?> classes, String... columnNames);
+    List<String> dropColumns(@NotNull Class<?> classes, String... columnNames);
 
-    boolean checkTableDifferenceInPrimaryKeyAndAutoIncrement(Class<?> classes);
+    boolean checkTableDifferenceInPrimaryKeyAndAutoIncrement(@NotNull Class<?> classes);
 
-    List<String> dropUnusedColumns(Class<?>... classes);
+    List<String> dropUnusedColumns(@NotNull Class<?>... classes);
 
-    List<String> tables(Class<?>... classes);
+    List<String> tables(@NotNull Class<?>... classes);
 
-    List<String> drop(Class<?>... classes);
+    List<String> drop(@NotNull Class<?>... classes);
 
-    List<String> create(Class<?>... classes);
+    List<String> create(@NotNull Class<?>... classes);
 
     String version();
 
@@ -51,51 +55,51 @@ public interface DB extends AutoCloseable {
 
     <T extends DataSupport<T>> List<String> update(T t);
 
-    <T extends DataSupport<T>> void delete(Class<T> tClass, String predicate, Object... args);
+    <T extends DataSupport<T>> void delete(@NotNull Class<T> tClass, String predicate, Object... args);
 
-    <T extends DataSupport<T>> void delete(Class<T> tClass, List<Long> ids);
+    <T extends DataSupport<T>> void delete(@NotNull Class<T> tClass, List<Long> ids);
 
-    <T extends DataSupport<T>> void delete(Class<T> tClass, Long... ids);
+    <T extends DataSupport<T>> void delete(@NotNull Class<T> tClass, Long... ids);
 
-    <T extends DataSupport<T>> void deleteAll(Class<T> tClass);
+    <T extends DataSupport<T>> void deleteAll(@NotNull Class<T> tClass);
 
-    <T extends DataSupport<T>> List<T> find(Class<T> tClass, Consumer<Options> consumer);
+    <T extends DataSupport<T>> List<T> find(@NotNull Class<T> tClass, Consumer<Options> consumer);
 
-    <T extends DataSupport<T>> List<T> find(Class<T> tClass, List<Long> ids);
+    <T extends DataSupport<T>> List<T> find(@NotNull Class<T> tClass, List<Long> ids);
 
-    <T extends DataSupport<T>> List<T> find(Class<T> tClass, Long... ids);
+    <T extends DataSupport<T>> List<T> find(@NotNull Class<T> tClass, Long... ids);
 
-    <T extends DataSupport<T>> List<T> findAll(Class<T> tClass);
+    <T extends DataSupport<T>> List<T> findAll(@NotNull Class<T> tClass);
 
-    <T extends DataSupport<T>> T findOne(Class<T> tClass, String predicate, Object... args);
+    <T extends DataSupport<T>> T findOne(@NotNull Class<T> tClass, String predicate, Object... args);
 
-    <T extends DataSupport<T>> T findOne(Class<T> tClass, Long id);
+    <T extends DataSupport<T>> T findOne(@NotNull Class<T> tClass, Long id);
 
-    <T extends DataSupport<T>> T first(Class<T> tClass, String predicate, Object... args);
+    <T extends DataSupport<T>> T first(@NotNull Class<T> tClass, String predicate, Object... args);
 
-    <T extends DataSupport<T>> T first(Class<T> tClass);
+    <T extends DataSupport<T>> T first(@NotNull Class<T> tClass);
 
-    <T extends DataSupport<T>> T last(Class<T> tClass, String predicate, Object... args);
+    <T extends DataSupport<T>> T last(@NotNull Class<T> tClass, String predicate, Object... args);
 
-    <T extends DataSupport<T>> T last(Class<T> tClass);
+    <T extends DataSupport<T>> T last(@NotNull Class<T> tClass);
 
-    <T extends DataSupport<T>> long count(Class<T> tClass, String predicate, Object... args);
+    <T extends DataSupport<T>> long count(@NotNull Class<T> tClass, String predicate, Object... args);
 
-    <T extends DataSupport<T>> long count(Class<T> tClass);
+    <T extends DataSupport<T>> long count(@NotNull Class<T> tClass);
 
-    <T extends DataSupport<T>> double average(Class<T> tClass, String column, String predicate, Object... args);
+    <T extends DataSupport<T>> double average(@NotNull Class<T> tClass, String column, String predicate, Object... args);
 
-    <T extends DataSupport<T>> double average(Class<T> tClass, String column);
+    <T extends DataSupport<T>> double average(@NotNull Class<T> tClass, String column);
 
-    <T extends DataSupport<T>> Number sum(Class<T> tClass, String column, String predicate, Object... args);
+    <T extends DataSupport<T>> Number sum(@NotNull Class<T> tClass, String column, String predicate, Object... args);
 
-    <T extends DataSupport<T>> Number sum(Class<T> tClass, String column);
+    <T extends DataSupport<T>> Number sum(@NotNull Class<T> tClass, String column);
 
-    <T extends DataSupport<T>> Number max(Class<T> tClass, String column, String predicate, Object... args);
+    <T extends DataSupport<T>> Number max(@NotNull Class<T> tClass, String column, String predicate, Object... args);
 
-    <T extends DataSupport<T>> Number max(Class<T> tClass, String column);
+    <T extends DataSupport<T>> Number max(@NotNull Class<T> tClass, String column);
 
-    <T extends DataSupport<T>> Number min(Class<T> tClass, String column, String predicate, Object... args);
+    <T extends DataSupport<T>> Number min(@NotNull Class<T> tClass, String column, String predicate, Object... args);
 
-    <T extends DataSupport<T>> Number min(Class<T> tClass, String column);
+    <T extends DataSupport<T>> Number min(@NotNull Class<T> tClass, String column);
 }

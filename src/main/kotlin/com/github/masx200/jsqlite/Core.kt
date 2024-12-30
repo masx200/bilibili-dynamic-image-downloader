@@ -113,12 +113,12 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun findDifferenceTypeColumns(classes: Class<*>?): List<String?>? {
+    override fun findDifferenceTypeColumns(classes: Class<*>): List<String?>? {
         TODO("Not yet implemented")
     }
 
     override fun createColumns(
-        classes: Class<*>?,
+        classes: Class<*>,
         vararg columnNames: String?
     ): List<String?>? {
         var resultList = mutableListOf<String>()
@@ -128,11 +128,110 @@ internal class Core(var path: String) : DB {
     }
 
     override fun dropColumns(
-        classes: Class<*>?,
+        classes: Class<*>,
         vararg columnNames: String?
     ): List<String?>? {
+        var toSet = columnNames.toSet()
         var resultList = mutableListOf<String>()
-        TODO("Not yet implemented")
+        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+
+        // 存储表名和其主键列名映射的Map
+        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        // 存储表名和其列是否自动增长映射的Map
+
+
+        val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
+        var tableNameSet = HashSet<String>()
+        for (tClass in listOf<Class<*>>(classes)) {
+            val tableName = getTableNameFromClass(tClass)
+            tableNameSet.add(tableName)
+        }
+        try {
+            connection!!.createStatement().use { statement ->
+                statement.executeQuery(s).use { result ->
+                    val metaData = connection!!.metaData
+                    while (result.next()) {
+                        val tableColumnTypeMap = HashMap<String?, String?>()
+
+                        val tableName = result.getString("name")
+                        if (tableNameSet.contains(tableName)) {
+                            metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
+                                while (primaryKeySet.next()) {
+                                    val primaryKeyColumn =
+                                        primaryKeySet.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+//                                println("Column $primaryKeyColumn in table $tableName is a primary key")
+                                    tablesMapPrimaryKeys.put(tableName, primaryKeyColumn)
+                                }
+
+                            }
+                            metaData.getColumns(null, null, tableName, null).use { set ->
+//                            println(set.metaData.isAutoIncrement())
+
+
+                                while (set.next()) {
+
+
+//
+                                    val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+                                    val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
+                                    tableColumnTypeMap.put(column, type)
+
+                                }
+                            }
+                            tablesMapTypes.put(tableName, tableColumnTypeMap)
+
+                        }
+                    }
+
+                    for (tClass in listOf<Class<*>>(classes)) {
+                        val tableName = getTableNameFromClass(tClass)
+                        val tableColumnTypeMap = tablesMapTypes.getOrDefault(tableName, null)
+                        val dbColumns = tableColumnTypeMap?.keys?.filter {
+
+                            tablesMapPrimaryKeys.get(tableName) != it
+                        }?.toSet()
+//                        val reflect: Reflect<*> = Reflect<Any?>(tClass)
+//                        val classColumns = mutableMapOf<String, String>()
+//                        reflect.getDBColumnsWithType { column: String?, type: String? ->
+//                            classColumns.put(column!!, type!!)
+//                        }
+//                        println(
+//                            dbColumns
+//                        )
+//                        println(
+//                            classColumns
+//                        )
+                        if (tableColumnTypeMap == null) {
+                            throw RuntimeException("table $tableName not found")
+                        } else {
+//                            println(tableColumnTypeMap)
+
+//                            删除多余字段：在遍历数据库中的列时，如果数据库中的列在类中不存在，则执行 dropTableColumn 操作来删除该列。
+                            dbColumns?.filter { toSet.contains(it) }?.forEach { column ->
+                                try {
+                                    column?.let {
+
+
+                                        var sql = SQLTemplate.dropTableColumn(tableName, it)
+
+                                        resultList.add(sql)
+                                        statement.executeUpdate(sql)
+                                    }
+                                } catch (e: SQLException) {
+                                    throw RuntimeException(e)
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw RuntimeException(e)
+        }
         return resultList
     }
 
