@@ -9,6 +9,24 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder
 class DataBaseTableDao<T : DataSupport<T>>(
     var database: DB, var entityClass: Class<T>,
 ) {
+    fun deleteAll(): List<String> {
+        return database.deleteAll<T>(entityClass)
+    }
+
+    fun delete(vararg ids: Long?): List<String> {
+        return database.delete<T>(entityClass, *ids)
+    }
+
+    fun delete(ids: MutableList<Long?>?): List<String> {
+        return database.delete<T>(entityClass, ids)
+    }
+
+    fun delete(block: SqlExpressionBuilder.() -> Op<Boolean>): List<String> {
+        val condition = Op.build(block)
+        val predicate = condition.toString()
+        return database.delete<T>(entityClass, predicate)
+    }
+
     fun insert(data1: T): List<String> {
         return database.insert<T>(data1)
     }

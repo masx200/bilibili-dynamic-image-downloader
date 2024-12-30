@@ -55,13 +55,13 @@ public interface DB extends AutoCloseable {
 
     <T extends DataSupport<T>> List<String> update(T t);
 
-    <T extends DataSupport<T>> void delete(@NotNull Class<T> tClass, String predicate, Object... args);
+    <T extends DataSupport<T>> List<String> delete(@NotNull Class<T> tClass, String predicate, Object... args);
 
-    <T extends DataSupport<T>> void delete(@NotNull Class<T> tClass, List<Long> ids);
+    <T extends DataSupport<T>> List<String> delete(@NotNull Class<T> tClass, List<Long> ids);
 
-    <T extends DataSupport<T>> void delete(@NotNull Class<T> tClass, Long... ids);
+    <T extends DataSupport<T>> List<String> delete(@NotNull Class<T> tClass, Long... ids);
 
-    <T extends DataSupport<T>> void deleteAll(@NotNull Class<T> tClass);
+    <T extends DataSupport<T>> List<String> deleteAll(@NotNull Class<T> tClass);
 
     <T extends DataSupport<T>> List<T> find(@NotNull Class<T> tClass, Consumer<Options> consumer);
 

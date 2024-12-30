@@ -102,7 +102,9 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 //                    println(oldranges)
                     println(dynamicRangesTable.update(data11))
                 }
-
+                println(dynamicRangesTable.delete({
+                    DynamicRangesSchema.userId eq options.host_uid
+                }))
             }
         }
 

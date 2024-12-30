@@ -1002,7 +1002,7 @@ internal class Core(var path: String) : DB {
         return update<T?>(t, "id = ?", t.id())
     }
 
-    override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, predicate: String?, vararg args: Any?) {
+    override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, predicate: String?, vararg args: Any?): List<String> {
         val sql = SQLTemplate.delete<T?>(tClass, Options().where(predicate, *args))
         try {
             connection!!.createStatement().use { statement ->
@@ -1014,20 +1014,21 @@ internal class Core(var path: String) : DB {
         } finally {
             lock.unlock()
         }
+        return mutableListOf(sql)
     }
 
-    override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, ids: MutableList<Long?>?) {
+    override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, ids: MutableList<Long?>?): List<String> {
         val builder = StringBuilder(ids.toString())
         builder.deleteCharAt(0).deleteCharAt(builder.length - 1)
-        delete<T?>(tClass, "id in(?)", builder)
+        return delete<T?>(tClass, "id in(?)", builder)
     }
 
-    override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, vararg ids: Long?) {
-        delete<T?>(tClass, Arrays.asList<Long?>(*ids))
+    override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, vararg ids: Long?): List<String> {
+        return delete<T?>(tClass, Arrays.asList<Long?>(*ids))
     }
 
-    override fun <T : DataSupport<T?>?> deleteAll(tClass: Class<T?>) {
-        delete<T?>(tClass, null, null as Any?)
+    override fun <T : DataSupport<T?>?> deleteAll(tClass: Class<T?>): List<String> {
+        return delete<T?>(tClass, null, null as Any?)
     }
 
     override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, consumer: Consumer<Options?>?): MutableList<T?> {
