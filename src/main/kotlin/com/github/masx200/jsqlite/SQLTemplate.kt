@@ -20,7 +20,6 @@ package com.github.masx200.jsqlite
 
 import com.github.masx200.jsqlite.Reflect.Companion.isAutoIncrement
 import com.github.masx200.jsqlite.Reflect.Companion.isPrimaryKey
-
 import java.util.*
 import java.util.function.BiConsumer
 
@@ -151,10 +150,15 @@ internal object SQLTemplate {
         return query<Any?>(getTableNameFromClass(tClass), options)
     }
 
-    fun createIndex(tClass: Class<*>, column: String?): String {
+    fun createIndex(tClass: Class<*>, column: String?, unique: Boolean?): String {
         val table = getTableNameFromClass(tClass)
         val index = `$`("idx_%s_%s", table, column)
-        return `$`("create index %s on %s(%s)", index, table, column)
+        return `$`(
+            "create " +
+                    if (unique == true) "unique" else ""
+
+                            + " index %s on %s(%s)", index, table, column
+        )
     }
 
     fun <T> dropIndex(index: String?): String {

@@ -269,7 +269,7 @@ internal class Core(var path: String) : DB {
                                 if (indexMapColumnsTemp.get(index) != null) {
                                     indexMapColumnsTemp.remove(index, column)
                                 } else {
-                                    statement.executeUpdate(SQLTemplate.createIndex(tClass, column))
+                                    statement.executeUpdate(SQLTemplate.createIndex(tClass, column, it?.unique))
                                 }
                             } catch (e: SQLException) {
                                 throw RuntimeException(e)
