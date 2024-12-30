@@ -40,14 +40,13 @@ Execute this command to run this sample:
 
 ```
 bilibili-dynamic-image-downloader
-usage: bilibili-dynamic-image-downloader [-h] -c COOKIE -u HOST_UID
+usage: bilibili-dynamic-image-downloader [-h] [-c COOKIE]
+                                         [--cookie-file COOKIE_FILE] -u HOST_UID
                                          [-o OFFSET_DYNAMIC_ID]
-                                         [-e endwith_dynamic_id]
+                                         [-e ENDWITH_DYNAMIC_ID]
                                          -s DOWNLOAD_STATE_FILE
 
 required arguments:
-  -c COOKIE, --cookie COOKIE                  cookie
-
   -u HOST_UID, --host_uid HOST_UID            host_uid
 
   -s DOWNLOAD_STATE_FILE,                     download_state_file
@@ -57,11 +56,15 @@ required arguments:
 optional arguments:
   -h, --help                                  show this help message and exit
 
+  -c COOKIE, --cookie COOKIE                  cookie
+
+  --cookie-file COOKIE_FILE                   cookie-file
+
   -o OFFSET_DYNAMIC_ID,                       offset_dynamic_id
   --offset_dynamic_id OFFSET_DYNAMIC_ID
 
-  -e endwith_dynamic_id,                      endwith_dynamic_id
-  --endwith_dynamic_id endwith_dynamic_id
+  -e ENDWITH_DYNAMIC_ID,                      endwith_dynamic_id
+  --endwith_dynamic_id ENDWITH_DYNAMIC_ID
 ```
 
 [//]: # (         [-d FILE_DYNAMIC_IDS])
@@ -74,6 +77,8 @@ optional arguments:
 
 参数 `COOKIE` 是bilibili账号的cookie
 
+参数 `COOKIE-file` 是bilibili账号的cookie所在在文件
+
 参数 `HOST_UID`是指定要下载的up主，即bilibili账号的uid
 
 参数 `offset_dynamic_id`是指定从此id之后的动态，不包含此id的动态
@@ -84,8 +89,8 @@ optional arguments:
 [//]: # ()
 [//]: # (参数 `file_dynamic_images`是指定一个文件，文件中每行一个动态图片，在文件中写入动态图片地址)
 
-参数 `download_state_file`
-是指定一个文件,使用sqlite格式，保存了下载进度的成功和失败的记录
+参数
+`download_state_file`是指定一个文件,使用sqlite格式，保存了下载进度的成功和失败的记录
 
 ## 状态保存功能
 

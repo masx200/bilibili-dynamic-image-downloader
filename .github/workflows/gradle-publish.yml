@@ -9,7 +9,7 @@ name: publish with Gradle
 
 on:
   release:
-    types: [ created ]
+    types: [created]
 
 jobs:
   build:

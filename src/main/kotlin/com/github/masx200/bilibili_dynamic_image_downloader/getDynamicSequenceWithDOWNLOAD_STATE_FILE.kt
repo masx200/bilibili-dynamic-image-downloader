@@ -51,7 +51,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
 //eq()
                 })
-                println(oldranges)
+//                println(oldranges)
                 if (oldranges == null) {
                     val data11 = DynamicRanges {
                         it.userId = options.host_uid
@@ -63,7 +63,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                         }
 
                     }
-                    println(data11)
+//                    println(data11)
 
                     dynamicRangesTable.insert(data11)
 
@@ -75,7 +75,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     if (options.endwith_dynamic_id != "") {
                         oldranges.endwith_dynamic_id = options.endwith_dynamic_id.toLong()
                     }
-                    println(oldranges)
+//                    println(oldranges)
                     dynamicRangesTable.update(oldranges)
                 }
 //                println(dynamicRangesTable.findOne(Op.build {
@@ -83,10 +83,10 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 ////eq()
 //                }))
 //
-                println((dynamicRangesTable.findOne {
-                    (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
-//eq()
-                }))
+//                println((dynamicRangesTable.findOne {
+//                    (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
+////eq()
+//                }))
             }
         }
 
