@@ -3,6 +3,8 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 //import com.sun.tools.javac.tree.TreeInfo.args
 import com.github.masx200.jsqlite.DB
 import com.github.masx200.jsqlite.DataSupport
+import com.github.masx200.jsqlite.Options
+import java.util.function.Consumer
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
 
@@ -68,4 +70,10 @@ class DataBaseTableDao<T : DataSupport<T>>(
         return database.update(data)
     }
 
+    fun find(consumer: Consumer<Options>): List<T> {}
+
+    fun find(ids: List<Long>): List<T> {};
+
+    fun find(vararg ids: Long): List<T> {};
+    fun findAll(): List<T> {};
 }
