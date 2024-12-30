@@ -3,16 +3,15 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 //import com.sun.tools.javac.tree.TreeInfo.args
 import com.github.masx200.jsqlite.DB
 import com.github.masx200.jsqlite.DataSupport
-import com.google.common.eventbus.AsyncEventBus
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
 
 class DataBaseTableDao<T : DataSupport<T>>(
     var database: DB, var entityClass: Class<T>,
 ) {
-    fun getAsyncEventBus(identifier: String): AsyncEventBus {
-        return database.getAsyncEventBus(identifier)
-    }
+//    fun getAsyncEventBus(identifier: String): AsyncEventBus {
+//        return database.getAsyncEventBus(identifier)
+//    }
 
     fun deleteAll(): List<String> {
         return database.deleteAll<T>(entityClass)
