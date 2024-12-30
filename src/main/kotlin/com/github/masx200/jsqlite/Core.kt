@@ -113,6 +113,24 @@ internal class Core(var path: String) : DB {
         }
     }
 
+    override fun findDifferenceTypeColumns(classes: Class<*>?): List<String?>? {
+        TODO("Not yet implemented")
+    }
+
+    override fun createColumns(
+        classes: Class<*>?,
+        vararg columnNames: String?
+    ): List<String?>? {
+        TODO("Not yet implemented")
+    }
+
+    override fun dropColumns(
+        classes: Class<*>?,
+        vararg columnNames: String?
+    ): List<String?>? {
+        TODO("Not yet implemented")
+    }
+
     override fun checkTableDifferenceInPrimaryKeyAndAutoIncrement(classes: Class<*>): Boolean {
 
         val classInfo = getClassInfoFromClass(classes)

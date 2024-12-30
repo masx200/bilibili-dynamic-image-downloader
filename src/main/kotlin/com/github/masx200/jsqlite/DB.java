@@ -26,6 +26,13 @@ public interface DB extends AutoCloseable {
     @Override
     void close();
 
+    List<String> findDifferenceTypeColumns(Class<?> classes);
+
+
+    List<String> createColumns(Class<?> classes, String... columnNames);
+
+    List<String> dropColumns(Class<?> classes, String... columnNames);
+
     boolean checkTableDifferenceInPrimaryKeyAndAutoIncrement(Class<?> classes);
 
     List<String> dropUnusedColumns(Class<?>... classes);

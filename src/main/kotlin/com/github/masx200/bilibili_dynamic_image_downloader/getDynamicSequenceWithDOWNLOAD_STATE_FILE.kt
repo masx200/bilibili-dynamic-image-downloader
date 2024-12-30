@@ -3,6 +3,7 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 //import java.sql.DriverManager
 //import com.github.masx200.jsqlite.DB.connect
 import com.github.masx200.jsqlite.DB.connect
+import com.github.masx200.jsqlite.recreateColumnsOnSchemaChangeInColumnTypes
 import com.github.masx200.jsqlite.recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -32,7 +33,14 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
                 )
             )
-
+            println(
+                recreateColumnsOnSchemaChangeInColumnTypes(
+                    db,
+                    DynamicRanges::class.java,
+                    DynamicPictures::class.java,
+                    DynamicRanges::class.java
+                )
+            )
             println(
                 recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement(
                     db,

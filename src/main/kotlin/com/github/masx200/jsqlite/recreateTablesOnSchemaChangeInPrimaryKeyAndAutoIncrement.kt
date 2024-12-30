@@ -18,3 +18,5 @@ fun recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement(db: DB, vararg list
     }
     return resultList
 }
+
+
