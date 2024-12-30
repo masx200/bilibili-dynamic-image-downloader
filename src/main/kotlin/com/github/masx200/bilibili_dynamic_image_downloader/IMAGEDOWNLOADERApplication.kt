@@ -40,7 +40,7 @@ fun main(args: Array<String>) {
                 } else {
                     cookie
                 }
-            println("cookie_str=" + cookie_str)
+            println("cookie_str=(" + cookie_str + ")")
 //            val iteritems: Sequence<Dynamic> =
 //                if (this.download_state_file != "") {
 //

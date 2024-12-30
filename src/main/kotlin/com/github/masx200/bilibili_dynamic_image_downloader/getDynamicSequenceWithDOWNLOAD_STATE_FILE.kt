@@ -2,6 +2,7 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 
 //import java.sql.DriverManager
 //import com.github.masx200.jsqlite.DB.connect
+import com.github.masx200.jsqlite.DB
 import com.github.masx200.jsqlite.DB.connect
 import com.github.masx200.jsqlite.recreateColumnsOnSchemaChangeInColumnTypes
 import com.github.masx200.jsqlite.recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement
@@ -22,37 +23,48 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
         DataBaseTableDao(db2, DynamicPictures::class.java)
 
         db2.use { db ->
-            var asyncEventBus = db.getAsyncEventBus("select")
-            asyncEventBus.register(MyEventListener({
-                System.out.println("select:" + "Received event: " + it.message)
-            }))
+            registerEventListenerForIdentifier(db, "select")
+
+            registerEventListenerForIdentifier(db, "create")
+            registerEventListenerForIdentifier(db, "alter")
+            registerEventListenerForIdentifier(db, "delete")
+            registerEventListenerForIdentifier(db, "drop")
+            registerEventListenerForIdentifier(db, "insert")
+            registerEventListenerForIdentifier(db, "update")
 //        println(db)
-            println(
-                db.tables(
-                    SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
-                )
+            var strings = db.tables(
+                SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
             )
-            println(
-                db.dropUnusedColumns(
-                    SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
+            if (strings.isNotEmpty()) {
+                println(
+                    strings
                 )
+            }
+            var strings1 = db.dropUnusedColumns(
+                SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
             )
-            println(
-                recreateColumnsOnSchemaChangeInColumnTypes(
-                    db,
-                    DynamicRanges::class.java,
-                    DynamicPictures::class.java,
-                    DynamicRanges::class.java
+            if (strings1.isNotEmpty()) {
+                println(
+                    strings1
                 )
+            }
+            var strings2 = recreateColumnsOnSchemaChangeInColumnTypes(
+                db, DynamicRanges::class.java, DynamicPictures::class.java, DynamicRanges::class.java
             )
-            println(
-                recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement(
-                    db,
-                    SpaceHistory::class.java,
-                    DynamicPictures::class.java,
-                    DynamicRanges::class.java
+            if (strings2.isNotEmpty()) {
+                println(
+                    strings2
                 )
+            }
+            var strings3 = recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement(
+                db, SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
             )
+
+            if (strings3.isNotEmpty()) {
+                println(
+                    strings3
+                )
+            }
 
 //        db.findOne<DynamicRanges>(DynamicRanges::class.java){
 //
@@ -119,3 +131,9 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 
 }
 
+fun registerEventListenerForIdentifier(db: DB, identifier: String) {
+    var asyncEventBus = db.getAsyncEventBus(identifier)
+    asyncEventBus.register(MyEventListener({
+        System.out.println("$identifier:" + "Received event:" + it.message)
+    }))
+}
