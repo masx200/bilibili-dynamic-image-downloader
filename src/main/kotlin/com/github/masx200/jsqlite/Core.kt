@@ -18,6 +18,9 @@
  */
 package com.github.masx200.jsqlite
 
+
+import com.github.masx200.jsqlite.Reflect.Companion.isAutoIncrement
+import com.github.masx200.jsqlite.Reflect.Companion.isPrimaryKey
 import com.github.masx200.jsqlite.SQLiteIndexFetcher.fetchIndexes
 import com.google.gson.Gson
 import java.nio.file.Files
@@ -49,6 +52,59 @@ internal class Core(var path: String) : DB {
         }
     }
 
+    fun getReflectInfo(vararg classes: Class<*>): TableReflectInfo {
+        val tablesMapIndexesData1: HashMap<String?, List<IndexesData1?>> = HashMap<String?, List<IndexesData1?>>()
+        // 存储表名和其列类型映射的Map
+        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+
+        // 存储表名和其主键列名映射的Map
+        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        // 存储表名和其列是否自动增长映射的Map
+        val tablesMapIsAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
+        // 存储索引名和列名映射的Map
+
+        var tableNameSet = HashSet<String>()
+        for (tClass in classes) {
+            val tableName = getTableNameFromClass(tClass)
+            tableNameSet.add(tableName)
+        }
+        for (tClass in classes) {
+
+            val tableName = getTableNameFromClass(tClass)
+            val reflect: Reflect<*> = Reflect<Any?>(tClass)
+
+            val classColumns = hashMapOf<String?, String?>()
+            reflect.getDBColumnsWithType { column: String?, type: String? ->
+                classColumns.put(column!!, type!!)
+            }
+            tablesMapTypes.put(tableName, classColumns)
+            val MapIsAutoIncrement = HashMap<String?, Boolean?>()
+
+            for (field in reflect.fieldMap) {
+                if (isPrimaryKey(field.value)) {
+                    tablesMapPrimaryKeys.put(tableName, field.key?.lowercase())
+                }
+                MapIsAutoIncrement.put(field.key?.lowercase(), isAutoIncrement(field.value))
+            }
+
+            tablesMapIsAutoIncrement.put(tableName, MapIsAutoIncrement)
+            val indexes = mutableListOf<IndexesData1>()
+            reflect.getIndexList {
+                val indexName = it?.name
+                val columnName = it?.column
+                if (indexName != null && columnName != null) {
+                    indexes.add(IndexesData1(it.unique, indexName, listOf(columnName)))
+                }
+            }
+            tablesMapIndexesData1[tableName] = indexes
+        }
+
+        return TableReflectInfo(
+            tablesMapTypes,
+            tablesMapPrimaryKeys, tablesMapIsAutoIncrement, tablesMapIndexesData1
+        )
+    }
+
     override fun close() {
         try {
             connection!!.close()
@@ -56,6 +112,7 @@ internal class Core(var path: String) : DB {
             throw RuntimeException(e)
         }
     }
+
     /**
      * 根据给定的类更新或创建数据库表结构
      * 此函数检查数据库中的现有表结构，并根据提供的类更新或创建相应的表
@@ -122,7 +179,7 @@ internal class Core(var path: String) : DB {
 //                                println(set.getString("TABLE_NAME"))
                                 val index = set.getString("INDEX_NAME")
                                 val column = set.getString("COLUMN_NAME")
-                                if (index != null){
+                                if (index != null) {
                                     indexMapTables.put(
                                         index.lowercase(Locale.getDefault()),
                                         tableName.lowercase(Locale.getDefault())
@@ -138,7 +195,7 @@ internal class Core(var path: String) : DB {
                             }
                         }
                     }
-                    val indexMapColumnsTemp=indexMapColumns.toMutableMap()
+                    val indexMapColumnsTemp = indexMapColumns.toMutableMap()
 
                     for (tClass in classes) {
                         val tableName = getTableNameFromClass(tClass)
@@ -205,7 +262,9 @@ internal class Core(var path: String) : DB {
                         }
 
 
-                        reflect.getIndexList { index: String?, column: String? ->
+                        reflect.getIndexList {
+                            var index = it?.name
+                            val column = it?.column
                             try {
                                 if (indexMapColumnsTemp.get(index) != null) {
                                     indexMapColumnsTemp.remove(index, column)
@@ -526,7 +585,7 @@ internal class Core(var path: String) : DB {
 
 
     fun getTablesInfo(vararg classes: Class<*>): TableReflectInfo {
-        val tablesMapIndexesData: HashMap<String?, List<IndexesData?>> = HashMap<String?, List<IndexesData?>>()
+        val tablesMapIndexesData1: HashMap<String?, List<IndexesData1?>> = HashMap<String?, List<IndexesData1?>>()
         // 存储表名和其列类型映射的Map
         val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
 
@@ -545,7 +604,7 @@ internal class Core(var path: String) : DB {
         val dbPath = this.path
         for (tablename in tableNameSet) {
             val indexes = fetchIndexes(dbPath, tablename)
-            tablesMapIndexesData.put(tablename, indexes)
+            tablesMapIndexesData1.put(tablename, indexes)
         }
         val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
         try {
@@ -599,7 +658,7 @@ internal class Core(var path: String) : DB {
 
                     return TableReflectInfo(
                         tablesMapTypes,
-                        tablesMapPrimaryKeys, tablesMapIsAutoIncrement, tablesMapIndexesData
+                        tablesMapPrimaryKeys, tablesMapIsAutoIncrement, tablesMapIndexesData1
                     )
                 }
             }

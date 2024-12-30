@@ -5,5 +5,5 @@ data class TableReflectInfo(
     val tablesMapPrimaryKeys: HashMap<String?, String?>,
     val tablesMapIsAutoIncrement: HashMap<String?, HashMap<String?, Boolean?>?>,
 
-    val tablesMapIndexesData: HashMap<String?, List<IndexesData?>>,
+    val tablesMapIndexesData1: HashMap<String?, List<IndexesData1?>>,
 )

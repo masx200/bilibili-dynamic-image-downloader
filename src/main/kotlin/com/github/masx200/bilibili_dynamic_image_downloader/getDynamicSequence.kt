@@ -12,11 +12,11 @@ import com.github.masx200.biliClient.model.dynamic.Dynamic
  * @param options 包含了获取动态数据所需的各种参数，如cookie、偏移动态ID、主机UID等
  * @return 返回一个动态数据的序列，每个元素代表一个动态数据项
  */
-fun getDynamicSequence(options: MyArgs): Sequence<Dynamic> {
+fun getDynamicSequence(options: MyArgs, cookie_str: String): Sequence<Dynamic> {
     return sequence {
 
 
-        val cookie = options.cookie
+        val cookie = cookie_str
         val offset_dynamic_id = options.offset_dynamic_id
         val host_uid = options.host_uid
 

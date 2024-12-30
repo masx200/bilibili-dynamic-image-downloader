@@ -7,8 +7,8 @@ import java.util.List;
 public class SQLiteIndexFetcher {
 
 
-    public static List<IndexesData> fetchIndexes(String dbPath, String tableName) throws SQLException {
-        List<IndexesData> indexesDataList = new ArrayList<>();
+    public static List<IndexesData1> fetchIndexes(String dbPath, String tableName) throws SQLException {
+        List<IndexesData1> indexesData1List = new ArrayList<>();
         String url = "jdbc:sqlite:" + dbPath;
 
         try (Connection conn = DriverManager.getConnection(url)) {
@@ -27,7 +27,7 @@ public class SQLiteIndexFetcher {
                         }
 
                         // 构造 IndexesData 并添加到列表
-                        indexesDataList.add(new IndexesData(isUnique, indexName, columns));
+                        indexesData1List.add(new IndexesData1(isUnique, indexName, columns));
                     }
                 }
             }
@@ -36,6 +36,6 @@ public class SQLiteIndexFetcher {
             throw e;
         }
 
-        return indexesDataList;
+        return indexesData1List;
     }
 }

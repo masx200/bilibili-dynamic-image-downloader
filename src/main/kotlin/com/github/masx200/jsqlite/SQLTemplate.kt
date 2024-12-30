@@ -18,8 +18,9 @@
  */
 package com.github.masx200.jsqlite
 
-import com.github.masx200.jsqlite.Reflect.isAutoIncrement
-import com.github.masx200.jsqlite.Reflect.isPrimaryKey
+import com.github.masx200.jsqlite.Reflect.Companion.isAutoIncrement
+import com.github.masx200.jsqlite.Reflect.Companion.isPrimaryKey
+
 import java.util.*
 import java.util.function.BiConsumer
 
@@ -39,11 +40,11 @@ internal object SQLTemplate {
         val columnsString = StringBuffer(
             "id integer " + when {
 
-                isPrimaryKey(field) -> "primary key"
+                field != null && isPrimaryKey(field) -> "primary key"
                 else -> ""
             } + " " + when {
 
-                isAutoIncrement(field) -> "autoincrement"
+                field != null && isAutoIncrement(field) -> "autoincrement"
                 else -> ""
             } + ","
         )
@@ -53,7 +54,7 @@ internal object SQLTemplate {
                 columnsString.append(column).append(" ").append(
                     type + " " + when {
 
-                        isAutoIncrement(field) -> "autoincrement"
+                        field != null && isAutoIncrement(field) -> "autoincrement"
                         else -> ""
                     }
                 ).append(",")
