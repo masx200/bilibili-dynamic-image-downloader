@@ -134,7 +134,8 @@ internal class Core(var path: String) : DB {
     /**
      * 无法删除主键!!!!!!!
      * */
-    override fun dropUnusedColumns(vararg classes: Class<*>) {
+    override fun dropUnusedColumns(vararg classes: Class<*>): List<String?>? {
+        var resultList = mutableListOf<String>()
         // 存储表名和其列类型映射的Map
         val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
 
@@ -144,6 +145,11 @@ internal class Core(var path: String) : DB {
 
 
         val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
+        var tableNameSet = HashSet<String>()
+        for (tClass in classes) {
+            val tableName = getTableNameFromClass(tClass)
+            tableNameSet.add(tableName)
+        }
         try {
             connection!!.createStatement().use { statement ->
                 statement.executeQuery(s).use { result ->
@@ -152,33 +158,33 @@ internal class Core(var path: String) : DB {
                         val tableColumnTypeMap = HashMap<String?, String?>()
 
                         val tableName = result.getString("name")
-
-                        metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
-                            while (primaryKeySet.next()) {
-                                val primaryKeyColumn =
-                                    primaryKeySet.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+                        if (tableNameSet.contains(tableName)) {
+                            metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
+                                while (primaryKeySet.next()) {
+                                    val primaryKeyColumn =
+                                        primaryKeySet.getString("COLUMN_NAME").lowercase(Locale.getDefault())
 //                                println("Column $primaryKeyColumn in table $tableName is a primary key")
-                                tablesMapPrimaryKeys.put(tableName, primaryKeyColumn)
-                            }
+                                    tablesMapPrimaryKeys.put(tableName, primaryKeyColumn)
+                                }
 
-                        }
-                        metaData.getColumns(null, null, tableName, null).use { set ->
+                            }
+                            metaData.getColumns(null, null, tableName, null).use { set ->
 //                            println(set.metaData.isAutoIncrement())
 
 
-                            while (set.next()) {
+                                while (set.next()) {
 
 
-//                             
-                                val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
-                                val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
-                                tableColumnTypeMap.put(column, type)
+//
+                                    val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+                                    val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
+                                    tableColumnTypeMap.put(column, type)
 
+                                }
                             }
+                            tablesMapTypes.put(tableName, tableColumnTypeMap)
+
                         }
-                        tablesMapTypes.put(tableName, tableColumnTypeMap)
-
-
                     }
 
                     for (tClass in classes) {
@@ -207,7 +213,14 @@ internal class Core(var path: String) : DB {
 //                            删除多余字段：在遍历数据库中的列时，如果数据库中的列在类中不存在，则执行 dropTableColumn 操作来删除该列。
                             dbColumns?.filter { !classColumns.contains(it) }?.forEach { column ->
                                 try {
-                                    column?.let { statement.executeUpdate(SQLTemplate.dropTableColumn(tableName, it)) }
+                                    column?.let {
+
+
+                                        var sql = SQLTemplate.dropTableColumn(tableName, it)
+
+                                        resultList.add(sql)
+                                        statement.executeUpdate(sql)
+                                    }
                                 } catch (e: SQLException) {
                                     throw RuntimeException(e)
                                 }
@@ -223,6 +236,7 @@ internal class Core(var path: String) : DB {
             e.printStackTrace()
             throw RuntimeException(e)
         }
+        return resultList
     }
 
     fun getTableInfoFromDatabase(value: Class<*>): PrimaryKeyAndAutoIncrementInfo? {
@@ -270,7 +284,8 @@ internal class Core(var path: String) : DB {
      *
      * @param classes 可变参数，代表需要更新或创建表结构的类
      */
-    override fun tables(vararg classes: Class<*>) {
+    override fun tables(vararg classes: Class<*>): List<String?>? {
+        var resultList = mutableListOf<String>()
         // 存储表名和其列类型映射的Map
         val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
 
@@ -283,6 +298,11 @@ internal class Core(var path: String) : DB {
         val indexMapTables = HashMap<String?, String?>()
 
         val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
+        var tableNameSet = HashSet<String>()
+        for (tClass in classes) {
+            val tableName = getTableNameFromClass(tClass)
+            tableNameSet.add(tableName)
+        }
         try {
             connection!!.createStatement().use { statement ->
                 statement.executeQuery(s).use { result ->
@@ -291,50 +311,52 @@ internal class Core(var path: String) : DB {
                         val tableColumnTypeMap = HashMap<String?, String?>()
                         val tableColumnTypeMapisAutoIncrement = HashMap<String?, Boolean?>()
                         val tableName = result.getString("name")
-
-                        metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
-                            while (primaryKeySet.next()) {
-                                val primaryKeyColumn =
-                                    primaryKeySet.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+                        if (tableNameSet.contains(tableName)) {
+                            metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
+                                while (primaryKeySet.next()) {
+                                    val primaryKeyColumn =
+                                        primaryKeySet.getString("COLUMN_NAME").lowercase(Locale.getDefault())
 //                                println("Column $primaryKeyColumn in table $tableName is a primary key")
-                                tablesMapPrimaryKeys.put(tableName, primaryKeyColumn)
-                            }
+                                    tablesMapPrimaryKeys.put(tableName, primaryKeyColumn)
+                                }
 
-                        }
-                        metaData.getColumns(null, null, tableName, null).use { set ->
+                            }
+                            metaData.getColumns(null, null, tableName, null).use { set ->
 //                            println(set.metaData.isAutoIncrement())
 
 
-                            while (set.next()) {
-                                val isAutoIncrement = set.getString("IS_AUTOINCREMENT").lowercase(Locale.getDefault())
+                                while (set.next()) {
+                                    val isAutoIncrement =
+                                        set.getString("IS_AUTOINCREMENT").lowercase(Locale.getDefault())
 
-//                             
-                                val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
-                                val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
-                                tableColumnTypeMap.put(column, type)
-                                tableColumnTypeMapisAutoIncrement.put(column, isAutoIncrement == "yes")
-                            }
-                        }
-                        tablesMapTypes.put(tableName, tableColumnTypeMap)
-                        tablesMapIsAutoIncrement.put(tableName, tableColumnTypeMapisAutoIncrement)
-                        metaData.getIndexInfo(null, null, tableName, false, false).use { set ->
-                            while (set.next()) {
-//                                println(set.getString("TABLE_NAME"))
-                                val index = set.getString("INDEX_NAME")
-                                val column = set.getString("COLUMN_NAME")
-                                if (index != null) {
-                                    indexMapTables.put(
-                                        index.lowercase(Locale.getDefault()),
-                                        tableName.lowercase(Locale.getDefault())
-                                    )
+//
+                                    val column = set.getString("COLUMN_NAME").lowercase(Locale.getDefault())
+                                    val type = set.getString("TYPE_NAME").lowercase(Locale.getDefault())
+                                    tableColumnTypeMap.put(column, type)
+                                    tableColumnTypeMapisAutoIncrement.put(column, isAutoIncrement == "yes")
                                 }
-                                Optional.ofNullable<String?>(index)
-                                    .ifPresent { i: String? ->
-                                        indexMapColumns.put(
+                            }
+                            tablesMapTypes.put(tableName, tableColumnTypeMap)
+                            tablesMapIsAutoIncrement.put(tableName, tableColumnTypeMapisAutoIncrement)
+                            metaData.getIndexInfo(null, null, tableName, false, false).use { set ->
+                                while (set.next()) {
+//                                println(set.getString("TABLE_NAME"))
+                                    val index = set.getString("INDEX_NAME")
+                                    val column = set.getString("COLUMN_NAME")
+                                    if (index != null) {
+                                        indexMapTables.put(
                                             index.lowercase(Locale.getDefault()),
-                                            column.lowercase(Locale.getDefault())
+                                            tableName.lowercase(Locale.getDefault())
                                         )
                                     }
+                                    Optional.ofNullable<String?>(index)
+                                        .ifPresent { i: String? ->
+                                            indexMapColumns.put(
+                                                index.lowercase(Locale.getDefault()),
+                                                column.lowercase(Locale.getDefault())
+                                            )
+                                        }
+                                }
                             }
                         }
                     }
@@ -356,7 +378,9 @@ internal class Core(var path: String) : DB {
 //                            classColumns
 //                        )
                         if (tableColumnTypeMap == null) {
-                            statement.executeUpdate(SQLTemplate.create(tClass))
+                            var sql = SQLTemplate.create(tClass)
+                            resultList.add(sql)
+                            statement.executeUpdate(sql)
                         } else {
 //                            println(tableColumnTypeMap)
                             reflect.getDBColumnsWithType { column: String?, type: String? ->
@@ -364,12 +388,14 @@ internal class Core(var path: String) : DB {
                                 if (tableColumnTypeMap.getOrDefault(column, null) == null) {
                                     try {
                                         column?.let {
+                                            var sql = SQLTemplate.addTableColumn(
+                                                tableName,
+                                                it,
+                                                type
+                                            )
+                                            resultList.add(sql)
                                             statement.executeUpdate(
-                                                SQLTemplate.addTableColumn(
-                                                    tableName,
-                                                    it,
-                                                    type
-                                                )
+                                                sql
                                             )
                                         }
                                     } catch (e: SQLException) {
@@ -381,12 +407,14 @@ internal class Core(var path: String) : DB {
                                 else if (tableColumnTypeMap[column] != type) {
                                     try {
                                         column?.let {
+                                            var sql = SQLTemplate.alterTableColumn(
+                                                tableName,
+                                                it,
+                                                type
+                                            )
+                                            resultList.add(sql)
                                             statement.executeUpdate(
-                                                SQLTemplate.alterTableColumn(
-                                                    tableName,
-                                                    it,
-                                                    type
-                                                )
+                                                sql
                                             )
                                         }
                                     } catch (e: SQLException) {
@@ -412,7 +440,9 @@ internal class Core(var path: String) : DB {
                                 if (indexMapColumnsTemp.get(index) != null) {
                                     indexMapColumnsTemp.remove(index, column)
                                 } else {
-                                    statement.executeUpdate(SQLTemplate.createIndex(tClass, column, it?.unique))
+                                    var sql = SQLTemplate.createIndex(tClass, column, it?.unique)
+                                    resultList.add(sql)
+                                    statement.executeUpdate(sql)
                                 }
                             } catch (e: SQLException) {
                                 throw RuntimeException(e)
@@ -421,7 +451,9 @@ internal class Core(var path: String) : DB {
                     }
                     indexMapColumnsTemp.forEach { (index: String?, _: String?) ->
                         try {
-                            statement.executeUpdate(SQLTemplate.dropIndex<Any?>(index))
+                            var sql = SQLTemplate.dropIndex<Any?>(index)
+                            resultList.add(sql)
+                            statement.executeUpdate(sql)
                         } catch (e: SQLException) {
                             throw RuntimeException(e)
                         }
@@ -432,30 +464,39 @@ internal class Core(var path: String) : DB {
             e.printStackTrace()
             throw RuntimeException(e)
         }
+        return resultList
     }
 
-    override fun create(vararg classes: Class<*>) {
+    override fun create(vararg classes: Class<*>): List<String?>? {
+        var resultList = mutableListOf<String>()
         try {
             connection!!.createStatement().use { statement ->
                 for (tClass in classes) {
-                    statement.executeUpdate(SQLTemplate.create(tClass))
+                    var sql = SQLTemplate.create(tClass)
+                    resultList.add(sql)
+                    statement.executeUpdate(sql)
                 }
             }
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
+        return resultList
     }
 
-    override fun drop(vararg classes: Class<*>) {
+    override fun drop(vararg classes: Class<*>): List<String?>? {
+        var resultList = mutableListOf<String>()
         try {
             connection!!.createStatement().use { statement ->
                 for (tClass in classes) {
-                    statement.executeUpdate(SQLTemplate.drop(tClass))
+                    var sql = SQLTemplate.drop(tClass)
+                    resultList.add(sql)
+                    statement.executeUpdate(sql)
                 }
             }
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
+        return resultList
     }
 
     override fun version(): String? {
@@ -471,13 +512,18 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T?>?> insert(t: T?) {
+    override fun <T : DataSupport<T?>?> insert(t: T?): List<String?>? {
+        var resultList = mutableListOf<String>()
         try {
             connection!!.createStatement().use { statement ->
                 lock.lock()
                 t!!.createdAt = System.currentTimeMillis()
                 t.updatedAt = t.createdAt
-                statement.executeUpdate(SQLTemplate.insert<T?>(t))
+                var sql = SQLTemplate.insert<T?>(t)
+                resultList.add(
+                    sql
+                )
+                statement.executeUpdate(sql)
                 statement.executeQuery("select last_insert_rowid()").use { result ->
                     if (result.next()) {
                         t.id = result.getLong(1)
@@ -489,27 +535,32 @@ internal class Core(var path: String) : DB {
         } finally {
             lock.unlock()
         }
+        return resultList
     }
 
-    override fun <T : DataSupport<T?>?> update(t: T?, predicate: String?, vararg args: Any?) {
+    override fun <T : DataSupport<T?>?> update(t: T?, predicate: String?, vararg args: Any?): List<String?>? {
+        var resultList = mutableListOf<String>()
         try {
             connection!!.createStatement().use { statement ->
                 lock.lock()
                 t!!.updatedAt = System.currentTimeMillis()
-                statement.executeUpdate(SQLTemplate.update<T?>(t, Options().where(predicate, *args)))
+                var sql = SQLTemplate.update<T?>(t, Options().where(predicate, *args))
+                resultList.add(sql)
+                statement.executeUpdate(sql)
             }
         } catch (e: Exception) {
             throw RuntimeException(e)
         } finally {
             lock.unlock()
         }
+        return resultList
     }
 
-    override fun <T : DataSupport<T?>?> update(t: T?) {
+    override fun <T : DataSupport<T?>?> update(t: T?): List<String?>? {
         if (t?.id == null) {
             throw IllegalArgumentException("The entity must have an id to be updated.")
         }
-        update<T?>(t, "id = ?", t.id())
+        return update<T?>(t, "id = ?", t.id())
     }
 
     override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, predicate: String?, vararg args: Any?) {

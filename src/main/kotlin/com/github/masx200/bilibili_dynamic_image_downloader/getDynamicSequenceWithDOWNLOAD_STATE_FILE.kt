@@ -21,11 +21,15 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 
         db2.use { db ->
 //        println(db)
-            db.tables(
-                SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
+            println(
+                db.tables(
+                    SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
+                )
             )
-            db.dropUnusedColumns(
-                SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
+            println(
+                db.dropUnusedColumns(
+                    SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
+                )
             )
 
             for (klass in listOf(SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java)) {
@@ -34,8 +38,8 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                 if (db.checkTableDifferenceInPrimaryKeyAndAutoIncrement(klass)) {
 
 
-                    db.drop(klass)
-                    db.create(klass)
+                    println(db.drop(klass))
+                    println(db.create(klass))
                 }
             }
 
@@ -70,7 +74,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     }
 //                    println(data11)
 
-                    dynamicRangesTable.insert(data11)
+                    println(dynamicRangesTable.insert(data11))
 
                 } else {
                     val data11 = DynamicRanges {
@@ -89,7 +93,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 //                    println(oldranges)
 
 //                    println(oldranges)
-                    dynamicRangesTable.update(data11)
+                    println(dynamicRangesTable.update(data11))
                 }
 //                println(dynamicRangesTable.findOne(Op.build {
 //                    (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)

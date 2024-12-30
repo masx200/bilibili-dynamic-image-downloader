@@ -28,21 +28,21 @@ public interface DB extends AutoCloseable {
 
     boolean checkTableDifferenceInPrimaryKeyAndAutoIncrement(Class<?> classes);
 
-    void dropUnusedColumns(Class<?>... classes);
+    List<String> dropUnusedColumns(Class<?>... classes);
 
-    void tables(Class<?>... classes);
+    List<String> tables(Class<?>... classes);
 
-    void drop(Class<?>... classes);
+    List<String> drop(Class<?>... classes);
 
-    void create(Class<?>... classes);
+    List<String> create(Class<?>... classes);
 
     String version();
 
-    <T extends DataSupport<T>> void insert(T t);
+    <T extends DataSupport<T>> List<String> insert(T t);
 
-    <T extends DataSupport<T>> void update(T t, String predicate, Object... args);
+    <T extends DataSupport<T>> List<String> update(T t, String predicate, Object... args);
 
-    <T extends DataSupport<T>> void update(T t);
+    <T extends DataSupport<T>> List<String> update(T t);
 
     <T extends DataSupport<T>> void delete(Class<T> tClass, String predicate, Object... args);
 

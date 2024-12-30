@@ -169,7 +169,7 @@ internal object SQLTemplate {
         return String.format(format, *objects)
     }
 
-    fun alterTableColumn(table_name: String, column_name: String, column_type: String?): String? {
+    fun alterTableColumn(table_name: String, column_name: String, column_type: String?): String {
         return "alter table $table_name alter column ${column_name.lowercase(Locale.getDefault())} $column_type"
 //        println(
 //            """
@@ -182,7 +182,7 @@ internal object SQLTemplate {
 //
     }
 
-    fun dropTableColumn(table_name: String, column_name: String): String? {
+    fun dropTableColumn(table_name: String, column_name: String): String {
 //        println(
 //            """
 //                dropTableColumn()
