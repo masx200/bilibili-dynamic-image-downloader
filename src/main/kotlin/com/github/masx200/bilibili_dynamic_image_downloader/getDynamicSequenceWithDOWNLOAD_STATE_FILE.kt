@@ -6,7 +6,7 @@ import com.github.masx200.jsqlite.DB.connect
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs) {
+fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: String) {
     val dbFile = options.download_state_file
     var data1 = Database.connect("jdbc:sqlite:$dbFile", "org.sqlite.JDBC")
 //    println(data1)

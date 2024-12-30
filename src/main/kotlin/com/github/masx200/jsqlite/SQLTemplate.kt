@@ -49,7 +49,14 @@ internal object SQLTemplate {
         )
         reflect.getDBColumnsWithType(BiConsumer { column: String?, type: String? ->
             if (column != "id") {
-                columnsString.append(column).append(" ").append(type).append(",")
+                val field = reflect.fieldMap[column]
+                columnsString.append(column).append(" ").append(
+                    type + " " + when {
+
+                        isAutoIncrement(field) -> "autoincrement"
+                        else -> ""
+                    }
+                ).append(",")
             }
         })
         columnsString.deleteCharAt(columnsString.length - 1)

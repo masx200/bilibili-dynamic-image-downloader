@@ -31,12 +31,21 @@ fun main(args: Array<String>) {
         ArgParser(args).parseInto(::MyArgs).run {
             printmyargs(this)
 
-
+            if (cookie == "" && cookie_file == "") {
+                throw Exception("cookie or cookie_file must be not empty")
+            }
+            val cookie_str =
+                if (cookie_file != "") {
+                    readCookieFromFile(cookie_file)
+                } else {
+                    cookie
+                }
+            println("cookie_str=" + cookie_str)
 //            val iteritems: Sequence<Dynamic> =
 //                if (this.download_state_file != "") {
 //
 
-            return@run getDynamicSequenceWithDOWNLOAD_STATE_FILE(this)
+            return@run getDynamicSequenceWithDOWNLOAD_STATE_FILE(this, cookie_str)
 //                } else {
 //
 //                    getDynamicSequence(this); }

@@ -14,8 +14,11 @@ class MyArgs(parser: ArgParser) {
     val cookie by parser.storing(
         "-c", "--cookie",
         help = "cookie"
-    )
-
+    ).default("")
+    val cookie_file by parser.storing(
+        "--cookie-file",
+        help = "cookie-file"
+    ).default("")
     val host_uid by parser.storing(
         "-u", "--host_uid",
         help = "host_uid"
@@ -43,7 +46,23 @@ class MyArgs(parser: ArgParser) {
     override fun toString(): String {
         return "MyArgs(cookie='$cookie', host_uid='$host_uid', offset_dynamic_id='$offset_dynamic_id', endwith_dynamic_id='$endwith_dynamic_id', " +
 //        file_dynamic_ids='$file_dynamic_ids', file_dynamic_images='$file_dynamic_images',
-                "download_state_file='$download_state_file')"
+                "download_state_file='$download_state_file'," +
+                "cookie_file=$cookie_file)"
     }
 
+}
+
+
+fun readCookieFromFile(string: String): String {
+
+
+    return try {
+        val file = java.io.File(string)
+        if (!file.exists()) {
+            throw Exception("cookie file not found")
+        }
+        file.readText()
+    } catch (e: Exception) {
+        throw e
+    }
 }

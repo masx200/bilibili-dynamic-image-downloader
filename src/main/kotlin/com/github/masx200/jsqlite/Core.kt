@@ -18,6 +18,7 @@
  */
 package com.github.masx200.jsqlite
 
+import com.github.masx200.jsqlite.SQLiteIndexFetcher.fetchIndexes
 import com.google.gson.Gson
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -28,14 +29,7 @@ import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Consumer
 
-data class TableReflectInfo(
-    val tablesMapTypes: HashMap<String?, HashMap<String?, String?>?>,
-    val tablesMapPrimaryKeys: HashMap<String?, String?>,
-    val tablesMapisAutoIncrement: HashMap<String?, HashMap<String?, Boolean?>?>,
-    val indexMapColumns: HashMap<String?, String?>,
-    val indexMapTables: HashMap<String?, String?>
-)
-internal class Core(path: String) : DB {
+internal class Core(var path: String) : DB {
     private val lock = ReentrantLock()
 
     private var connection: Connection? = null
@@ -76,7 +70,7 @@ internal class Core(path: String) : DB {
         // 存储表名和其主键列名映射的Map
         val tablesMapPrimaryKeys = HashMap<String?, String?>()
         // 存储表名和其列是否自动增长映射的Map
-        val tablesMapisAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
+        val tablesMapIsAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
         // 存储索引名和列名映射的Map
         val indexMapColumns = HashMap<String?, String?>()
         val indexMapTables = HashMap<String?, String?>()
@@ -122,7 +116,7 @@ internal class Core(path: String) : DB {
                             }
                         }
                         tablesMapTypes.put(tableName, tableColumnTypeMap)
-                        tablesMapisAutoIncrement.put(tableName, tableColumnTypeMapisAutoIncrement)
+                        tablesMapIsAutoIncrement.put(tableName, tableColumnTypeMapisAutoIncrement)
                         metaData.getIndexInfo(null, null, tableName, false, false).use { set ->
                             while (set.next()) {
 //                                println(set.getString("TABLE_NAME"))
@@ -234,6 +228,18 @@ internal class Core(path: String) : DB {
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            throw RuntimeException(e)
+        }
+    }
+
+    fun create(vararg classes: Class<*>) {
+        try {
+            connection!!.createStatement().use { statement ->
+                for (tClass in classes) {
+                    statement.executeUpdate(SQLTemplate.create(tClass))
+                }
+            }
+        } catch (e: Exception) {
             throw RuntimeException(e)
         }
     }
@@ -520,23 +526,27 @@ internal class Core(path: String) : DB {
 
 
     fun getTablesInfo(vararg classes: Class<*>): TableReflectInfo {
+        val tablesMapIndexesData: HashMap<String?, List<IndexesData?>> = HashMap<String?, List<IndexesData?>>()
         // 存储表名和其列类型映射的Map
         val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
 
         // 存储表名和其主键列名映射的Map
         val tablesMapPrimaryKeys = HashMap<String?, String?>()
         // 存储表名和其列是否自动增长映射的Map
-        val tablesMapisAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
+        val tablesMapIsAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
         // 存储索引名和列名映射的Map
-        val indexMapColumns = HashMap<String?, String?>()
-        val indexMapTables = HashMap<String?, String?>()
+//        val indexMapColumns = HashMap<String?, String?>()
+//        val indexMapTables = HashMap<String?, String?>()
         var tableNameSet = HashSet<String>()
         for (tClass in classes) {
             val tableName = getTableNameFromClass(tClass)
             tableNameSet.add(tableName)
         }
-
-
+        val dbPath = this.path
+        for (tablename in tableNameSet) {
+            val indexes = fetchIndexes(dbPath, tablename)
+            tablesMapIndexesData.put(tablename, indexes)
+        }
         val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
         try {
 
@@ -581,37 +591,15 @@ internal class Core(path: String) : DB {
                                 }
                             }
                             tablesMapTypes.put(tableName, tableColumnTypeMap)
-                            tablesMapisAutoIncrement.put(tableName, tableColumnTypeMapisAutoIncrement)
-                            metaData.getIndexInfo(null, null, tableName, false, false).use { set ->
-                                while (set.next()) {
-//                                println(set.getString("TABLE_NAME"))
-                                    val index = set.getString("INDEX_NAME")
-                                    val column = set.getString("COLUMN_NAME")
-                                    if (index != null) {
-                                        indexMapTables.put(
-                                            index.lowercase(Locale.getDefault()),
-                                            tableName.lowercase(Locale.getDefault())
-                                        )
-                                    }
-                                    Optional.ofNullable<String?>(index)
-                                        .ifPresent { i: String? ->
-                                            indexMapColumns.put(
-                                                index.lowercase(Locale.getDefault()),
-                                                column.lowercase(Locale.getDefault())
-                                            )
-                                        }
-                                }
-                            }
+                            tablesMapIsAutoIncrement.put(tableName, tableColumnTypeMapisAutoIncrement)
+
                         }
                     }
                     // val indexMapColumnsTemp = indexMapColumns.toMutableMap()
 
                     return TableReflectInfo(
                         tablesMapTypes,
-                        tablesMapPrimaryKeys,
-                        tablesMapisAutoIncrement,
-                        indexMapColumns,
-                        indexMapTables
+                        tablesMapPrimaryKeys, tablesMapIsAutoIncrement, tablesMapIndexesData
                     )
                 }
             }
