@@ -27,7 +27,7 @@ import java.util.function.Consumer
 import kotlin.jvm.functions.Function1
 
 internal class Reflect<T> {
-    val fieldMap: MutableMap<String?, Field> = LinkedHashMap<String?, Field>()
+    val fieldMap: MutableMap<String, Field> = LinkedHashMap<String, Field>()
     private var tClass: Class<*>? = null
     private var t: T? = null
 
@@ -80,7 +80,7 @@ internal class Reflect<T> {
         return field?.type
     }
 
-    fun getDatabaseType(fieldName: String): String? {
+    fun getDatabaseType(fieldName: String): String {
         when (getType(fieldName.lowercase(Locale.getDefault()))?.getSimpleName()?.lowercase(Locale.getDefault())) {
             "int", "integer", "byte", "short", "long" -> return "integer"
             "float", "double" -> return "real"
@@ -111,13 +111,13 @@ internal class Reflect<T> {
         }
     }
 
-    fun getDBColumnsWithValue(consumer: BiConsumer<String?, Any?>) {
+    fun getDBColumnsWithValue(consumer: BiConsumer<String, Any?>) {
         for (field in fieldMap.values) {
             consumer.accept(field.name, getDBValue(field))
         }
     }
 
-    fun getDBColumnsWithType(consumer: BiConsumer<String?, String?>) {
+    fun getDBColumnsWithType(consumer: BiConsumer<String, String>) {
         for (field in fieldMap.values) {
             if (isJson(field)) {
                 consumer.accept(field.name.lowercase(Locale.getDefault()), "text")
@@ -127,7 +127,7 @@ internal class Reflect<T> {
         }
     }
 
-    fun getIndexList(consumer: Consumer<IndexesData2?>) {
+    fun getIndexList(consumer: Consumer<IndexesData2>) {
         val table = getTableNameFromClass(tClass!!)
         fieldMap.values.forEach(Consumer { field: Field? ->
             if (isIndex(field!!)) {
@@ -144,11 +144,11 @@ internal class Reflect<T> {
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        fun <T> toEntity(tClass: Class<T?>, options: Options?, resultSet: ResultSet): T? {
+        fun <T> toEntity(tClass: Class<T>, options: Options?, resultSet: ResultSet): T? {
             try {
-                val columnsMap: MutableMap<String?, Boolean?> = HashMap<String?, Boolean?>()
+                val columnsMap: MutableMap<String, Boolean?> = HashMap<String, Boolean?>()
                 if (options != null && options.selectColumns != null && (options.selectColumns != "*")) {
-                    val columns: Array<String?> =
+                    val columns: Array<String> =
                         options.selectColumns.split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                     for (column in columns) {
                         columnsMap.put(column, true)

@@ -109,7 +109,7 @@ internal object SQLTemplate {
             .toString()
     }
 
-    fun <T> delete(tClass: Class<T?>, options: Options): String {
+    fun <T> delete(tClass: Class<T>, options: Options): String {
         val deleteString = `$`("delete from %s ", getTableNameFromClass(tClass))
         val whereString = if (options.wherePredicate != null) `$`("where %s ", options.wherePredicate) else ""
         val SQLBuilder = StringBuilder()
@@ -146,7 +146,7 @@ internal object SQLTemplate {
             .toString()
     }
 
-    fun <T> query(tClass: Class<T?>, options: Options?): String {
+    fun <T> query(tClass: Class<T>, options: Options?): String {
         return query<Any?>(getTableNameFromClass(tClass), options)
     }
 

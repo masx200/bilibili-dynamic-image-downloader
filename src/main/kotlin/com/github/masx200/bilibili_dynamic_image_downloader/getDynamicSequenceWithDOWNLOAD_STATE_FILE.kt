@@ -3,7 +3,7 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 //import java.sql.DriverManager
 //import com.github.masx200.jsqlite.DB.connect
 import com.github.masx200.jsqlite.DB
-import com.github.masx200.jsqlite.DB.connect
+import com.github.masx200.jsqlite.DB.Companion.connect
 import com.github.masx200.jsqlite.recreateColumnsOnSchemaChangeInColumnTypes
 import com.github.masx200.jsqlite.recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement
 import org.jetbrains.exposed.sql.Database
@@ -13,7 +13,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
     val dbFile = options.download_state_file
     var data1 = Database.connect("jdbc:sqlite:$dbFile", "org.sqlite.JDBC")
 
-    var listeners = mutableListOf<() -> Unit>()
+    var listeners = mutableListOf<AutoCloseable>()
 //    println(data1)
     try {
         val db2 = connect(dbFile)
@@ -23,16 +23,16 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
         val dynamicRangesTable = DataBaseTableDao(db2, DynamicRanges::class.java)
         DataBaseTableDao(db2, SpaceHistory::class.java)
         DataBaseTableDao(db2, DynamicPictures::class.java)
+        val sqlIdentifiers = listOf("select", "create", "alter", "delete", "drop", "insert", "update")
 
         db2.use { db ->
-            listeners.add { registerEventListenerForIdentifier(db, "select") }
 
-            listeners.add { registerEventListenerForIdentifier(db, "create") }
-            listeners.add { registerEventListenerForIdentifier(db, "alter") }
-            listeners.add { registerEventListenerForIdentifier(db, "delete") }
-            listeners.add { registerEventListenerForIdentifier(db, "drop") }
-            listeners.add { registerEventListenerForIdentifier(db, "insert") }
-            listeners.add { registerEventListenerForIdentifier(db, "update") }
+            sqlIdentifiers.forEach { identifier ->
+                listeners.add(
+
+                    registerEventListenerForIdentifier(db, identifier)
+                )
+            }
 //        println(db)
             var strings = db.tables(
                 SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
@@ -131,19 +131,21 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
         data1.connector().close()
 
 
-        listeners.forEach { it() }
+        listeners.forEach { it.close() }
     }
 
 }
 
-fun registerEventListenerForIdentifier(db: DB, identifier: String): () -> Unit {
+fun registerEventListenerForIdentifier(db: DB, identifier: String): AutoCloseable {
     var asyncEventBus = db.getAsyncEventBus(identifier)
     var myEventListener = MyEventListener({
         System.out.println("$identifier:" + "Received event:" + it.message)
     })
     asyncEventBus.register(myEventListener)
-
-    return fun() {
-        asyncEventBus.unregister(myEventListener)
+    return object : AutoCloseable {
+        override fun close() {
+            asyncEventBus.unregister(myEventListener)
+        }
     }
+
 }

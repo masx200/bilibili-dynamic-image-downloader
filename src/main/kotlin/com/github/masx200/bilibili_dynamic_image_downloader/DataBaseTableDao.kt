@@ -19,18 +19,18 @@ class DataBaseTableDao<T : DataSupport<T>>(
         return database.deleteAll<T>(entityClass)
     }
 
-    fun delete(vararg ids: Long?): List<String> {
-        return database.delete<T>(entityClass, *ids)
+    fun delete(vararg ids: Long): List<String> {
+        return database.deleteByVarargId<T>(entityClass, *ids)
     }
 
-    fun delete(ids: MutableList<Long?>?): List<String> {
-        return database.delete<T>(entityClass, ids)
+    fun delete(ids: List<Long>): List<String> {
+        return database.deleteByListId<T>(entityClass, ids)
     }
 
     fun delete(block: SqlExpressionBuilder.() -> Op<Boolean>): List<String> {
         val condition = Op.build(block)
         val predicate = condition.toString()
-        return database.delete<T>(entityClass, predicate)
+        return database.deleteByPredicate<T>(entityClass, predicate)
     }
 
     fun insert(data1: T): List<String> {
@@ -39,7 +39,7 @@ class DataBaseTableDao<T : DataSupport<T>>(
 
     fun findOne(id: Long): T? {
 
-        return database.findOne<T>(entityClass, id)
+        return database.findOneById<T>(entityClass, id)
     }
 
     fun findOne(block: SqlExpressionBuilder.() -> Op<Boolean>): T? {
@@ -49,7 +49,7 @@ class DataBaseTableDao<T : DataSupport<T>>(
 //        println(entityClass)
         val predicate = condition.toString() //
 //        println(predicate)
-        return database.findOne<T>(entityClass, predicate)
+        return database.findOneByPredicate<T>(entityClass, predicate)
     }
 
     // 新增的 update 方法
@@ -59,7 +59,7 @@ class DataBaseTableDao<T : DataSupport<T>>(
 //        println(database)
 //        println(entityClass)
         val predicate = condition.toString() //
-        return database.update(data, predicate)
+        return database.updateByPredicate(data, predicate)
     }
 
     // 新增的 update 方法
@@ -67,13 +67,22 @@ class DataBaseTableDao<T : DataSupport<T>>(
         if (data.id == null) {
             throw IllegalArgumentException("The entity must have an id to be updated.")
         }
-        return database.update(data)
+        return database.updateById(data)
     }
 
-    fun find(consumer: Consumer<Options>): List<T> {}
+    fun find(consumer: Consumer<Options>): List<T> {
+        return database.findByConsumer<T>(entityClass, consumer)
+    }
 
-    fun find(ids: List<Long>): List<T> {};
+    fun find(ids: List<Long>): List<T> {
+        return database.findByListId<T>(entityClass, ids)
+    }
 
-    fun find(vararg ids: Long): List<T> {};
-    fun findAll(): List<T> {};
+    fun find(vararg ids: Long): List<T> {
+        return database.findByVarargId<T>(entityClass, *ids)
+    }
+
+    fun findAll(): List<T> {
+        return database.findAll<T>(entityClass)
+    }
 }

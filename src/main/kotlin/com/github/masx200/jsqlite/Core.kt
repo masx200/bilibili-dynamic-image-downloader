@@ -59,14 +59,14 @@ internal class Core(var path: String) : DB {
     }
 
     fun getReflectInfo(vararg classes: Class<*>): TableReflectInfo {
-        val tablesMapIndexesData1: HashMap<String?, List<IndexesData1?>> = HashMap<String?, List<IndexesData1?>>()
+        val tablesMapIndexesData1: HashMap<String, List<IndexesData1>> = HashMap<String, List<IndexesData1>>()
         // 存储表名和其列类型映射的Map
-        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+        val tablesMapTypes = HashMap<String, HashMap<String, String>>()
 
         // 存储表名和其主键列名映射的Map
-        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        val tablesMapPrimaryKeys = HashMap<String, String>()
         // 存储表名和其列是否自动增长映射的Map
-        val tablesMapIsAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
+        val tablesMapIsAutoIncrement = HashMap<String, HashMap<String, Boolean>>()
         // 存储索引名和列名映射的Map
 
         var tableNameSet = HashSet<String>()
@@ -79,26 +79,26 @@ internal class Core(var path: String) : DB {
             val tableName = getTableNameFromClass(tClass)
             val reflect: Reflect<*> = Reflect<Any?>(tClass)
 
-            val classColumns = hashMapOf<String?, String?>()
-            reflect.getDBColumnsWithType { column: String?, type: String? ->
-                classColumns.put(column!!, type!!)
+            val classColumns = hashMapOf<String, String>()
+            reflect.getDBColumnsWithType { column: String, type: String ->
+                classColumns.put(column, type)
             }
             tablesMapTypes.put(tableName, classColumns)
-            val MapIsAutoIncrement = HashMap<String?, Boolean?>()
+            val MapIsAutoIncrement = HashMap<String, Boolean>()
 
             for (field in reflect.fieldMap) {
                 if (isPrimaryKey(field.value)) {
-                    tablesMapPrimaryKeys.put(tableName, field.key?.lowercase())
+                    tablesMapPrimaryKeys.put(tableName, field.key.lowercase())
                 }
-                MapIsAutoIncrement.put(field.key?.lowercase(), isAutoIncrement(field.value))
+                MapIsAutoIncrement.put(field.key.lowercase(), isAutoIncrement(field.value))
             }
 
             tablesMapIsAutoIncrement.put(tableName, MapIsAutoIncrement)
             val indexes = mutableListOf<IndexesData1>()
             reflect.getIndexList {
-                val indexName = it?.name
-                val columnName = it?.column
-                if (indexName != null && columnName != null) {
+                val indexName = it.name
+                val columnName = it.column
+                if (true) {
                     indexes.add(IndexesData1(it.unique, indexName, listOf(columnName)))
                 }
             }
@@ -135,15 +135,15 @@ internal class Core(var path: String) : DB {
 
     override fun findDifferenceTypeColumns(classes: Class<*>): List<String> {
         var differenceTypeColumns: MutableList<String> = mutableListOf()
-        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+        val tablesMapTypes = HashMap<String, HashMap<String, String>>()
 
         // 存储表名和其主键列名映射的Map
-        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        val tablesMapPrimaryKeys = HashMap<String, String>()
         // 存储表名和其列是否自动增长映射的Map
-        val tablesMapIsAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
+        val tablesMapIsAutoIncrement = HashMap<String, HashMap<String, Boolean>>()
         // 存储索引名和列名映射的Map
-        val indexMapColumns = HashMap<String?, String?>()
-        val indexMapTables = HashMap<String?, String?>()
+        val indexMapColumns = HashMap<String, String>()
+        val indexMapTables = HashMap<String, String>()
 
         val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
         var tableNameSet = HashSet<String>()
@@ -156,8 +156,8 @@ internal class Core(var path: String) : DB {
                 statement.executeQuery(s).use { result ->
                     val metaData = connection!!.metaData
                     while (result.next()) {
-                        val tableColumnTypeMap = HashMap<String?, String?>()
-                        val tableColumnTypeMapisAutoIncrement = HashMap<String?, Boolean?>()
+                        val tableColumnTypeMap = HashMap<String, String>()
+                        val tableColumnTypeMapisAutoIncrement = HashMap<String, Boolean>()
                         val tableName = result.getString("name")
                         if (tableNameSet.contains(tableName)) {
                             metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
@@ -197,8 +197,8 @@ internal class Core(var path: String) : DB {
                                             tableName.lowercase(Locale.getDefault())
                                         )
                                     }
-                                    Optional.ofNullable<String?>(index)
-                                        .ifPresent { i: String? ->
+                                    Optional.ofNullable<String>(index)
+                                        .ifPresent { i: String ->
                                             indexMapColumns.put(
                                                 index.lowercase(Locale.getDefault()),
                                                 column.lowercase(Locale.getDefault())
@@ -214,8 +214,8 @@ internal class Core(var path: String) : DB {
 //                        val dbColumns = tableColumnTypeMap?.keys?.toSet()
                         val reflect: Reflect<*> = Reflect<Any?>(tClass)
                         val classColumns = mutableMapOf<String, String>()
-                        reflect.getDBColumnsWithType { column: String?, type: String? ->
-                            classColumns.put(column!!, type!!)
+                        reflect.getDBColumnsWithType { column: String, type: String ->
+                            classColumns.put(column, type)
                         }
 //                        println(
 //                            dbColumns
@@ -231,7 +231,7 @@ internal class Core(var path: String) : DB {
                         } else {
 
 //                            println(tableColumnTypeMap)
-                            reflect.getDBColumnsWithType { column: String?, type: String? ->
+                            reflect.getDBColumnsWithType { column: String, type: String ->
 
 //                                if (tableColumnTypeMap.getOrDefault(column, null) == null) {
 //                                    try {
@@ -253,7 +253,7 @@ internal class Core(var path: String) : DB {
 //                                }
 //检查列类型并修改：在遍历类的列时，如果数据库中的列类型与类中的列类型不同，则执行 alterTableColumn 操作来修改列类型。
                                 if (tableColumnTypeMap[column] != type) {
-                                    column?.let { differenceTypeColumns.add(it) }
+                                    column.let { differenceTypeColumns.add(it) }
                                 }
 //                                    try {
 //                                        column?.let {
@@ -304,18 +304,15 @@ internal class Core(var path: String) : DB {
         return differenceTypeColumns
     }
 
-    override fun createColumns(
-        classes: Class<*>,
-        vararg columnNames: String?
-    ): List<String?>? {
+    override fun createColumns(classes: Class<*>, vararg columnNames: String): MutableList<String> {
         var toSet = columnNames.toSet()
         var resultList = mutableListOf<String>()
-        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+        val tablesMapTypes = HashMap<String, HashMap<String, String>>()
 
         // 存储表名和其主键列名映射的Map
-        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        val tablesMapPrimaryKeys = HashMap<String, String>()
         // 存储表名和其列是否自动增长映射的Map
-        val tablesMapIsAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
+        val tablesMapIsAutoIncrement = HashMap<String, HashMap<String, Boolean>>()
         // 存储索引名和列名映射的Map
 
 
@@ -330,8 +327,8 @@ internal class Core(var path: String) : DB {
                 statement.executeQuery(s).use { result ->
                     val metaData = connection!!.metaData
                     while (result.next()) {
-                        val tableColumnTypeMap = HashMap<String?, String?>()
-                        val tableColumnTypeMapisAutoIncrement = HashMap<String?, Boolean?>()
+                        val tableColumnTypeMap = HashMap<String, String>()
+                        val tableColumnTypeMapisAutoIncrement = HashMap<String, Boolean>()
                         val tableName = result.getString("name")
                         if (tableNameSet.contains(tableName)) {
                             metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
@@ -370,8 +367,8 @@ internal class Core(var path: String) : DB {
 //                        val dbColumns = tableColumnTypeMap?.keys?.toSet()
                         val reflect: Reflect<*> = Reflect<Any?>(tClass)
                         val classColumns = mutableMapOf<String, String>()
-                        reflect.getDBColumnsWithType { column: String?, type: String? ->
-                            classColumns.put(column!!, type!!)
+                        reflect.getDBColumnsWithType { column: String, type: String ->
+                            classColumns.put(column, type)
                         }
 //                        println(
 //                            dbColumns
@@ -383,11 +380,11 @@ internal class Core(var path: String) : DB {
                             throw RuntimeException("table $tableName not found")
                         } else {
 //                            println(tableColumnTypeMap)
-                            reflect.getDBColumnsWithType { column: String?, type: String? ->
+                            reflect.getDBColumnsWithType { column: String, type: String ->
 
                                 if (toSet.contains(column) && tableColumnTypeMap.getOrDefault(column, null) == null) {
                                     try {
-                                        column?.let {
+                                        column.let {
                                             var sql = SQLTemplate.addTableColumn(
                                                 tableName,
                                                 it,
@@ -458,14 +455,14 @@ internal class Core(var path: String) : DB {
 
     override fun dropColumns(
         classes: Class<*>,
-        vararg columnNames: String?
-    ): List<String?>? {
+        vararg columnNames: String
+    ): List<String> {
         var toSet = columnNames.toSet()
         var resultList = mutableListOf<String>()
-        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+        val tablesMapTypes = HashMap<String, HashMap<String, String>>()
 
         // 存储表名和其主键列名映射的Map
-        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        val tablesMapPrimaryKeys = HashMap<String, String>()
         // 存储表名和其列是否自动增长映射的Map
 
 
@@ -480,7 +477,7 @@ internal class Core(var path: String) : DB {
                 statement.executeQuery(s).use { result ->
                     val metaData = connection!!.metaData
                     while (result.next()) {
-                        val tableColumnTypeMap = HashMap<String?, String?>()
+                        val tableColumnTypeMap = HashMap<String, String>()
 
                         val tableName = result.getString("name")
                         if (tableNameSet.contains(tableName)) {
@@ -521,7 +518,7 @@ internal class Core(var path: String) : DB {
                         }?.toSet()
 //                        val reflect: Reflect<*> = Reflect<Any?>(tClass)
 //                        val classColumns = mutableMapOf<String, String>()
-//                        reflect.getDBColumnsWithType { column: String?, type: String? ->
+//                        reflect.getDBColumnsWithType { column: String, type: String ->
 //                            classColumns.put(column!!, type!!)
 //                        }
 //                        println(
@@ -538,7 +535,7 @@ internal class Core(var path: String) : DB {
 //                            删除多余字段：在遍历数据库中的列时，如果数据库中的列在类中不存在，则执行 dropTableColumn 操作来删除该列。
                             dbColumns?.filter { toSet.contains(it) }?.forEach { column ->
                                 try {
-                                    column?.let {
+                                    column.let {
 
 
                                         var sql = SQLTemplate.dropTableColumn(tableName, it)
@@ -586,13 +583,13 @@ internal class Core(var path: String) : DB {
     /**
      * 无法删除主键!!!!!!!
      * */
-    override fun dropUnusedColumns(vararg classes: Class<*>): List<String?>? {
+    override fun dropUnusedColumns(vararg classes: Class<*>): List<String> {
         var resultList = mutableListOf<String>()
         // 存储表名和其列类型映射的Map
-        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+        val tablesMapTypes = HashMap<String, HashMap<String, String>>()
 
         // 存储表名和其主键列名映射的Map
-        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        val tablesMapPrimaryKeys = HashMap<String, String>()
         // 存储表名和其列是否自动增长映射的Map
 
 
@@ -607,7 +604,7 @@ internal class Core(var path: String) : DB {
                 statement.executeQuery(s).use { result ->
                     val metaData = connection!!.metaData
                     while (result.next()) {
-                        val tableColumnTypeMap = HashMap<String?, String?>()
+                        val tableColumnTypeMap = HashMap<String, String>()
 
                         val tableName = result.getString("name")
                         if (tableNameSet.contains(tableName)) {
@@ -648,8 +645,8 @@ internal class Core(var path: String) : DB {
                         }?.toSet()
                         val reflect: Reflect<*> = Reflect<Any?>(tClass)
                         val classColumns = mutableMapOf<String, String>()
-                        reflect.getDBColumnsWithType { column: String?, type: String? ->
-                            classColumns.put(column!!, type!!)
+                        reflect.getDBColumnsWithType { column: String, type: String ->
+                            classColumns.put(column, type)
                         }
 //                        println(
 //                            dbColumns
@@ -665,7 +662,7 @@ internal class Core(var path: String) : DB {
 //                            删除多余字段：在遍历数据库中的列时，如果数据库中的列在类中不存在，则执行 dropTableColumn 操作来删除该列。
                             dbColumns?.filter { !classColumns.contains(it) }?.forEach { column ->
                                 try {
-                                    column?.let {
+                                    column.let {
 
 
                                         var sql = SQLTemplate.dropTableColumn(tableName, it)
@@ -737,18 +734,18 @@ internal class Core(var path: String) : DB {
      *
      * @param classes 可变参数，代表需要更新或创建表结构的类
      */
-    override fun tables(vararg classes: Class<*>): List<String?>? {
+    override fun tables(vararg classes: Class<*>): List<String> {
         var resultList = mutableListOf<String>()
         // 存储表名和其列类型映射的Map
-        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+        val tablesMapTypes = HashMap<String, HashMap<String, String>>()
 
         // 存储表名和其主键列名映射的Map
-        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        val tablesMapPrimaryKeys = HashMap<String, String>()
         // 存储表名和其列是否自动增长映射的Map
-        val tablesMapIsAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
+        val tablesMapIsAutoIncrement = HashMap<String, HashMap<String, Boolean>>()
         // 存储索引名和列名映射的Map
-        val indexMapColumns = HashMap<String?, String?>()
-        val indexMapTables = HashMap<String?, String?>()
+        val indexMapColumns = HashMap<String, String>()
+        val indexMapTables = HashMap<String, String>()
 
         val s = SQLTemplate.query<Any?>("sqlite_master", Options().where("type = ?", "table"))
         var tableNameSet = HashSet<String>()
@@ -761,8 +758,8 @@ internal class Core(var path: String) : DB {
                 statement.executeQuery(s).use { result ->
                     val metaData = connection!!.metaData
                     while (result.next()) {
-                        val tableColumnTypeMap = HashMap<String?, String?>()
-                        val tableColumnTypeMapisAutoIncrement = HashMap<String?, Boolean?>()
+                        val tableColumnTypeMap = HashMap<String, String>()
+                        val tableColumnTypeMapisAutoIncrement = HashMap<String, Boolean>()
                         val tableName = result.getString("name")
                         if (tableNameSet.contains(tableName)) {
                             metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
@@ -802,8 +799,8 @@ internal class Core(var path: String) : DB {
                                             tableName.lowercase(Locale.getDefault())
                                         )
                                     }
-                                    Optional.ofNullable<String?>(index)
-                                        .ifPresent { i: String? ->
+                                    Optional.ofNullable<String>(index)
+                                        .ifPresent { i: String ->
                                             indexMapColumns.put(
                                                 index.lowercase(Locale.getDefault()),
                                                 column.lowercase(Locale.getDefault())
@@ -821,8 +818,8 @@ internal class Core(var path: String) : DB {
 //                        val dbColumns = tableColumnTypeMap?.keys?.toSet()
                         val reflect: Reflect<*> = Reflect<Any?>(tClass)
                         val classColumns = mutableMapOf<String, String>()
-                        reflect.getDBColumnsWithType { column: String?, type: String? ->
-                            classColumns.put(column!!, type!!)
+                        reflect.getDBColumnsWithType { column: String, type: String ->
+                            classColumns.put(column, type)
                         }
 //                        println(
 //                            dbColumns
@@ -838,11 +835,11 @@ internal class Core(var path: String) : DB {
                             statement.executeUpdate(sql)
                         } else {
 //                            println(tableColumnTypeMap)
-                            reflect.getDBColumnsWithType { column: String?, type: String? ->
+                            reflect.getDBColumnsWithType { column: String, type: String ->
 
                                 if (tableColumnTypeMap.getOrDefault(column, null) == null) {
                                     try {
-                                        column?.let {
+                                        column.let {
                                             var sql = SQLTemplate.addTableColumn(
                                                 tableName,
                                                 it,
@@ -901,13 +898,13 @@ internal class Core(var path: String) : DB {
 
 
                         reflect.getIndexList {
-                            var index = it?.name
-                            val column = it?.column
+                            var index = it.name
+                            val column = it.column
                             try {
                                 if (indexMapColumnsTemp.get(index) != null) {
                                     indexMapColumnsTemp.remove(index, column)
                                 } else {
-                                    var sql = SQLTemplate.createIndex(tClass, column, it?.unique)
+                                    var sql = SQLTemplate.createIndex(tClass, column, it.unique)
                                     var asyncEventBus = getAsyncEventBus("create")
                                     asyncEventBus.post(MyEvent(sql))
                                     resultList.add(sql)
@@ -918,7 +915,7 @@ internal class Core(var path: String) : DB {
                             }
                         }
                     }
-                    indexMapColumnsTemp.forEach { (index: String?, _: String?) ->
+                    indexMapColumnsTemp.forEach { (index: String, _: String) ->
                         try {
                             var sql = SQLTemplate.dropIndex<Any?>(index)
                             var asyncEventBus = getAsyncEventBus("drop")
@@ -938,7 +935,7 @@ internal class Core(var path: String) : DB {
         return resultList
     }
 
-    override fun create(vararg classes: Class<*>): List<String?>? {
+    override fun create(vararg classes: Class<*>): List<String> {
         var resultList = mutableListOf<String>()
         try {
             connection!!.createStatement().use { statement ->
@@ -956,7 +953,7 @@ internal class Core(var path: String) : DB {
         return resultList
     }
 
-    override fun drop(vararg classes: Class<*>): List<String?>? {
+    override fun drop(vararg classes: Class<*>): List<String> {
         var resultList = mutableListOf<String>()
         try {
             connection!!.createStatement().use { statement ->
@@ -974,7 +971,7 @@ internal class Core(var path: String) : DB {
         return resultList
     }
 
-    override fun version(): String? {
+    override fun version(): String {
         val s = "select sqlite_version();"
         try {
             connection!!.createStatement().use { statement ->
@@ -987,14 +984,14 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T?>?> insert(t: T?): List<String?>? {
+    override fun <T : DataSupport<T>> insert(t: T): List<String> {
         var resultList = mutableListOf<String>()
         try {
             connection!!.createStatement().use { statement ->
                 lock.lock()
-                t!!.createdAt = System.currentTimeMillis()
+                t.createdAt = System.currentTimeMillis()
                 t.updatedAt = t.createdAt
-                var sql = SQLTemplate.insert<T?>(t)
+                var sql = SQLTemplate.insert<T>(t)
                 var asyncEventBus = getAsyncEventBus("insert")
                 asyncEventBus.post(MyEvent(sql))
                 resultList.add(
@@ -1015,13 +1012,13 @@ internal class Core(var path: String) : DB {
         return resultList
     }
 
-    override fun <T : DataSupport<T?>?> update(t: T?, predicate: String?, vararg args: Any?): List<String?>? {
+    override fun <T : DataSupport<T>> updateByPredicate(t: T, predicate: String?, vararg args: Any?): List<String> {
         var resultList = mutableListOf<String>()
         try {
             connection!!.createStatement().use { statement ->
                 lock.lock()
-                t!!.updatedAt = System.currentTimeMillis()
-                var sql = SQLTemplate.update<T?>(t, Options().where(predicate, *args))
+                t.updatedAt = System.currentTimeMillis()
+                var sql = SQLTemplate.update<T>(t, Options().where(predicate, *args))
                 var asyncEventBus = getAsyncEventBus("update")
                 asyncEventBus.post(MyEvent(sql))
                 resultList.add(sql)
@@ -1035,15 +1032,19 @@ internal class Core(var path: String) : DB {
         return resultList
     }
 
-    override fun <T : DataSupport<T?>?> update(t: T?): List<String?>? {
-        if (t?.id == null) {
+    override fun <T : DataSupport<T>> updateById(t: T): List<String> {
+        if (t.id == null) {
             throw IllegalArgumentException("The entity must have an id to be updated.")
         }
-        return update<T?>(t, "id = ?", t.id())
+        return updateByPredicate<T>(t, "id = ?", t.id())
     }
 
-    override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, predicate: String?, vararg args: Any?): List<String> {
-        val sql = SQLTemplate.delete<T?>(tClass, Options().where(predicate, *args))
+    override fun <T : DataSupport<T>> deleteByPredicate(
+        tClass: Class<T>,
+        predicate: String?,
+        vararg args: Any?
+    ): List<String> {
+        val sql = SQLTemplate.delete<T>(tClass, Options().where(predicate, *args))
         var asyncEventBus = getAsyncEventBus("delete")
         asyncEventBus.post(MyEvent(sql))
         try {
@@ -1059,34 +1060,36 @@ internal class Core(var path: String) : DB {
         return mutableListOf(sql)
     }
 
-    override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, ids: MutableList<Long?>?): List<String> {
+    override fun <T : DataSupport<T>> deleteByListId(tClass: Class<T>, ids: List<Long>): List<String> {
         val builder = StringBuilder(ids.toString())
         builder.deleteCharAt(0).deleteCharAt(builder.length - 1)
-        return delete<T?>(tClass, "id in(?)", builder)
+        return deleteByPredicate<T>(tClass, "id in(?)", builder)
     }
 
-    override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, vararg ids: Long?): List<String> {
-        return delete<T?>(tClass, Arrays.asList<Long?>(*ids))
+    override fun <T : DataSupport<T>> deleteByVarargId(tClass: Class<T>, vararg ids: Long): List<String> {
+        val builder = StringBuilder(ids.toString())
+        builder.deleteCharAt(0).deleteCharAt(builder.length - 1)
+        return deleteByPredicate<T>(tClass, "id in(?)", builder)
     }
 
-    override fun <T : DataSupport<T?>?> deleteAll(tClass: Class<T?>): List<String> {
-        return delete<T?>(tClass, null, null as Any?)
+    override fun <T : DataSupport<T>> deleteAll(tClass: Class<T>): List<String> {
+        return deleteByPredicate<T>(tClass, null, null)
     }
 
-    override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, consumer: Consumer<Options?>?): MutableList<T?> {
-        val options = if (consumer != null) Options() else null
-        Optional.ofNullable<Consumer<Options?>?>(consumer)
-            .ifPresent { c: Consumer<Options?>? -> c!!.accept(options) }
-        val sql = SQLTemplate.query<T?>(tClass, options)
+    override fun <T : DataSupport<T>> findByConsumer(tClass: Class<T>, consumer: Consumer<Options>?): MutableList<T> {
+        val options = Options()
+        Optional.ofNullable<Consumer<Options>?>(consumer)
+            .ifPresent { c: Consumer<Options> -> c.accept(options) }
+        val sql = SQLTemplate.query<T>(tClass, options)
         var asyncEventBus = getAsyncEventBus("select")
         asyncEventBus.post(MyEvent(sql))
         try {
             connection!!.createStatement().use { statement ->
                 statement.executeQuery(sql).use { resultSet ->
-                    val list: MutableList<T?> = ArrayList<T?>()
+                    val list: MutableList<T> = ArrayList<T>()
                     while (resultSet.next()) {
-                        val t = Reflect.toEntity<T?>(tClass, options, resultSet)
-                        Optional.ofNullable<T?>(t).ifPresent { e: T? -> list.add(e) }
+                        val t = Reflect.toEntity<T>(tClass, options, resultSet)
+                        Optional.ofNullable<T>(t).ifPresent { e: T -> list.add(e) }
                     }
                     return list
                 }
@@ -1097,53 +1100,55 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, ids: MutableList<Long?>?): MutableList<T?> {
+    override fun <T : DataSupport<T>> findByListId(tClass: Class<T>, ids: List<Long>): List<T> {
         val builder = StringBuilder(ids.toString())
         builder.deleteCharAt(0).deleteCharAt(builder.length - 1)
-        return find<T?>(tClass) { options: Options? -> options!!.where("id in(?)", builder) }
+        return findByConsumer<T>(tClass) { options: Options? -> options!!.where("id in(?)", builder) }
     }
 
-    override fun <T : DataSupport<T?>?> find(tClass: Class<T?>, vararg ids: Long?): MutableList<T?> {
-        return find<T?>(tClass, Arrays.asList<Long?>(*ids))
+    override fun <T : DataSupport<T>> findByVarargId(tClass: Class<T>, vararg ids: Long): MutableList<T> {
+        val builder = StringBuilder(ids.toString())
+        builder.deleteCharAt(0).deleteCharAt(builder.length - 1)
+        return findByConsumer<T>(tClass) { options: Options? -> options!!.where("id in(?)", builder) }
     }
 
-    override fun <T : DataSupport<T?>?> findAll(tClass: Class<T?>): MutableList<T?> {
-        return find<T?>(tClass, null as Consumer<Options?>?)
+    override fun <T : DataSupport<T>> findAll(tClass: Class<T>): MutableList<T> {
+        return findByConsumer<T>(tClass, null as Consumer<Options>?)
     }
 
-    override fun <T : DataSupport<T?>?> findOne(tClass: Class<T?>, predicate: String?, vararg args: Any?): T? {
-        val list = find<T?>(tClass) { options: Options? -> options!!.where(predicate, *args) }
+    override fun <T : DataSupport<T>> findOneByPredicate(tClass: Class<T>, predicate: String?, vararg args: Any?): T? {
+        val list = findByConsumer<T>(tClass) { options: Options? -> options!!.where(predicate, *args) }
         return if (!list.isEmpty()) list.get(0) else null
     }
 
-    override fun <T : DataSupport<T?>?> findOne(tClass: Class<T?>, id: Long?): T? {
-        return findOne<T?>(tClass, "id = ?", id)
+    override fun <T : DataSupport<T>> findOneById(tClass: Class<T>, id: Long): T? {
+        return findOneByPredicate<T>(tClass, "id = ?", id)
     }
 
-    override fun <T : DataSupport<T?>?> first(tClass: Class<T?>, predicate: String?, vararg args: Any?): T? {
-        val list = find<T?>(
+    override fun <T : DataSupport<T>> firstByPredicate(tClass: Class<T>, predicate: String?, vararg args: Any?): T? {
+        val list = findByConsumer<T>(
             tClass
         ) { options: Options? -> options!!.where(predicate, *args).order("id", Options.ASC) }
         return if (!list.isEmpty()) list.get(0) else null
     }
 
-    override fun <T : DataSupport<T?>?> first(tClass: Class<T?>): T? {
-        return first<T?>(tClass, null, null as Any?)
+    override fun <T : DataSupport<T>> first(tClass: Class<T>): T? {
+        return firstByPredicate<T>(tClass, null, null as Any?)
     }
 
-    override fun <T : DataSupport<T?>?> last(tClass: Class<T?>, predicate: String?, vararg args: Any?): T? {
-        val list = find<T?>(
+    override fun <T : DataSupport<T>> lastByPredicate(tClass: Class<T>, predicate: String?, vararg args: Any?): T? {
+        val list = findByConsumer<T>(
             tClass
         ) { options: Options? -> options!!.where(predicate, *args).order("id", Options.DESC) }
         return if (!list.isEmpty()) list.get(0) else null
     }
 
-    override fun <T : DataSupport<T?>?> last(tClass: Class<T?>): T? {
-        return last<T?>(tClass, null, null as Any?)
+    override fun <T : DataSupport<T>> last(tClass: Class<T>): T? {
+        return lastByPredicate<T>(tClass, null, null as Any?)
     }
 
-    override fun <T : DataSupport<T?>?> count(tClass: Class<T?>, predicate: String?, vararg args: Any?): Long {
-        val sql = SQLTemplate.query<T?>(tClass, Options().select("count(*)").where(predicate, *args))
+    override fun <T : DataSupport<T>> countByPredicate(tClass: Class<T>, predicate: String?, vararg args: Any?): Long {
+        val sql = SQLTemplate.query<T>(tClass, Options().select("count(*)").where(predicate, *args))
         var asyncEventBus = getAsyncEventBus("select")
         asyncEventBus.post(MyEvent(sql))
         try {
@@ -1157,17 +1162,17 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T?>?> count(tClass: Class<T?>): Long {
-        return count<T?>(tClass, null, null as Any?)
+    override fun <T : DataSupport<T>> count(tClass: Class<T>): Long {
+        return countByPredicate<T>(tClass, null, null as Any?)
     }
 
-    override fun <T : DataSupport<T?>?> average(
-        tClass: Class<T?>,
-        column: String?,
+    override fun <T : DataSupport<T>> averageByPredicate(
+        tClass: Class<T>,
+        column: String,
         predicate: String?,
         vararg args: Any?
     ): Double {
-        val sql = SQLTemplate.query<T?>(
+        val sql = SQLTemplate.query<T>(
             tClass,
             Options().select(String.format("avg(%s)", column)).where(predicate, *args)
         )
@@ -1184,17 +1189,17 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T?>?> average(tClass: Class<T?>, column: String?): Double {
-        return average<T?>(tClass, column, null, null as Any?)
+    override fun <T : DataSupport<T>> average(tClass: Class<T>, column: String): Double {
+        return averageByPredicate<T>(tClass, column, null, null as Any?)
     }
 
-    override fun <T : DataSupport<T?>?> sum(
-        tClass: Class<T?>,
-        column: String?,
+    override fun <T : DataSupport<T>> sumByPredicate(
+        tClass: Class<T>,
+        column: String,
         predicate: String?,
         vararg args: Any?
-    ): Number? {
-        val sql = SQLTemplate.query<T?>(
+    ): Number {
+        val sql = SQLTemplate.query<T>(
             tClass,
             Options().select(String.format("sum(%s)", column)).where(predicate, *args)
         )
@@ -1203,7 +1208,7 @@ internal class Core(var path: String) : DB {
         try {
             connection!!.createStatement().use { statement ->
                 statement.executeQuery(sql).use { resultSet ->
-                    return if (resultSet.next()) resultSet.getObject(1) as Number? else 0
+                    return if (resultSet.next()) resultSet.getObject(1) as Number else 0
                 }
             }
         } catch (e: SQLException) {
@@ -1211,17 +1216,17 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T?>?> sum(tClass: Class<T?>, column: String?): Number? {
-        return sum<T?>(tClass, column, null, null as Any?)
+    override fun <T : DataSupport<T>> sum(tClass: Class<T>, column: String): Number {
+        return sumByPredicate<T>(tClass, column, null, null as Any?)
     }
 
-    override fun <T : DataSupport<T?>?> max(
-        tClass: Class<T?>,
-        column: String?,
+    override fun <T : DataSupport<T>> maxByPredicate(
+        tClass: Class<T>,
+        column: String,
         predicate: String?,
         vararg args: Any?
-    ): Number? {
-        val sql = SQLTemplate.query<T?>(
+    ): Number {
+        val sql = SQLTemplate.query<T>(
             tClass,
             Options().select(String.format("max(%s)", column)).where(predicate, *args)
         )
@@ -1230,7 +1235,7 @@ internal class Core(var path: String) : DB {
         try {
             connection!!.createStatement().use { statement ->
                 statement.executeQuery(sql).use { resultSet ->
-                    return if (resultSet.next()) resultSet.getObject(1) as Number? else 0
+                    return if (resultSet.next()) resultSet.getObject(1) as Number else 0
                 }
             }
         } catch (e: SQLException) {
@@ -1238,17 +1243,17 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T?>?> max(tClass: Class<T?>, column: String?): Number? {
-        return max<T?>(tClass, column, null, null as Any?)
+    override fun <T : DataSupport<T>> max(tClass: Class<T>, column: String): Number {
+        return maxByPredicate<T>(tClass, column, null, null as Any?)
     }
 
-    override fun <T : DataSupport<T?>?> min(
-        tClass: Class<T?>,
-        column: String?,
+    override fun <T : DataSupport<T>> minByPredicate(
+        tClass: Class<T>,
+        column: String,
         predicate: String?,
         vararg args: Any?
-    ): Number? {
-        val sql = SQLTemplate.query<T?>(
+    ): Number {
+        val sql = SQLTemplate.query<T>(
             tClass,
             Options().select(String.format("min(%s)", column)).where(predicate, *args)
         )
@@ -1257,7 +1262,7 @@ internal class Core(var path: String) : DB {
         try {
             connection!!.createStatement().use { statement ->
                 statement.executeQuery(sql).use { resultSet ->
-                    return if (resultSet.next()) resultSet.getObject(1) as Number? else 0
+                    return if (resultSet.next()) resultSet.getObject(1) as Number else 0
                 }
             }
         } catch (e: SQLException) {
@@ -1265,8 +1270,8 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T?>?> min(tClass: Class<T?>, column: String?): Number? {
-        return min<T?>(tClass, column, null, null as Any?)
+    override fun <T : DataSupport<T>> min(tClass: Class<T>, column: String): Number {
+        return minByPredicate<T>(tClass, column, null, null as Any?)
     }
 
     companion object {
@@ -1276,17 +1281,17 @@ internal class Core(var path: String) : DB {
 
 
     fun getTablesInfo(vararg classes: Class<*>): TableReflectInfo {
-        val tablesMapIndexesData1: HashMap<String?, List<IndexesData1?>> = HashMap<String?, List<IndexesData1?>>()
+        val tablesMapIndexesData1: HashMap<String, List<IndexesData1>> = HashMap<String, List<IndexesData1>>()
         // 存储表名和其列类型映射的Map
-        val tablesMapTypes = HashMap<String?, HashMap<String?, String?>?>()
+        val tablesMapTypes = HashMap<String, HashMap<String, String>>()
 
         // 存储表名和其主键列名映射的Map
-        val tablesMapPrimaryKeys = HashMap<String?, String?>()
+        val tablesMapPrimaryKeys = HashMap<String, String>()
         // 存储表名和其列是否自动增长映射的Map
-        val tablesMapIsAutoIncrement = HashMap<String?, HashMap<String?, Boolean?>?>()
+        val tablesMapIsAutoIncrement = HashMap<String, HashMap<String, Boolean>>()
         // 存储索引名和列名映射的Map
-//        val indexMapColumns = HashMap<String?, String?>()
-//        val indexMapTables = HashMap<String?, String?>()
+//        val indexMapColumns = HashMap<String, String>()
+//        val indexMapTables = HashMap<String, String>()
         var tableNameSet = HashSet<String>()
         for (tClass in classes) {
             val tableName = getTableNameFromClass(tClass)
@@ -1305,8 +1310,8 @@ internal class Core(var path: String) : DB {
                 statement.executeQuery(s).use { result ->
                     val metaData = connection!!.metaData
                     while (result.next()) {
-                        val tableColumnTypeMap = HashMap<String?, String?>()
-                        val tableColumnTypeMapisAutoIncrement = HashMap<String?, Boolean?>()
+                        val tableColumnTypeMap = HashMap<String, String>()
+                        val tableColumnTypeMapisAutoIncrement = HashMap<String, Boolean>()
                         val tableName = result.getString("name")
                         if (tableNameSet.contains(tableName)) {
                             metaData.getPrimaryKeys(null, null, tableName).use { primaryKeySet ->
