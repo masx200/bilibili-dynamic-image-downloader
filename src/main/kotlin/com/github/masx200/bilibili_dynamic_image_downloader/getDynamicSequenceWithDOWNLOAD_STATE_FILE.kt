@@ -33,7 +33,14 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                 )
             )
 
-            println(recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement(db))
+            println(
+                recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement(
+                    db,
+                    SpaceHistory::class.java,
+                    DynamicPictures::class.java,
+                    DynamicRanges::class.java
+                )
+            )
 
 //        db.findOne<DynamicRanges>(DynamicRanges::class.java){
 //
