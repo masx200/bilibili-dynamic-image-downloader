@@ -19,15 +19,15 @@ class DataBaseTableDao<T : DataSupport<T>>(
         return database.deleteAll<T>(entityClass)
     }
 
-    fun delete(vararg ids: Long): List<String> {
+    fun deleteByVarargId(vararg ids: Long): List<String> {
         return database.deleteByVarargId<T>(entityClass, *ids)
     }
 
-    fun delete(ids: List<Long>): List<String> {
+    fun deleteByListId(ids: List<Long>): List<String> {
         return database.deleteByListId<T>(entityClass, ids)
     }
 
-    fun delete(block: SqlExpressionBuilder.() -> Op<Boolean>): List<String> {
+    fun deleteByPredicate(block: SqlExpressionBuilder.() -> Op<Boolean>): List<String> {
         val condition = Op.build(block)
         val predicate = condition.toString()
         return database.deleteByPredicate<T>(entityClass, predicate)
@@ -37,12 +37,12 @@ class DataBaseTableDao<T : DataSupport<T>>(
         return database.insert<T>(data1)
     }
 
-    fun findOne(id: Long): T? {
+    fun findOneById(id: Long): T? {
 
         return database.findOneById<T>(entityClass, id)
     }
 
-    fun findOne(block: SqlExpressionBuilder.() -> Op<Boolean>): T? {
+    fun findOneByPredicate(block: SqlExpressionBuilder.() -> Op<Boolean>): T? {
         val condition = Op.build(block)
 
 //        println(database)
@@ -53,7 +53,7 @@ class DataBaseTableDao<T : DataSupport<T>>(
     }
 
     // 新增的 update 方法
-    fun update(data: T, block: SqlExpressionBuilder.() -> Op<Boolean>): List<String> {
+    fun updateByPredicate(data: T, block: SqlExpressionBuilder.() -> Op<Boolean>): List<String> {
         val condition = Op.build(block)
 
 //        println(database)
@@ -63,22 +63,22 @@ class DataBaseTableDao<T : DataSupport<T>>(
     }
 
     // 新增的 update 方法
-    fun update(data: T): List<String> {
+    fun updateById(data: T): List<String> {
         if (data.id == null) {
             throw IllegalArgumentException("The entity must have an id to be updated.")
         }
         return database.updateById(data)
     }
 
-    fun find(consumer: Consumer<Options>): List<T> {
+    fun findByConsumer(consumer: Consumer<Options>): List<T> {
         return database.findByConsumer<T>(entityClass, consumer)
     }
 
-    fun find(ids: List<Long>): List<T> {
+    fun findByListId(ids: List<Long>): List<T> {
         return database.findByListId<T>(entityClass, ids)
     }
 
-    fun find(vararg ids: Long): List<T> {
+    fun findVarargId(vararg ids: Long): List<T> {
         return database.findByVarargId<T>(entityClass, *ids)
     }
 

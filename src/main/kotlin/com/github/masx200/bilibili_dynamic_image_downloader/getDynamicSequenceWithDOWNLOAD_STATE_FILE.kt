@@ -21,8 +21,8 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 //        println(db2)
 //
         val dynamicRangesTable = DataBaseTableDao(db2, DynamicRanges::class.java)
-        DataBaseTableDao(db2, SpaceHistory::class.java)
-        DataBaseTableDao(db2, DynamicPictures::class.java)
+//        DataBaseTableDao(db2, SpaceHistory::class.java)
+//        DataBaseTableDao(db2, DynamicPictures::class.java)
         val sqlIdentifiers = listOf("select", "create", "alter", "delete", "drop", "insert", "update")
 
         db2.use { db ->
@@ -79,7 +79,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
             //增量同步
             transaction(data1) {
 //                println(DynamicRanges())
-                val oldranges = (dynamicRangesTable.findOne {
+                val oldranges = (dynamicRangesTable.findOneByPredicate {
                     (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
 //eq()
                 })
@@ -118,9 +118,9 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 //                    println(oldranges)
 
 //                    println(oldranges)
-                    println(dynamicRangesTable.update(data11))
+                    println(dynamicRangesTable.updateById(data11))
                 }
-                println(dynamicRangesTable.delete({
+                println(dynamicRangesTable.deleteByPredicate({
                     DynamicRangesSchema.userId eq options.host_uid
                 }))
             }
