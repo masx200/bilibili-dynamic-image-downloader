@@ -89,11 +89,11 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                         it.userId = options.host_uid
 
                         it.endwith_dynamic_id =
-                            if (options.endwith_dynamic_id != "") options.endwith_dynamic_id.toLong() else 0
+                            if (options.endwith_dynamic_id != "") options.endwith_dynamic_id.toLong() else 0L
 
 
                         it.offset_dynamic_id =
-                            if (options.offset_dynamic_id != "") options.offset_dynamic_id.toLong() else 0
+                            if (options.offset_dynamic_id != "") options.offset_dynamic_id.toLong() else 0L
 
 
                     }
@@ -106,11 +106,11 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                         it.userId = options.host_uid
 
                         it.endwith_dynamic_id =
-                            if (options.endwith_dynamic_id != "") options.endwith_dynamic_id.toLong() else 0
+                            if (options.endwith_dynamic_id != "") options.endwith_dynamic_id.toLong() else 0L
 
 
                         it.offset_dynamic_id =
-                            if (options.offset_dynamic_id != "") options.offset_dynamic_id.toLong() else 0
+                            if (options.offset_dynamic_id != "") options.offset_dynamic_id.toLong() else 0L
 
 
                     }
