@@ -407,7 +407,17 @@ internal class Core(var path: String) : DB {
                                 else if (tableColumnTypeMap[column] != type) {
                                     try {
                                         column?.let {
-                                            var sql = SQLTemplate.alterTableColumn(
+                                            var sql1 = SQLTemplate.dropTableColumn(
+                                                tableName,
+                                                it,
+
+                                                )
+                                            resultList.add(sql1)
+                                            statement.executeUpdate(
+                                                sql1
+                                            )
+
+                                            var sql = SQLTemplate.addTableColumn(
                                                 tableName,
                                                 it,
                                                 type

@@ -168,19 +168,19 @@ internal object SQLTemplate {
     private fun `$`(format: String, vararg objects: Any?): String {
         return String.format(format, *objects)
     }
-
-    fun alterTableColumn(table_name: String, column_name: String, column_type: String?): String {
-        return "alter table $table_name alter column ${column_name.lowercase(Locale.getDefault())} $column_type"
-//        println(
-//            """
-//                alterTableColumn()
-//                string: $string
-//                string1: $string1
-//                string2: $string2
-//                """.trimIndent()
-//        )
-//
-    }
+//不能修改列的类型语法错误
+//    fun alterTableColumn(table_name: String, column_name: String, column_type: String?): String {
+//        return "alter table $table_name alter column ${column_name.lowercase(Locale.getDefault())} $column_type"
+////        println(
+////            """
+////                alterTableColumn()
+////                string: $string
+////                string1: $string1
+////                string2: $string2
+////                """.trimIndent()
+////        )
+////
+//    }
 
     fun dropTableColumn(table_name: String, column_name: String): String {
 //        println(
