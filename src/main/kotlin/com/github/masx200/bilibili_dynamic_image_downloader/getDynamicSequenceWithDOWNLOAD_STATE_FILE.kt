@@ -120,9 +120,9 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 //                    println(oldranges)
                     println(dynamicRangesTable.updateById(data11))
                 }
-                println(dynamicRangesTable.deleteByPredicate({
+                println(dynamicRangesTable.deleteByPredicate {
                     DynamicRangesSchema.userId eq options.host_uid
-                }))
+                })
             }
         }
 
@@ -138,9 +138,9 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 
 fun registerEventListenerForIdentifier(db: DB, identifier: String): AutoCloseable {
     var asyncEventBus = db.getAsyncEventBus(identifier)
-    var myEventListener = MyEventListener({
+    var myEventListener = MyEventListener {
         System.out.println("$identifier:" + "Received event:" + it.message)
-    })
+    }
     asyncEventBus.register(myEventListener)
     return object : AutoCloseable {
         override fun close() {
