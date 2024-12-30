@@ -1,4 +1,4 @@
-package com.github.masx200.bilibili_dynamic_image_downloader
+package com.github.masx200.jsqlite
 
 import org.jetbrains.exposed.dao.id.LongIdTable
 

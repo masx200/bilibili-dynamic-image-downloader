@@ -55,12 +55,14 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                 if (oldranges == null) {
                     val data11 = DynamicRanges {
                         it.userId = options.host_uid
-                        if (options.endwith_dynamic_id != "") {
-                            it.endwith_dynamic_id = options.endwith_dynamic_id.toLong()
-                        }
-                        if (options.offset_dynamic_id != "") {
-                            it.offset_dynamic_id = options.offset_dynamic_id.toLong()
-                        }
+
+                        it.endwith_dynamic_id =
+                            if (options.endwith_dynamic_id != "") options.endwith_dynamic_id.toLong() else null
+
+
+                        it.offset_dynamic_id =
+                            if (options.offset_dynamic_id != "") options.offset_dynamic_id.toLong() else null
+
 
                     }
 //                    println(data11)
@@ -68,15 +70,23 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     dynamicRangesTable.insert(data11)
 
                 } else {
-//                    println(oldranges)
-                    if (options.offset_dynamic_id != "") {
-                        oldranges.offset_dynamic_id = options.offset_dynamic_id.toLong()
+                    val data11 = DynamicRanges {
+                        it.userId = options.host_uid
+
+                        it.endwith_dynamic_id =
+                            if (options.endwith_dynamic_id != "") options.endwith_dynamic_id.toLong() else null
+
+
+                        it.offset_dynamic_id =
+                            if (options.offset_dynamic_id != "") options.offset_dynamic_id.toLong() else null
+
+
                     }
-                    if (options.endwith_dynamic_id != "") {
-                        oldranges.endwith_dynamic_id = options.endwith_dynamic_id.toLong()
-                    }
+                    data11.id = oldranges.id
 //                    println(oldranges)
-                    dynamicRangesTable.update(oldranges)
+
+//                    println(oldranges)
+                    dynamicRangesTable.update(data11)
                 }
 //                println(dynamicRangesTable.findOne(Op.build {
 //                    (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
