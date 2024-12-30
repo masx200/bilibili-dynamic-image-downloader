@@ -113,6 +113,62 @@ internal class Core(var path: String) : DB {
         }
     }
 
+    override fun checkTableDifferenceInPrimaryKeyAndAutoIncrement(classes: Class<*>): Boolean {
+
+        val classInfo = getClassInfoFromClass(classes)
+        val dbInfo = getTableInfoFromDatabase(classes)
+//        println(
+//            classInfo
+//
+//
+//        )
+//        println(
+//            dbInfo
+//
+//
+//        )
+        if (dbInfo == null || classInfo == null) return true
+        return classInfo.primaryKey != dbInfo.primaryKey || classInfo.isAutoIncrement != dbInfo.isAutoIncrement
+    }
+
+    fun getTableInfoFromDatabase(value: Class<*>): PrimaryKeyAndAutoIncrementInfo? {
+        val tableName = value.let { getTableNameFromClass(it) }
+        var tablesInfo = getTablesInfo(value)
+        return tablesInfo.tablesMapPrimaryKeys.get(tableName)?.let {
+
+
+            var isAutoIncrement = tablesInfo.tablesMapIsAutoIncrement.get(tableName)?.get(it)
+
+            if (isAutoIncrement == null) {
+                isAutoIncrement = false
+            }
+            PrimaryKeyAndAutoIncrementInfo(
+                it,
+                isAutoIncrement = isAutoIncrement,
+            )
+        }
+    }
+
+    fun getClassInfoFromClass(value: Class<*>): PrimaryKeyAndAutoIncrementInfo? {
+
+
+        val tableName = value.let { getTableNameFromClass(it) }
+        var tablesInfo = getReflectInfo(value)
+        return tablesInfo.tablesMapPrimaryKeys.get(tableName)?.let {
+
+
+            var isAutoIncrement = tablesInfo.tablesMapIsAutoIncrement.get(tableName)?.get(it)
+
+            if (isAutoIncrement == null) {
+                isAutoIncrement = false
+            }
+            PrimaryKeyAndAutoIncrementInfo(
+                it,
+                isAutoIncrement = isAutoIncrement,
+            )
+        }
+    }
+
     /**
      * 根据给定的类更新或创建数据库表结构
      * 此函数检查数据库中的现有表结构，并根据提供的类更新或创建相应的表
@@ -291,7 +347,7 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    fun create(vararg classes: Class<*>) {
+    override fun create(vararg classes: Class<*>) {
         try {
             connection!!.createStatement().use { statement ->
                 for (tClass in classes) {
@@ -672,3 +728,8 @@ internal class Core(var path: String) : DB {
     }
 
 }
+
+data class PrimaryKeyAndAutoIncrementInfo(
+    var primaryKey: String,
+    var isAutoIncrement: Boolean
+)

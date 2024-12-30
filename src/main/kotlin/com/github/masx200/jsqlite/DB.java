@@ -26,9 +26,13 @@ public interface DB extends AutoCloseable {
     @Override
     void close();
 
+    boolean checkTableDifferenceInPrimaryKeyAndAutoIncrement(Class<?> classes);
+
     void tables(Class<?>... classes);
 
     void drop(Class<?>... classes);
+
+    void create(Class<?>... classes);
 
     String version();
 

@@ -24,6 +24,18 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
             db.tables(
                 SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
             )
+
+            for (klass in listOf(SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java)) {
+
+
+                if (db.checkTableDifferenceInPrimaryKeyAndAutoIncrement(klass)) {
+
+
+                    db.drop(klass)
+                    db.create(klass)
+                }
+            }
+
 //        db.findOne<DynamicRanges>(DynamicRanges::class.java){
 //
 //        }
@@ -95,4 +107,3 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
     // 以下是一个示例实现，假设我们有一个函数fetchDynamicIds返回动态ID列表
 
 }
-
