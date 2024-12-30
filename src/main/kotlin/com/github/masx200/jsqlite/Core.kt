@@ -121,14 +121,19 @@ internal class Core(var path: String) : DB {
         classes: Class<*>?,
         vararg columnNames: String?
     ): List<String?>? {
-        TODO("Not yet implemented")
+        var resultList = mutableListOf<String>()
+        for (columnName in columnNames)
+            TODO("Not yet implemented")
+        return resultList
     }
 
     override fun dropColumns(
         classes: Class<*>?,
         vararg columnNames: String?
     ): List<String?>? {
+        var resultList = mutableListOf<String>()
         TODO("Not yet implemented")
+        return resultList
     }
 
     override fun checkTableDifferenceInPrimaryKeyAndAutoIncrement(classes: Class<*>): Boolean {
