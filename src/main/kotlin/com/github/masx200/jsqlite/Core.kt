@@ -19,9 +19,12 @@
 package com.github.masx200.jsqlite
 
 
+import com.github.masx200.bilibili_dynamic_image_downloader.MyEvent
 import com.github.masx200.jsqlite.Reflect.Companion.isAutoIncrement
 import com.github.masx200.jsqlite.Reflect.Companion.isPrimaryKey
 import com.github.masx200.jsqlite.SQLiteIndexFetcher.fetchIndexes
+import com.google.common.eventbus.AsyncEventBus
+import com.google.common.util.concurrent.MoreExecutors
 import com.google.gson.Gson
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -29,6 +32,9 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Consumer
 
@@ -105,7 +111,21 @@ internal class Core(var path: String) : DB {
         )
     }
 
+    override fun getAsyncEventBus(identifier: String): AsyncEventBus {
+        return asyncEventBusMap.computeIfAbsent(identifier) {
+            AsyncEventBus(MoreExecutors.listeningDecorator(executorService))
+        }
+    }
+
+    private val asyncEventBusMap: MutableMap<String, AsyncEventBus> = ConcurrentHashMap()
+    private val executorService: ExecutorService = Executors.newCachedThreadPool()
     override fun close() {
+        try {
+
+            executorService.shutdown()
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
         try {
             connection!!.close()
         } catch (e: SQLException) {
@@ -373,6 +393,8 @@ internal class Core(var path: String) : DB {
                                                 it,
                                                 type
                                             )
+                                            var asyncEventBus = getAsyncEventBus("alter")
+                                            asyncEventBus.post(MyEvent(sql))
                                             resultList.add(sql)
                                             statement.executeUpdate(
                                                 sql
@@ -520,7 +542,8 @@ internal class Core(var path: String) : DB {
 
 
                                         var sql = SQLTemplate.dropTableColumn(tableName, it)
-
+                                        var asyncEventBus = getAsyncEventBus("alter")
+                                        asyncEventBus.post(MyEvent(sql))
                                         resultList.add(sql)
                                         statement.executeUpdate(sql)
                                     }
@@ -646,7 +669,8 @@ internal class Core(var path: String) : DB {
 
 
                                         var sql = SQLTemplate.dropTableColumn(tableName, it)
-
+                                        var asyncEventBus = getAsyncEventBus("alter")
+                                        asyncEventBus.post(MyEvent(sql))
                                         resultList.add(sql)
                                         statement.executeUpdate(sql)
                                     }
@@ -808,6 +832,8 @@ internal class Core(var path: String) : DB {
 //                        )
                         if (tableColumnTypeMap == null) {
                             var sql = SQLTemplate.create(tClass)
+                            var asyncEventBus = getAsyncEventBus("create")
+                            asyncEventBus.post(MyEvent(sql))
                             resultList.add(sql)
                             statement.executeUpdate(sql)
                         } else {
@@ -822,6 +848,8 @@ internal class Core(var path: String) : DB {
                                                 it,
                                                 type
                                             )
+                                            var asyncEventBus = getAsyncEventBus("alter")
+                                            asyncEventBus.post(MyEvent(sql))
                                             resultList.add(sql)
                                             statement.executeUpdate(
                                                 sql
@@ -880,6 +908,8 @@ internal class Core(var path: String) : DB {
                                     indexMapColumnsTemp.remove(index, column)
                                 } else {
                                     var sql = SQLTemplate.createIndex(tClass, column, it?.unique)
+                                    var asyncEventBus = getAsyncEventBus("create")
+                                    asyncEventBus.post(MyEvent(sql))
                                     resultList.add(sql)
                                     statement.executeUpdate(sql)
                                 }
@@ -891,6 +921,8 @@ internal class Core(var path: String) : DB {
                     indexMapColumnsTemp.forEach { (index: String?, _: String?) ->
                         try {
                             var sql = SQLTemplate.dropIndex<Any?>(index)
+                            var asyncEventBus = getAsyncEventBus("drop")
+                            asyncEventBus.post(MyEvent(sql))
                             resultList.add(sql)
                             statement.executeUpdate(sql)
                         } catch (e: SQLException) {
@@ -912,6 +944,8 @@ internal class Core(var path: String) : DB {
             connection!!.createStatement().use { statement ->
                 for (tClass in classes) {
                     var sql = SQLTemplate.create(tClass)
+                    var asyncEventBus = getAsyncEventBus("create")
+                    asyncEventBus.post(MyEvent(sql))
                     resultList.add(sql)
                     statement.executeUpdate(sql)
                 }
@@ -928,6 +962,8 @@ internal class Core(var path: String) : DB {
             connection!!.createStatement().use { statement ->
                 for (tClass in classes) {
                     var sql = SQLTemplate.drop(tClass)
+                    var asyncEventBus = getAsyncEventBus("drop")
+                    asyncEventBus.post(MyEvent(sql))
                     resultList.add(sql)
                     statement.executeUpdate(sql)
                 }
@@ -959,6 +995,8 @@ internal class Core(var path: String) : DB {
                 t!!.createdAt = System.currentTimeMillis()
                 t.updatedAt = t.createdAt
                 var sql = SQLTemplate.insert<T?>(t)
+                var asyncEventBus = getAsyncEventBus("insert")
+                asyncEventBus.post(MyEvent(sql))
                 resultList.add(
                     sql
                 )
@@ -984,6 +1022,8 @@ internal class Core(var path: String) : DB {
                 lock.lock()
                 t!!.updatedAt = System.currentTimeMillis()
                 var sql = SQLTemplate.update<T?>(t, Options().where(predicate, *args))
+                var asyncEventBus = getAsyncEventBus("update")
+                asyncEventBus.post(MyEvent(sql))
                 resultList.add(sql)
                 statement.executeUpdate(sql)
             }
@@ -1004,6 +1044,8 @@ internal class Core(var path: String) : DB {
 
     override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, predicate: String?, vararg args: Any?): List<String> {
         val sql = SQLTemplate.delete<T?>(tClass, Options().where(predicate, *args))
+        var asyncEventBus = getAsyncEventBus("delete")
+        asyncEventBus.post(MyEvent(sql))
         try {
             connection!!.createStatement().use { statement ->
                 lock.lock()
@@ -1036,6 +1078,8 @@ internal class Core(var path: String) : DB {
         Optional.ofNullable<Consumer<Options?>?>(consumer)
             .ifPresent { c: Consumer<Options?>? -> c!!.accept(options) }
         val sql = SQLTemplate.query<T?>(tClass, options)
+        var asyncEventBus = getAsyncEventBus("select")
+        asyncEventBus.post(MyEvent(sql))
         try {
             connection!!.createStatement().use { statement ->
                 statement.executeQuery(sql).use { resultSet ->
@@ -1099,10 +1143,12 @@ internal class Core(var path: String) : DB {
     }
 
     override fun <T : DataSupport<T?>?> count(tClass: Class<T?>, predicate: String?, vararg args: Any?): Long {
-        val s = SQLTemplate.query<T?>(tClass, Options().select("count(*)").where(predicate, *args))
+        val sql = SQLTemplate.query<T?>(tClass, Options().select("count(*)").where(predicate, *args))
+        var asyncEventBus = getAsyncEventBus("select")
+        asyncEventBus.post(MyEvent(sql))
         try {
             connection!!.createStatement().use { statement ->
-                statement.executeQuery(s).use { resultSet ->
+                statement.executeQuery(sql).use { resultSet ->
                     return if (resultSet.next()) resultSet.getLong(1) else 0
                 }
             }
@@ -1121,13 +1167,15 @@ internal class Core(var path: String) : DB {
         predicate: String?,
         vararg args: Any?
     ): Double {
-        val s = SQLTemplate.query<T?>(
+        val sql = SQLTemplate.query<T?>(
             tClass,
             Options().select(String.format("avg(%s)", column)).where(predicate, *args)
         )
+        var asyncEventBus = getAsyncEventBus("select")
+        asyncEventBus.post(MyEvent(sql))
         try {
             connection!!.createStatement().use { statement ->
-                statement.executeQuery(s).use { resultSet ->
+                statement.executeQuery(sql).use { resultSet ->
                     return if (resultSet.next()) resultSet.getDouble(1) else 0.0
                 }
             }
@@ -1146,13 +1194,15 @@ internal class Core(var path: String) : DB {
         predicate: String?,
         vararg args: Any?
     ): Number? {
-        val s = SQLTemplate.query<T?>(
+        val sql = SQLTemplate.query<T?>(
             tClass,
             Options().select(String.format("sum(%s)", column)).where(predicate, *args)
         )
+        var asyncEventBus = getAsyncEventBus("select")
+        asyncEventBus.post(MyEvent(sql))
         try {
             connection!!.createStatement().use { statement ->
-                statement.executeQuery(s).use { resultSet ->
+                statement.executeQuery(sql).use { resultSet ->
                     return if (resultSet.next()) resultSet.getObject(1) as Number? else 0
                 }
             }
@@ -1171,13 +1221,15 @@ internal class Core(var path: String) : DB {
         predicate: String?,
         vararg args: Any?
     ): Number? {
-        val s = SQLTemplate.query<T?>(
+        val sql = SQLTemplate.query<T?>(
             tClass,
             Options().select(String.format("max(%s)", column)).where(predicate, *args)
         )
+        var asyncEventBus = getAsyncEventBus("select")
+        asyncEventBus.post(MyEvent(sql))
         try {
             connection!!.createStatement().use { statement ->
-                statement.executeQuery(s).use { resultSet ->
+                statement.executeQuery(sql).use { resultSet ->
                     return if (resultSet.next()) resultSet.getObject(1) as Number? else 0
                 }
             }
@@ -1196,13 +1248,15 @@ internal class Core(var path: String) : DB {
         predicate: String?,
         vararg args: Any?
     ): Number? {
-        val s = SQLTemplate.query<T?>(
+        val sql = SQLTemplate.query<T?>(
             tClass,
             Options().select(String.format("min(%s)", column)).where(predicate, *args)
         )
+        var asyncEventBus = getAsyncEventBus("select")
+        asyncEventBus.post(MyEvent(sql))
         try {
             connection!!.createStatement().use { statement ->
-                statement.executeQuery(s).use { resultSet ->
+                statement.executeQuery(sql).use { resultSet ->
                     return if (resultSet.next()) resultSet.getObject(1) as Number? else 0
                 }
             }

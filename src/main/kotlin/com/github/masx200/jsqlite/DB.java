@@ -17,6 +17,7 @@ package com.github.masx200.jsqlite;
 
 //import lombok.NonNull;
 
+import com.google.common.eventbus.AsyncEventBus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -26,6 +27,8 @@ public interface DB extends AutoCloseable {
     static DB connect(String path) {
         return new Core(path);
     }
+
+    AsyncEventBus getAsyncEventBus(String identifier);
 
     @Override
     void close();

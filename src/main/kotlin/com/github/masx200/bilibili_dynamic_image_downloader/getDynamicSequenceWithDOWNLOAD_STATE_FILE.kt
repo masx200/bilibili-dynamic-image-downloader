@@ -22,6 +22,10 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
         DataBaseTableDao(db2, DynamicPictures::class.java)
 
         db2.use { db ->
+            var asyncEventBus = db.getAsyncEventBus("select")
+            asyncEventBus.register(MyEventListener({
+                System.out.println("select:" + "Received event: " + it.message)
+            }))
 //        println(db)
             println(
                 db.tables(
