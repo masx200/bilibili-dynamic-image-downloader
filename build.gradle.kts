@@ -106,7 +106,7 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.41.2.2")
     // https://mvnrepository.com/artifact/com.xenomachina/kotlin-argparser
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
-    implementation("ch.qos.logback:logback-core:1.5.13")
+    implementation("ch.qos.logback:logback-core:1.5.15")
 
 }
 tasks.named<JavaExec>("run") {
@@ -144,7 +144,7 @@ allprojects {
     configurations.all {
         resolutionStrategy {
             // 强制使用特定版本的依赖
-            force("ch.qos.logback:logback-core:1.5.13")
+            force("ch.qos.logback:logback-core:1.5.15")
 
             // 或者你可以使用每个依赖的 group 和 version
             eachDependency {
