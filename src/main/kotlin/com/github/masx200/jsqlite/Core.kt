@@ -363,7 +363,10 @@ internal class Core(var path: String) : DB {
     }
 
     override fun <T : DataSupport<T?>?> update(t: T?) {
-        update<T?>(t, "id = ?", t!!.id())
+        if (t?.id == null) {
+            throw IllegalArgumentException("The entity must have an id to be updated.")
+        }
+        update<T?>(t, "id = ?", t.id())
     }
 
     override fun <T : DataSupport<T?>?> delete(tClass: Class<T?>, predicate: String?, vararg args: Any?) {
