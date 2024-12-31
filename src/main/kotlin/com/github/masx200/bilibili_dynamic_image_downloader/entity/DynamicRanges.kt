@@ -1,4 +1,4 @@
-package com.github.masx200.bilibili_dynamic_image_downloader
+package com.github.masx200.bilibili_dynamic_image_downloader.entity
 
 import com.github.masx200.jsqlite.Column
 import com.github.masx200.jsqlite.DataSupport

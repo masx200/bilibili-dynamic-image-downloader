@@ -3,6 +3,10 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 
 import com.github.masx200.biliClient.model.dynamic.Dynamic
 import com.github.masx200.biliClient.model.dynamic.Picture
+import com.github.masx200.bilibili_dynamic_image_downloader.entity.DynamicPictures
+import com.github.masx200.bilibili_dynamic_image_downloader.entity.DynamicRanges
+import com.github.masx200.bilibili_dynamic_image_downloader.entity.SpaceHistory
+import com.github.masx200.bilibili_dynamic_image_downloader.schema.DynamicRangesSchema
 import com.github.masx200.jsqlite.DB.Companion.connect
 import com.github.masx200.jsqlite.recreateColumnsOnSchemaChangeInColumnTypes
 import com.github.masx200.jsqlite.recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement
@@ -200,7 +204,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                         }
 
 
-
+                        assert(data11.earliestDynamicId != null)
 
                         println(dynamicRangesTable.updateByPredicate(data11) {
                             DynamicRangesSchema.userId eq options.host_uid

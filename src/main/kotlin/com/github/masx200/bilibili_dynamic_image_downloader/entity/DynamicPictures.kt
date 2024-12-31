@@ -1,4 +1,4 @@
-package com.github.masx200.bilibili_dynamic_image_downloader
+package com.github.masx200.bilibili_dynamic_image_downloader.entity
 
 import com.github.masx200.jsqlite.Column
 import com.github.masx200.jsqlite.DataSupport
@@ -37,8 +37,8 @@ class DynamicPictures(consumer: ((DynamicPictures) -> Unit)) :
 
     override fun toString(): String {
         return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc, userId=$userId" + "" +
-                "dynamicOriginType=$dynamicOriginType" +
-                "dynamicOriginId=$dynamicOriginId" +
+                "dynamicOriginType=$dynamicOriginType," +
+                "dynamicOriginId=$dynamicOriginId," +
                 ")" + super.toString()
 //                ", dynamicType=$dynamicType)"
     }

@@ -3,12 +3,13 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 import com.github.masx200.biliClient.model.dynamic.Dynamic
 import com.github.masx200.biliClient.model.dynamic.DynamicData
 import com.github.masx200.biliClient.model.dynamic.Picture
+import com.github.masx200.bilibili_dynamic_image_downloader.entity.DynamicPictures
 
 /**
  * 处理动态图片信息并插入到数据库。
  *
  * 此函数接收一个图片对象、动态项、动态数据、主机用户ID、一个回调列表以及一个数据库表访问对象。
- * 它提取图片的URL，创建一个新的 [DynamicPictures] 实例，填充必要的字段，
+ * 它提取图片的URL，创建一个新的 [com.github.masx200.bilibili_dynamic_image_downloader.entity.DynamicPictures] 实例，填充必要的字段，
  * 并在确保所有必要字段不为空的情况下，将插入操作作为回调添加到 [datatoinsertcallbacks] 列表中。
  *
  * @param picture 图片对象，可以为空，但必须包含 img_src 属性。
