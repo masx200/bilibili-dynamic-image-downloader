@@ -1,11 +1,16 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import jdk.tools.jlink.resources.plugins
+
+//import jdk.tools.jlink.resources.plugins
+
+//import jdk.tools.jlink.resources.plugins
 
 val artifact_id = "bilibili-dynamic-image-downloader"
 //val ktor_version: String by project
 val logback_version: String by project
 val org_gradle_jvmargs: String by project
 group = "com.github.masx200"
-version = "2.2.1"
+version = "2.2.2"
 tasks.named<ShadowJar>("shadowJar") {
     manifest {
         attributes["Main-Class"] = "com.github.masx200.bilibili_dynamic_image_downloader.IMAGEDOWNLOADERApplicationKt"
@@ -85,7 +90,22 @@ repositories {
 repositories {
     maven { url = uri("https://www.jitpack.io") }
 }
+repositories {
 
+    maven {
+        url = uri("https://maven.pkg.github.com/masx200/sqlite-java")
+
+        credentials {
+            username = System.getenv("MAVEN_USERNAME") ?: ""
+            password = System.getenv("MAVEN_PASSWORD") ?: ""
+        }
+    }
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation("com.github.masx200:sqlite-java:2.2.1")
+}
 dependencies {
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation("com.google.guava:guava:33.4.0-jre")
