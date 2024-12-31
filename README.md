@@ -112,15 +112,26 @@ https://github.com/JetBrains/Exposed
 
 https://github.com/lengpucheng/BilibiliClient
 
-## 如何下载
+## 如何导出数据和下载
 
-使用sqlite studio等sqlite管理软件,
+1.使用sqlite studio等sqlite管理软件,
 
-打开数据库文件,执行下列的sql语句,
-
-然后复制全部数据到motrix等下载器进行下载即可.
+打开数据库文件,执行下列的sql语句,然后复制全部数据.
 
 ```sql
 SELECT picturesrc
   FROM dynamicpictures;
 ```
+
+2.使用sqlite3执行脚本.
+
+```sql
+.open "***/**/***.db"
+.output "***/**/***.txt"
+SELECT picturesrc   FROM dynamicpictures;
+.exit
+```
+
+3.如何下载
+
+然后复制全部数据到motrix等下载器进行下载即可.
