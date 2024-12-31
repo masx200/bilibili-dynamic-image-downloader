@@ -8,6 +8,7 @@ import com.github.masx200.bilibili_dynamic_image_downloader.entity.DynamicRanges
 import com.github.masx200.bilibili_dynamic_image_downloader.entity.SpaceHistory
 import com.github.masx200.bilibili_dynamic_image_downloader.schema.DynamicPicturesSchema
 import com.github.masx200.bilibili_dynamic_image_downloader.schema.DynamicRangesSchema
+//import com.github.masx200.bilibili_dynamic_image_downloader.schema.DynamicRangesSchema.earliestDynamicId
 import com.github.masx200.jsqlite.DB.Companion.connect
 import com.github.masx200.jsqlite.recreateColumnsOnSchemaChangeInColumnTypes
 import com.github.masx200.jsqlite.recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement
@@ -135,6 +136,82 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                 }
             }
             if (mindynamicid != 0 && maxdynamicid != 0) {
+                //增量更新,比现有的更大的动态id
+                val iteritemslarger: Sequence<Dynamic> = getDynamicSequence(
+                    mindynamicid.toString(),
+                    options.host_uid,
+                    endwith_dynamic_id = options.endwith_dynamic_id,
+                    cookie_str
+                )
+                for (item in iteritemslarger) {
+
+                    var datatoinsertcallbacks = mutableListOf<() -> Unit>()
+                    println(item)
+                    println("https://t.bilibili.com/" + item.data!!.dynamic_id)
+
+
+                    val spaceHistory = SpaceHistory {
+                        it.userId = options.host_uid
+                        it.dynamicId = item.desc?.dynamic_id_str?.toLong()
+                        it.dynamicType = item.desc?.type?.toLong()
+
+                        it.dynamicOriginId = item.desc?.orig_dy_id_str?.toLong()
+                        it.dynamicOriginType = item.desc?.orig_type?.toLong()
+                    }
+                    println(spaceHistory)
+                    assert(spaceHistory.dynamicId != null)
+                    assert(spaceHistory.dynamicType != null)
+                    assert(spaceHistory.userId != null)
+                    datatoinsertcallbacks.add {
+                        println(
+                            spaceHistoryTable.insert(spaceHistory)
+                        )
+                    }
+//                    item.desc?.dynamic_id_str?.toLong().let {
+//                        earliestDynamicId = it
+//                    }
+
+                    if (item.detail != null) {
+
+                        // 如果动态项包含文章信息，则处理图片链接
+
+                        // 如果动态项包含图片信息，则处理图片链接
+                        if (item.detail!!.pictures != null) {
+                            val pictures = item.detail!!.pictures
+
+
+                            if (pictures is Iterable<Picture?>) {
+                                pictures.forEach { picture ->
+                                    processAndInsertDynamicPicture(
+                                        picture,
+                                        item,
+                                        item.data,
+                                        options.host_uid,
+                                        datatoinsertcallbacks,
+                                        dynamicPicturesTable
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    item.origin?.detail?.pictures.let { pictures ->
+                        if (pictures != null) {
+
+                            pictures.forEach { picture ->
+                                processAndInsertDynamicPicture(
+                                    picture,
+                                    item,
+                                    item.data,
+                                    options.host_uid,
+                                    datatoinsertcallbacks,
+                                    dynamicPicturesTable
+                                )
+
+                            }
+                        }
+                    }
+                    datatoinsertcallbacks.forEach { it() }
+                }
 //增量更新,比现有的更小的动态id
                 val iteritems: Sequence<Dynamic> = getDynamicSequence(
                     mindynamicid.toString(),
