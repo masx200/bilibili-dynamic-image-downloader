@@ -133,6 +133,9 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     it.userId = options.host_uid
                     it.dynamicId = item.desc?.dynamic_id_str?.toLong()
                     it.dynamicType = item.desc?.type?.toLong()
+
+                    it.dynamicOriginId = item.desc?.orig_dy_id_str?.toLong()
+                    it.dynamicOriginType = item.desc?.orig_type?.toLong()
                 }
                 println(spaceHistory)
                 assert(spaceHistory.dynamicId != null)
@@ -158,35 +161,34 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 
                         if (pictures is Iterable<Picture?>) {
                             pictures.forEach { picture ->
-                                val str = picture!!.img_src
-
-                                str?.let { url ->
-
-
-                                    println(url)
-
-
-                                    var dynamicPictures = DynamicPictures {
-
-                                        it.dynamicId = item.data!!.dynamic_id_str?.toLong()
-                                        it.pictureSrc = url.toString()
-                                        it.userId = options.host_uid
-                                    }
-                                    println(dynamicPictures)
-                                    assert(
-                                        dynamicPictures.dynamicId != null && dynamicPictures.pictureSrc != null && dynamicPictures.userId != null
-                                    )
-                                    datatoinsertcallbacks.add {
-                                        println(
-                                            dynamicPicturesTable.insert(dynamicPictures)
-                                        )
-                                    }
-                                }
+                                processAndInsertDynamicPicture(
+                                    picture,
+                                    item,
+                                    item.data,
+                                    options.host_uid,
+                                    datatoinsertcallbacks,
+                                    dynamicPicturesTable
+                                )
                             }
                         }
                     }
                 }
+                item.origin?.detail?.pictures.let { pictures ->
+                    if (pictures != null) {
 
+                        pictures.forEach { picture ->
+                            processAndInsertDynamicPicture(
+                                picture,
+                                item,
+                                item.data,
+                                options.host_uid,
+                                datatoinsertcallbacks,
+                                dynamicPicturesTable
+                            )
+
+                        }
+                    }
+                }
                 datatoinsertcallbacks.forEach { it() }
             }
             transaction(data1) {
