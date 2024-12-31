@@ -53,16 +53,3 @@ class MyArgs(parser: ArgParser) {
 }
 
 
-fun readCookieFromFile(string: String): String {
-
-
-    return try {
-        val file = java.io.File(string)
-        if (!file.exists()) {
-            throw Exception("cookie file not found")
-        }
-        file.readText()
-    } catch (e: Exception) {
-        throw e
-    }
-}

@@ -1,7 +1,8 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
 
-import com.github.masx200.jsqlite.DB
+import com.github.masx200.biliClient.model.dynamic.Dynamic
+import com.github.masx200.biliClient.model.dynamic.Picture
 import com.github.masx200.jsqlite.DB.Companion.connect
 import com.github.masx200.jsqlite.recreateColumnsOnSchemaChangeInColumnTypes
 import com.github.masx200.jsqlite.recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement
@@ -20,6 +21,10 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 
         val dynamicRangesTable = DataBaseTableDao(db2, DynamicRanges::class.java)
 
+        val spaceHistoryTable = DataBaseTableDao(db2, SpaceHistory::class.java)
+
+
+        val dynamicPicturesTable = DataBaseTableDao(db2, DynamicPictures::class.java)
 
         val sqlIdentifiers = listOf("select", "create", "alter", "delete", "drop", "insert", "update")
 
@@ -113,6 +118,95 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 
 
             }
+
+
+            val iteritems: Sequence<Dynamic> = getDynamicSequence(options, cookie_str)
+            var earliestDynamicId: Long? = null
+            for (item in iteritems) {
+
+                var datatoinsertcallbacks = mutableListOf<() -> Unit>()
+                println(item)
+                println("https://t.bilibili.com/" + item.data!!.dynamic_id)
+
+
+                val spaceHistory = SpaceHistory {
+                    it.userId = options.host_uid
+                    it.dynamicId = item.desc?.dynamic_id_str?.toLong()
+                    it.dynamicType = item.desc?.type?.toLong()
+                }
+                println(spaceHistory)
+                assert(spaceHistory.dynamicId != null)
+                assert(spaceHistory.dynamicType != null)
+                assert(spaceHistory.userId != null)
+                datatoinsertcallbacks.add {
+                    println(
+                        spaceHistoryTable.insert(spaceHistory)
+                    )
+                }
+                item.desc?.dynamic_id_str?.toLong().let {
+                    earliestDynamicId = it
+                }
+
+                if (item.detail != null) {
+
+                    // 如果动态项包含文章信息，则处理图片链接
+
+                    // 如果动态项包含图片信息，则处理图片链接
+                    if (item.detail!!.pictures != null) {
+                        val pictures = item.detail!!.pictures
+
+
+                        if (pictures is Iterable<Picture?>) {
+                            pictures.forEach { picture ->
+                                val str = picture!!.img_src
+
+                                str?.let {
+
+
+                                    println(it)
+
+
+                                    var dynamicPictures = DynamicPictures {
+
+                                        it.dynamicId = item.data!!.dynamic_id_str?.toLong()
+                                        it.pictureSrc = it.toString()
+                                        it.userId = options.host_uid
+                                    }
+                                    println(dynamicPictures)
+                                    assert(
+                                        dynamicPictures.dynamicId != null && dynamicPictures.pictureSrc != null && dynamicPictures.userId != null
+                                    )
+                                    datatoinsertcallbacks.add {
+                                        println(
+                                            dynamicPicturesTable.insert(dynamicPictures)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                datatoinsertcallbacks.forEach { it() }
+            }
+            transaction(data1) {
+                earliestDynamicId.let {
+                    if (it != null) {
+                        val data11 = DynamicRanges {
+                            it.earliestDynamicId
+
+                        }
+
+
+
+
+                        println(dynamicRangesTable.updateByPredicate(data11) {
+                            DynamicRangesSchema.userId eq options.host_uid
+                        })
+                    }
+                }
+            }
+
         }
 
     } finally {
@@ -125,16 +219,3 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 
 }
 
-fun registerEventListenerForIdentifier(db: DB, identifier: String): AutoCloseable {
-    var asyncEventBus = db.getAsyncEventBus(identifier)
-    var myEventListener = MyEventListener {
-        System.out.println("$identifier:" + "Received event:" + it.message)
-    }
-    asyncEventBus.register(myEventListener)
-    return object : AutoCloseable {
-        override fun close() {
-            asyncEventBus.unregister(myEventListener)
-        }
-    }
-
-}
