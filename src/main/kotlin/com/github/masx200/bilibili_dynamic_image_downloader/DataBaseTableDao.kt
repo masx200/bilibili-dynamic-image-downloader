@@ -107,7 +107,7 @@ class DataBaseTableDao<T : DataSupport<T>>(
 
         column: String,
 
-        ): Number {
+        ): Number? {
         return database.max(entityClass, column)
     }
 
@@ -115,7 +115,7 @@ class DataBaseTableDao<T : DataSupport<T>>(
 
         column: String,
         block: SqlExpressionBuilder.() -> Op<Boolean>
-    ): Number {
+    ): Number? {
         val condition = Op.build(block)
         val predicate = condition.toString()
         return database.maxByPredicate(entityClass, column, predicate)
@@ -126,7 +126,7 @@ class DataBaseTableDao<T : DataSupport<T>>(
 
         column: String,
 
-        ): Number {
+        ): Number? {
         return database.min(entityClass, column)
     }
 
@@ -134,7 +134,7 @@ class DataBaseTableDao<T : DataSupport<T>>(
 
         column: String,
         block: SqlExpressionBuilder.() -> Op<Boolean>
-    ): Number {
+    ): Number? {
         val condition = Op.build(block)
         val predicate = condition.toString()
         return database.minByPredicate(entityClass, column, predicate)

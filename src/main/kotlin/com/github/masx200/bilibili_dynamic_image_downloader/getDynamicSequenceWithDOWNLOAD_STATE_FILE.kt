@@ -136,7 +136,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     (SpaceHistorySchema.userId eq options.host_uid)
                 }
             }
-            if (mindynamicid != 0 && maxdynamicid != 0) {
+            if (mindynamicid != null && mindynamicid != 0 && maxdynamicid != 0 && maxdynamicid != null) {
                 println(
                     "现有的最新的动态内容id为" + maxdynamicid
                 )

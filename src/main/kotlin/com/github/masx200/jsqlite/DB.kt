@@ -108,18 +108,18 @@ interface DB : AutoCloseable {
         column: String,
         predicate: String?,
         vararg args: Any?
-    ): Number
+    ): Number?
 
-    fun <T : DataSupport<T>> max(tClass: Class<T>, column: String): Number
+    fun <T : DataSupport<T>> max(tClass: Class<T>, column: String): Number?
 
     fun <T : DataSupport<T>> minByPredicate(
         tClass: Class<T>,
         column: String,
         predicate: String?,
         vararg args: Any?
-    ): Number
+    ): Number?
 
-    fun <T : DataSupport<T>> min(tClass: Class<T>, column: String): Number
+    fun <T : DataSupport<T>> min(tClass: Class<T>, column: String): Number?
 
     companion object {
         fun connect(path: String): DB {

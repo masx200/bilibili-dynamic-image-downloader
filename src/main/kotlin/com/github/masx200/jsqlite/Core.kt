@@ -1225,7 +1225,7 @@ internal class Core(var path: String) : DB {
         column: String,
         predicate: String?,
         vararg args: Any?
-    ): Number {
+    ): Number? {
         val sql = SQLTemplate.query<T>(
             tClass,
             Options().select(String.format("max(%s)", column)).where(predicate, *args)
@@ -1235,7 +1235,10 @@ internal class Core(var path: String) : DB {
         try {
             connection!!.createStatement().use { statement ->
                 statement.executeQuery(sql).use { resultSet ->
-                    return if (resultSet.next()) resultSet.getObject(1) as Number else 0
+                    return if (resultSet.next()) {
+                        var any = resultSet.getObject(1)
+                        if (any == null) null else (any as Number)
+                    } else 0
                 }
             }
         } catch (e: SQLException) {
@@ -1243,7 +1246,7 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T>> max(tClass: Class<T>, column: String): Number {
+    override fun <T : DataSupport<T>> max(tClass: Class<T>, column: String): Number? {
         return maxByPredicate<T>(tClass, column, null, null as Any?)
     }
 
@@ -1252,7 +1255,7 @@ internal class Core(var path: String) : DB {
         column: String,
         predicate: String?,
         vararg args: Any?
-    ): Number {
+    ): Number? {
         val sql = SQLTemplate.query<T>(
             tClass,
             Options().select(String.format("min(%s)", column)).where(predicate, *args)
@@ -1262,7 +1265,10 @@ internal class Core(var path: String) : DB {
         try {
             connection!!.createStatement().use { statement ->
                 statement.executeQuery(sql).use { resultSet ->
-                    return if (resultSet.next()) resultSet.getObject(1) as Number else 0
+                    return if (resultSet.next()) {
+                        var any = resultSet.getObject(1)
+                        if (any == null) null else (any as Number)
+                    } else 0
                 }
             }
         } catch (e: SQLException) {
@@ -1270,7 +1276,7 @@ internal class Core(var path: String) : DB {
         }
     }
 
-    override fun <T : DataSupport<T>> min(tClass: Class<T>, column: String): Number {
+    override fun <T : DataSupport<T>> min(tClass: Class<T>, column: String): Number? {
         return minByPredicate<T>(tClass, column, null, null as Any?)
     }
 
