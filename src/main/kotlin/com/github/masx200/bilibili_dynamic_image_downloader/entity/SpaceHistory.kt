@@ -33,7 +33,7 @@ class SpaceHistory(consumer: ((SpaceHistory) -> Unit)) :
     var dynamicOriginId: Long? = null
 
     override fun toString(): String {
-        return "SpaceHistory(userId=$userId, dynamicId=$dynamicId, dynamicType=$dynamicType" +
+        return "SpaceHistory(userId=$userId, dynamicId=$dynamicId, dynamicType=$dynamicType," +
                 "dynamicOriginType=$dynamicOriginType," +
                 "dynamicOriginId=$dynamicOriginId," +
                 ")" + super.toString()

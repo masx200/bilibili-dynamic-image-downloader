@@ -34,7 +34,7 @@ class DynamicPictures(consumer: ((DynamicPictures) -> Unit)) :
     }
 
     override fun toString(): String {
-        return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc, userId=$userId" + "" +
+        return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc, userId=$userId" + "," +
 //                "dynamicOriginType=$dynamicOriginType," +
                 "dynamicOriginId=$dynamicOriginId," +
                 ")" + super.toString()
