@@ -1,14 +1,14 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
 
+//import com.github.masx200.bilibili_dynamic_image_downloader.schema.DynamicRangesSchema.earliestDynamicId
 import com.github.masx200.biliClient.model.dynamic.Dynamic
 import com.github.masx200.biliClient.model.dynamic.Picture
 import com.github.masx200.bilibili_dynamic_image_downloader.entity.DynamicPictures
 import com.github.masx200.bilibili_dynamic_image_downloader.entity.DynamicRanges
 import com.github.masx200.bilibili_dynamic_image_downloader.entity.SpaceHistory
-import com.github.masx200.bilibili_dynamic_image_downloader.schema.DynamicPicturesSchema
 import com.github.masx200.bilibili_dynamic_image_downloader.schema.DynamicRangesSchema
-//import com.github.masx200.bilibili_dynamic_image_downloader.schema.DynamicRangesSchema.earliestDynamicId
+import com.github.masx200.bilibili_dynamic_image_downloader.schema.SpaceHistorySchema
 import com.github.masx200.jsqlite.DB.Companion.connect
 import com.github.masx200.jsqlite.recreateColumnsOnSchemaChangeInColumnTypes
 import com.github.masx200.jsqlite.recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement
@@ -77,7 +77,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                 )
             }
 
-
+            var earliestDynamicIdinoldranges: Long? = null
             transaction(data1) {
 
                 val oldranges = (dynamicRangesTable.findOneByPredicate {
@@ -103,6 +103,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     println(dynamicRangesTable.insert(data11))
 
                 } else {
+                    earliestDynamicIdinoldranges = oldranges.earliestDynamicId
                     val data11 = DynamicRanges {
                         it.userId = options.host_uid
 
@@ -126,13 +127,13 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
             }
 
             val maxdynamicid = transaction(data1) {
-                dynamicPicturesTable.maxByPredicate(DynamicPicturesSchema.dynamicId.name) {
-                    (DynamicPicturesSchema.userId eq options.host_uid)
+                spaceHistoryTable.maxByPredicate(SpaceHistorySchema.dynamicId.name) {
+                    (SpaceHistorySchema.userId eq options.host_uid)
                 }
             }
             val mindynamicid = transaction(data1) {
-                dynamicPicturesTable.minByPredicate(DynamicPicturesSchema.dynamicId.name) {
-                    (DynamicPicturesSchema.userId eq options.host_uid)
+                spaceHistoryTable.minByPredicate(SpaceHistorySchema.dynamicId.name) {
+                    (SpaceHistorySchema.userId eq options.host_uid)
                 }
             }
             if (mindynamicid != 0 && maxdynamicid != 0) {
@@ -143,7 +144,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     "现有的最旧的动态内容id为" + mindynamicid
                 )
                 println(
-                    "开始开始增量更新更新的内容"
+                    "开始增量更新更新的内容"
                 )
                 //增量更新,比现有的更大的动态id
                 val iteritemslarger: Sequence<Dynamic> = getDynamicSequence(
@@ -222,14 +223,26 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     datatoinsertcallbacks.forEach { it() }
                 }
                 println(
-                    "开始开始增量更新更旧的内容"
+                    "完成增量更新更新的内容"
+                )
+
+                if (earliestDynamicIdinoldranges != null && earliestDynamicIdinoldranges != 0L && mindynamicid.toString() == earliestDynamicIdinoldranges.toString()) {
+
+                    println(
+                        "无需增量更新更旧的内容,数据库中已经存在的最旧动态id为" + earliestDynamicIdinoldranges.toString() + "已经没有更旧的动态内容"
+                    )
+                    return
+                }
+                println(
+                    "开始增量更新更旧的内容"
                 )
 //增量更新,比现有的更小的动态id
                 val iteritems: Sequence<Dynamic> = getDynamicSequence(
                     mindynamicid.toString(),
                     options.host_uid,
                     endwith_dynamic_id = options.endwith_dynamic_id,
-                    cookie_str
+                    cookie_str,
+                    acceptEmpty = true
                 )
                 var earliestDynamicId: Long? = null
                 for (item in iteritems) {
@@ -318,6 +331,9 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                         }
                     }
                 }
+                println(
+                    "完成增量更新更旧的内容"
+                )
             } else {
                 //全量更新
                 println(
@@ -325,10 +341,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     "开始全量更新"
                 )
                 val iteritems: Sequence<Dynamic> = getDynamicSequence(
-                    options.offset_dynamic_id,
-                    options.host_uid,
-                    options.endwith_dynamic_id,
-                    cookie_str
+                    options.offset_dynamic_id, options.host_uid, options.endwith_dynamic_id, cookie_str
                 )
                 var earliestDynamicId: Long? = null
                 for (item in iteritems) {
@@ -417,7 +430,10 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                         }
                     }
                 }
+                println(
 
+                    "完成全量更新"
+                )
             }
 
         }

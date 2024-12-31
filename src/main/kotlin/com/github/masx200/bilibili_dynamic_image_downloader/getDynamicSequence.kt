@@ -2,6 +2,7 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 
 import com.github.masx200.biliClient.BiliClientFactor
 import com.github.masx200.biliClient.model.dynamic.Dynamic
+import com.github.masx200.biliClient.model.dynamic.DynamicItems
 
 
 /**
@@ -17,7 +18,7 @@ fun getDynamicSequence(
     offset_dynamic_id: String = "",
     host_uid: String,
     endwith_dynamic_id: String = "",
-    cookie_str: String
+    cookie_str: String, acceptEmpty: Boolean = false
 ): Sequence<Dynamic> {
     return sequence {
 
@@ -31,10 +32,18 @@ fun getDynamicSequence(
         var offset: String = offset_dynamic_id
         var hasMore = true
         while (hasMore) {
-
-            val list = if (offset != "") client.dynamic().withHostUid(host_uid.toLong()).list(offset.toLong()) else {
-                client.dynamic().withHostUid(host_uid.toLong()).list()
+            val list: DynamicItems?
+            try {
+                list = if (offset != "") client.dynamic().withHostUid(host_uid.toLong()).list(offset.toLong()) else {
+                    client.dynamic().withHostUid(host_uid.toLong()).list()
+                }
+            } catch (e: Throwable) {
+                if (acceptEmpty && e.message == "cardsarray为null,可能未登录") {
+                    return@sequence
+                }
+                throw (e)
             }
+
             //System.out.println(list)
 //            System.out.println("是还有动态--> " + (list.hasMore == 1))
 //            System.out.println("nextOffset--> " + (list.nextOffset))
