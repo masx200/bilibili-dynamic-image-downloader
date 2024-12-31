@@ -11,6 +11,23 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder
 class DataBaseTableDao<T : DataSupport<T>>(
     var database: DB, var entityClass: Class<T>,
 ) {
+
+
+    fun findByConsumerPredicate(
+        consumer: Consumer<Options>? = Consumer {}, where: (SqlExpressionBuilder.() -> Op<Boolean>)? = {
+            Op.TRUE
+        }
+    ): List<T> {
+
+        return database.findByConsumer<T>(entityClass, {
+            consumer?.accept(it)
+            if (where != null) {
+                val condition = Op.build(where)
+                val predicate = condition.toString()
+                it.where(predicate)
+            }
+        })
+    }
 //    fun getAsyncEventBus(identifier: String): AsyncEventBus {
 //        return database.getAsyncEventBus(identifier)
 //    }

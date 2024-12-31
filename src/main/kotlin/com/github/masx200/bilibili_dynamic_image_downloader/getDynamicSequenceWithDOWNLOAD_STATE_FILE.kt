@@ -67,14 +67,6 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
             }
 
 
-
-
-
-
-
-
-
-
             transaction(data1) {
 
                 val oldranges = (dynamicRangesTable.findOneByPredicate {
