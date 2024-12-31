@@ -136,11 +136,20 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                 }
             }
             if (mindynamicid != 0 && maxdynamicid != 0) {
+                println(
+                    "现有的最新的动态内容id为" + maxdynamicid
+                )
+                println(
+                    "现有的最旧的动态内容id为" + mindynamicid
+                )
+                println(
+                    "开始开始增量更新更新的内容"
+                )
                 //增量更新,比现有的更大的动态id
                 val iteritemslarger: Sequence<Dynamic> = getDynamicSequence(
-                    mindynamicid.toString(),
+                    options.offset_dynamic_id,
                     options.host_uid,
-                    endwith_dynamic_id = options.endwith_dynamic_id,
+                    endwith_dynamic_id = maxdynamicid.toString(),
                     cookie_str
                 )
                 for (item in iteritemslarger) {
@@ -212,6 +221,9 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     }
                     datatoinsertcallbacks.forEach { it() }
                 }
+                println(
+                    "开始开始增量更新更旧的内容"
+                )
 //增量更新,比现有的更小的动态id
                 val iteritems: Sequence<Dynamic> = getDynamicSequence(
                     mindynamicid.toString(),
@@ -308,6 +320,10 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                 }
             } else {
                 //全量更新
+                println(
+
+                    "开始全量更新"
+                )
                 val iteritems: Sequence<Dynamic> = getDynamicSequence(
                     options.offset_dynamic_id,
                     options.host_uid,
