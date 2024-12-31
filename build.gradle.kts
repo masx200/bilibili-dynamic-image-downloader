@@ -5,7 +5,7 @@ val artifact_id = "bilibili-dynamic-image-downloader"
 val logback_version: String by project
 val org_gradle_jvmargs: String by project
 group = "com.github.masx200"
-version = "1.1.1"
+version = "2.2.0"
 tasks.named<ShadowJar>("shadowJar") {
     manifest {
         attributes["Main-Class"] = "com.github.masx200.bilibili_dynamic_image_downloader.IMAGEDOWNLOADERApplicationKt"
@@ -13,6 +13,7 @@ tasks.named<ShadowJar>("shadowJar") {
     }
 }
 plugins {
+    id("java")
     id("application")
     kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "8.3.5"
@@ -51,7 +52,24 @@ afterEvaluate {
 application {
     mainClass.set("com.github.masx200.bilibili_dynamic_image_downloader.IMAGEDOWNLOADERApplicationKt")
 }
-
+sourceSets {
+    main {
+        java {
+            setSrcDirs(listOf("src/main/kotlin"))
+        }
+        resources {
+            setSrcDirs(listOf("src/main/resources"))
+        }
+    }
+    test {
+        java {
+            setSrcDirs(listOf("src/test/kotlin"))
+        }
+        resources {
+            setSrcDirs(listOf("src/test/resources"))
+        }
+    }
+}
 repositories {
     mavenCentral()
     gradlePluginPortal()
@@ -64,7 +82,25 @@ repositories {
         }
     }
 }
+repositories {
+    maven { url = uri("https://www.jitpack.io") }
+}
 
+dependencies {
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation("com.google.guava:guava:33.4.0-jre")
+
+    implementation("com.google.code.gson:gson:2.10.1")
+    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+    //implementation("org.xerial:sqlite-jdbc:3.47.1.0")
+// https://mvnrepository.com/artifact/org.jetbrains.exposed/exposed-jdbc
+    runtimeOnly("org.jetbrains.exposed:exposed-jdbc:0.57.0")
+
+    // https://mvnrepository.com/artifact/org.jetbrains.exposed/exposed-core
+    implementation("org.jetbrains.exposed:exposed-core:0.57.0")
+
+//    implementation("com.github.artbits:sqlite-java:1.0.8")
+}
 dependencies {
 
     implementation("com.alibaba.fastjson2:fastjson2:2.0.53")
@@ -81,7 +117,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.16")
 
     // https://mvnrepository.com/artifact/cn.hll520.linclient/bilibiliclient
-    implementation("com.github.masx200:bilibiliclient:1.4.0")
+    implementation("com.github.masx200:bilibiliclient:1.5.2")
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
@@ -103,7 +139,11 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
     implementation("org.apache.httpcomponents:httpcore:4.4.16")
     testImplementation(kotlin("test"))
+//<<<<<<< sqlite保存状态
+//    implementation("org.xerial:sqlite-jdbc:3.36.0.3")
+//=======
     implementation("org.xerial:sqlite-jdbc:3.47.1.0")
+//>>>>>>> master
     // https://mvnrepository.com/artifact/com.xenomachina/kotlin-argparser
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
     implementation("ch.qos.logback:logback-core:1.5.15")
@@ -140,6 +180,9 @@ graalvmNative {
     }
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
 allprojects {
     configurations.all {
         resolutionStrategy {
