@@ -1,7 +1,6 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
-//import java.sql.DriverManager
-//import com.github.masx200.jsqlite.DB.connect
+
 import com.github.masx200.jsqlite.DB
 import com.github.masx200.jsqlite.DB.Companion.connect
 import com.github.masx200.jsqlite.recreateColumnsOnSchemaChangeInColumnTypes
@@ -14,15 +13,14 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
     var data1 = Database.connect("jdbc:sqlite:$dbFile", "org.sqlite.JDBC")
 
     var listeners = mutableListOf<AutoCloseable>()
-//    println(data1)
+
     try {
         val db2 = connect(dbFile)
-//        db2.findOne<DynamicRanges>( DynamicRanges::class.java,"dynamicranges.userId = '10013290'")
-//        println(db2)
-//
+
+
         val dynamicRangesTable = DataBaseTableDao(db2, DynamicRanges::class.java)
-//        DataBaseTableDao(db2, SpaceHistory::class.java)
-//        DataBaseTableDao(db2, DynamicPictures::class.java)
+
+
         val sqlIdentifiers = listOf("select", "create", "alter", "delete", "drop", "insert", "update")
 
         db2.use { db ->
@@ -33,7 +31,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     registerEventListenerForIdentifier(db, identifier)
                 )
             }
-//        println(db)
+
             var strings = db.tables(
                 SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
             )
@@ -68,22 +66,22 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                 )
             }
 
-//        db.findOne<DynamicRanges>(DynamicRanges::class.java){
-//
-//        }
-//全量同步
-//        修改DynamicRanges
-//        val dynamicRanges = db.select<DynamicRanges>().where {
-//            DynamicRanges::userId.eq(options.host_uid)
-//        }.toList()
-            //增量同步
+
+
+
+
+
+
+
+
+
             transaction(data1) {
-//                println(DynamicRanges())
+
                 val oldranges = (dynamicRangesTable.findOneByPredicate {
-                    (DynamicRangesSchema.userId eq options.host_uid)// and (DynamicRanges.id eq 1L)
-//eq()
+                    (DynamicRangesSchema.userId eq options.host_uid)
+
                 })
-//                println(oldranges)
+
                 if (oldranges == null) {
                     val data11 = DynamicRanges {
                         it.userId = options.host_uid
@@ -97,7 +95,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 
 
                     }
-//                    println(data11)
+
 
                     println(dynamicRangesTable.insert(data11))
 
@@ -115,19 +113,18 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
 
                     }
                     data11.id = oldranges.id
-//                    println(oldranges)
 
-//                    println(oldranges)
+
+
                     println(dynamicRangesTable.updateById(data11))
                 }
-                println(dynamicRangesTable.deleteByPredicate {
-                    DynamicRangesSchema.userId eq options.host_uid
-                })
+
+
             }
         }
 
     } finally {
-//        println(  data1.connector())
+
         data1.connector().close()
 
 
