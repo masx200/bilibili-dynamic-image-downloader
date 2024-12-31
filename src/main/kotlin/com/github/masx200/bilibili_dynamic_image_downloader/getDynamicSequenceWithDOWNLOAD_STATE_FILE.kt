@@ -192,10 +192,10 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                 datatoinsertcallbacks.forEach { it() }
             }
             transaction(data1) {
-                earliestDynamicId.let {
-                    if (it != null) {
+                earliestDynamicId.let { earliestDynamicId ->
+                    if (earliestDynamicId != null) {
                         val data11 = DynamicRanges {
-                            it.earliestDynamicId
+                            it.earliestDynamicId = earliestDynamicId
 
                         }
 
