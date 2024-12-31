@@ -102,4 +102,41 @@ class DataBaseTableDao<T : DataSupport<T>>(
     fun findAll(): List<T> {
         return database.findAll<T>(entityClass)
     }
+
+    fun max(
+
+        column: String,
+
+        ): Number {
+        return database.max(entityClass, column)
+    }
+
+    fun maxByPredicate(
+
+        column: String,
+        block: SqlExpressionBuilder.() -> Op<Boolean>
+    ): Number {
+        val condition = Op.build(block)
+        val predicate = condition.toString()
+        return database.maxByPredicate(entityClass, column, predicate)
+    }
+
+
+    fun min(
+
+        column: String,
+
+        ): Number {
+        return database.min(entityClass, column)
+    }
+
+    fun minByPredicate(
+
+        column: String,
+        block: SqlExpressionBuilder.() -> Op<Boolean>
+    ): Number {
+        val condition = Op.build(block)
+        val predicate = condition.toString()
+        return database.minByPredicate(entityClass, column, predicate)
+    }
 }
