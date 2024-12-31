@@ -37,7 +37,7 @@ fun processAndInsertDynamicPicture(
 
         var dynamicPictures = DynamicPictures {
             it.dynamicOriginId = item.desc?.orig_dy_id_str?.toLong()
-            it.dynamicOriginType = item.desc?.orig_type?.toLong()
+//            it.dynamicOriginType = item.desc?.orig_type?.toLong()
             it.dynamicId = data!!.dynamic_id_str?.toLong()
             it.pictureSrc = url.toString()
             it.userId = host_uid

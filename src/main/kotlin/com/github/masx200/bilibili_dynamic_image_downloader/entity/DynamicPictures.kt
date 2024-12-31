@@ -22,8 +22,6 @@ class DynamicPictures(consumer: ((DynamicPictures) -> Unit)) :
     @Column(index = true)
     var userId: String? = null
 
-    @Column(index = true)
-    var dynamicOriginType: Long? = null
 
     @Column(index = true)
     var dynamicOriginId: Long? = null
@@ -37,7 +35,7 @@ class DynamicPictures(consumer: ((DynamicPictures) -> Unit)) :
 
     override fun toString(): String {
         return "DynamicPictures(dynamicId=$dynamicId, pictureSrc=$pictureSrc, userId=$userId" + "" +
-                "dynamicOriginType=$dynamicOriginType," +
+//                "dynamicOriginType=$dynamicOriginType," +
                 "dynamicOriginId=$dynamicOriginId," +
                 ")" + super.toString()
 //                ", dynamicType=$dynamicType)"
