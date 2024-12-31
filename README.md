@@ -17,11 +17,17 @@ gradle shadowJar
 #### 使用说明
 
 [//]: # (```shell)
+
 [//]: # (java   -jar "bilibili-dynamic-image-downloader-all.jar" "--cookie=*****=****" "--host_uid=********" -o "*****")
+
 [//]: # (```)
+
 [//]: # ()
+
 [//]: # (```shell)
+
 [//]: # (java   -jar "bilibili-dynamic-image-downloader-all.jar"    -c "*****=*****"  -u "*********" -d "./file_dynamic_ids.txt" -i "./file_dynamic_images.txt")
+
 [//]: # (```)
 
 ```shell
@@ -68,11 +74,17 @@ optional arguments:
 ```
 
 [//]: # (         [-d FILE_DYNAMIC_IDS])
+
 [//]: # (                                         [-i FILE_DYNAMIC_IMAGES])
+
 [//]: # (  -d FILE_DYNAMIC_IDS,                        file_dynamic_ids)
+
 [//]: # (  --file_dynamic_ids FILE_DYNAMIC_IDS)
+
 [//]: # ()
+
 [//]: # (  -i FILE_DYNAMIC_IMAGES,                     file_dynamic_images)
+
 [//]: # (  --file_dynamic_images FILE_DYNAMIC_IMAGES)
 
 参数 `COOKIE` 是bilibili账号的cookie
@@ -86,7 +98,9 @@ optional arguments:
 参数 `endwith_dynamic_id`是指定到此id之前的动态，不包含此id的动态
 
 [//]: # (参数 `file_dynamic_ids`是指定一个文件，文件中每行一个动态id，在文件中写入动态id)
+
 [//]: # ()
+
 [//]: # (参数 `file_dynamic_images`是指定一个文件，文件中每行一个动态图片，在文件中写入动态图片地址)
 
 参数

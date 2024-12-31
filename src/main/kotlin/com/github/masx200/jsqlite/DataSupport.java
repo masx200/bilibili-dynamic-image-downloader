@@ -24,6 +24,17 @@ import static com.github.masx200.jsqlite.Core.gson;
 public class DataSupport<T extends DataSupport<T>> {
     @Column(autoIncrement = true, primaryKey = true)
     public Long id;
+    public Long createdAt;
+    public Long updatedAt;
+
+    public DataSupport() {
+    }
+
+    @SuppressWarnings("unchecked")
+    public DataSupport(Consumer<T> consumer) {
+
+        Optional.of(consumer).ifPresent(c -> c.accept((T) this));
+    }
 
     public Long getId() {
         return id;
@@ -47,17 +58,6 @@ public class DataSupport<T extends DataSupport<T>> {
 
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
-    }
-    public Long createdAt;
-    public Long updatedAt;
-
-    public DataSupport() {
-    }
-
-    @SuppressWarnings("unchecked")
-    public DataSupport(Consumer<T> consumer) {
-
-        Optional.of(consumer).ifPresent(c -> c.accept((T) this));
     }
 
     @SuppressWarnings("unchecked")
