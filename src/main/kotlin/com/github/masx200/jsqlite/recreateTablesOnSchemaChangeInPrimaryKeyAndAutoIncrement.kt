@@ -16,6 +16,10 @@ fun recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement(db: DB, vararg list
 
         }
     }
+
+    db.tables(*list).forEach {
+        resultList.add(it)
+    }
     return resultList
 }
 
