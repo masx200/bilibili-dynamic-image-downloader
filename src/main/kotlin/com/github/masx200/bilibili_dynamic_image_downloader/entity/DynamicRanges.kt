@@ -1,8 +1,8 @@
 package com.github.masx200.bilibili_dynamic_image_downloader.entity
 
-import com.github.masx200.jsqlite.Column
-import com.github.masx200.jsqlite.DataSupport
-import com.github.masx200.jsqlite.Table
+import com.github.masx200.sqlite_java.Column
+import com.github.masx200.sqlite_java.DataSupport
+import com.github.masx200.sqlite_java.Table
 
 @Table(name = "dynamicranges")
 class DynamicRanges(consumer: ((DynamicRanges) -> Unit)) :

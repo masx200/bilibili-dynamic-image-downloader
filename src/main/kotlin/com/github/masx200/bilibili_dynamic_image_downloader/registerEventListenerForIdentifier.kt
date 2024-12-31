@@ -1,6 +1,6 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
-import com.github.masx200.jsqlite.DB
+import com.github.masx200.sqlite_java.DB
 
 fun registerEventListenerForIdentifier(db: DB, identifier: String): AutoCloseable {
     var asyncEventBus = db.getAsyncEventBus(identifier)
