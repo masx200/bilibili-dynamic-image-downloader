@@ -12,10 +12,11 @@ import com.github.masx200.bilibili_dynamic_image_downloader.schema.SpaceHistoryS
 import com.github.masx200.jsqlite.DB.Companion.connect
 import com.github.masx200.jsqlite.recreateColumnsOnSchemaChangeInColumnTypes
 import com.github.masx200.jsqlite.recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement
+import kotlinx.coroutines.flow.Flow
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: String) {
+suspend fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: String) {
     val dbFile = options.download_state_file
     var data1 = Database.connect("jdbc:sqlite:$dbFile", "org.sqlite.JDBC")
 
@@ -147,13 +148,13 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     "开始增量更新更新的内容"
                 )
                 //增量更新,比现有的更大的动态id
-                val iteritemslarger: Sequence<Dynamic> = getDynamicSequence(
+                val iteritemslarger: Flow<Dynamic> = getDynamicSequence(
                     options.offset_dynamic_id,
                     options.host_uid,
                     endwith_dynamic_id = maxdynamicid.toString(),
                     cookie_str
                 )
-                for (item in iteritemslarger) {
+                iteritemslarger.collect { item ->
 
                     var datatoinsertcallbacks = mutableListOf<() -> Unit>()
                     println(item)
@@ -237,7 +238,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     "开始增量更新更旧的内容"
                 )
 //增量更新,比现有的更小的动态id
-                val iteritems: Sequence<Dynamic> = getDynamicSequence(
+                val iteritems: Flow<Dynamic> = getDynamicSequence(
                     mindynamicid.toString(),
                     options.host_uid,
                     endwith_dynamic_id = options.endwith_dynamic_id,
@@ -245,7 +246,7 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     acceptEmpty = true
                 )
                 var earliestDynamicId: Long? = null
-                for (item in iteritems) {
+                iteritems.collect { item ->
 
                     var datatoinsertcallbacks = mutableListOf<() -> Unit>()
                     println(item)
@@ -335,16 +336,22 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                     "完成增量更新更旧的内容"
                 )
             } else {
+                println(
+                    "现有的数据库最新的动态内容不存在"
+                )
+                println(
+                    "现有的数据库最旧的动态内容不存在"
+                )
                 //全量更新
                 println(
 
                     "开始全量更新"
                 )
-                val iteritems: Sequence<Dynamic> = getDynamicSequence(
+                val iteritems: Flow<Dynamic> = getDynamicSequence(
                     options.offset_dynamic_id, options.host_uid, options.endwith_dynamic_id, cookie_str
                 )
                 var earliestDynamicId: Long? = null
-                for (item in iteritems) {
+                iteritems.collect { item ->
 
                     var datatoinsertcallbacks = mutableListOf<() -> Unit>()
                     println(item)

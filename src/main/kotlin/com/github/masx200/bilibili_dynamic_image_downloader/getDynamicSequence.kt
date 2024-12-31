@@ -1,8 +1,13 @@
 package com.github.masx200.bilibili_dynamic_image_downloader
 
 import com.github.masx200.biliClient.BiliClientFactor
+import com.github.masx200.biliClient.exception.BiliRequestException
 import com.github.masx200.biliClient.model.dynamic.Dynamic
 import com.github.masx200.biliClient.model.dynamic.DynamicItems
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 
 
 /**
@@ -19,8 +24,8 @@ fun getDynamicSequence(
     host_uid: String,
     endwith_dynamic_id: String = "",
     cookie_str: String, acceptEmpty: Boolean = false
-): Sequence<Dynamic> {
-    return sequence {
+): Flow<Dynamic> {
+    return flow {
 
 
         val cookie = cookie_str
@@ -32,17 +37,33 @@ fun getDynamicSequence(
         var offset: String = offset_dynamic_id
         var hasMore = true
         while (hasMore) {
-            val list: DynamicItems?
-            try {
-                list = if (offset != "") client.dynamic().withHostUid(host_uid.toLong()).list(offset.toLong()) else {
-                    client.dynamic().withHostUid(host_uid.toLong()).list()
+            val list: DynamicItems? =
+                try {
+                    if (offset != "") client.dynamic().withHostUid(host_uid.toLong()).list(offset.toLong()) else {
+                        client.dynamic().withHostUid(host_uid.toLong()).list()
+                    }
+                } catch (e: BiliRequestException) {
+                    if (e.message == "由于触发哔哩哔哩安全风控策略，该次访问请求被拒绝。") {
+                        val seconds = 30
+                        delay(seconds * 1000L)
+                        var sequence = getDynamicSequence(
+                            offset_dynamic_id,
+                            host_uid,
+                            endwith_dynamic_id,
+                            cookie_str
+
+                        )
+                        return@flow emitAll(
+                            sequence
+                        )
+                    }
+                    throw (e)
+                } catch (e: Exception) {
+                    if (acceptEmpty && e.message == "cardsarray为null,可能未登录") {
+                        return@flow
+                    }
+                    throw (e)
                 }
-            } catch (e: Throwable) {
-                if (acceptEmpty && e.message == "cardsarray为null,可能未登录") {
-                    return@sequence
-                }
-                throw (e)
-            }
 
             //System.out.println(list)
 //            System.out.println("是还有动态--> " + (list.hasMore == 1))
@@ -60,10 +81,10 @@ fun getDynamicSequence(
                             .toLong() < endwith_dynamic_id.toLong())
                     ) {
 
-                        return@sequence
+                        return@flow
                     } else {
 
-                        yield(item)
+                        emit(item)
                     }
                 }
             }

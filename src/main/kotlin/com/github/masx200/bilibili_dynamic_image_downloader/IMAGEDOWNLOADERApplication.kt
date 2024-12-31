@@ -2,6 +2,7 @@ package com.github.masx200.bilibili_dynamic_image_downloader
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
+import kotlinx.coroutines.runBlocking
 
 /**
  * The entry point of the program.
@@ -27,25 +28,30 @@ fun main(args: Array<String>) {
     println("args:" + "Array:" + args.contentToString())
     mainBody("bilibili-dynamic-image-downloader") {
 
+
         // Creates a Netty server
         ArgParser(args).parseInto(::MyArgs).run {
-            printmyargs(this)
+            val args = this
+            return@run runBlocking {
+                printmyargs(args)
 
-            if (cookie == "" && cookie_file == "") {
-                throw Exception("cookie or cookie_file must be not empty")
-            }
-            val cookie_str =
-                if (cookie_file != "") {
-                    readCookieFromFile(cookie_file)
-                } else {
-                    cookie
+                if (cookie == "" && cookie_file == "") {
+                    throw Exception("cookie or cookie_file must be not empty")
                 }
-            println("cookie_str=(" + cookie_str + ")")
+                val cookie_str =
+                    if (cookie_file != "") {
+                        readCookieFromFile(cookie_file)
+                    } else {
+                        cookie
+                    }
+                println("cookie_str=(" + cookie_str + ")")
 //            val iteritems: Sequence<Dynamic> =
 //                if (this.download_state_file != "") {
 //
 
-            return@run getDynamicSequenceWithDOWNLOAD_STATE_FILE(this, cookie_str)
+                return@runBlocking getDynamicSequenceWithDOWNLOAD_STATE_FILE(args, cookie_str)
+            }
+
 //                } else {
 //
 //                    getDynamicSequence(this); }
