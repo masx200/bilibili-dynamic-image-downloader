@@ -92,7 +92,7 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.10.1")
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-    implementation("org.xerial:sqlite-jdbc:3.47.1.0")
+    //implementation("org.xerial:sqlite-jdbc:3.47.1.0")
 // https://mvnrepository.com/artifact/org.jetbrains.exposed/exposed-jdbc
     runtimeOnly("org.jetbrains.exposed:exposed-jdbc:0.57.0")
 
@@ -139,10 +139,14 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
     implementation("org.apache.httpcomponents:httpcore:4.4.16")
     testImplementation(kotlin("test"))
+//<<<<<<< sqlite保存状态
 //    implementation("org.xerial:sqlite-jdbc:3.36.0.3")
+//=======
+    implementation("org.xerial:sqlite-jdbc:3.47.1.0")
+//>>>>>>> master
     // https://mvnrepository.com/artifact/com.xenomachina/kotlin-argparser
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
-    implementation("ch.qos.logback:logback-core:1.5.13")
+    implementation("ch.qos.logback:logback-core:1.5.15")
 
 }
 tasks.named<JavaExec>("run") {
@@ -183,7 +187,7 @@ allprojects {
     configurations.all {
         resolutionStrategy {
             // 强制使用特定版本的依赖
-            force("ch.qos.logback:logback-core:1.5.13")
+            force("ch.qos.logback:logback-core:1.5.15")
 
             // 或者你可以使用每个依赖的 group 和 version
             eachDependency {
