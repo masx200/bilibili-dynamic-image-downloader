@@ -114,11 +114,11 @@ https://github.com/lengpucheng/BilibiliClient
 
 ## 如何下载
 
-使用sqlite studio
+使用sqlite studio等sqlite管理软件,
 
 打开数据库文件,执行下列的sql语句,
 
-然后复制全部数据到motrix进行下载即可.
+然后复制全部数据到motrix等下载器进行下载即可.
 
 ```sql
 SELECT picturesrc
