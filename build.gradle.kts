@@ -1,9 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import jdk.tools.jlink.resources.plugins
 
-//import jdk.tools.jlink.resources.plugins
-
-//import jdk.tools.jlink.resources.plugins
 
 val artifact_id = "bilibili-dynamic-image-downloader"
 //val ktor_version: String by project
