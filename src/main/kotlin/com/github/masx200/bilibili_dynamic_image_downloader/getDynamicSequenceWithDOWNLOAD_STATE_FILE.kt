@@ -160,16 +160,16 @@ fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_str: Strin
                             pictures.forEach { picture ->
                                 val str = picture!!.img_src
 
-                                str?.let {
+                                str?.let { url ->
 
 
-                                    println(it)
+                                    println(url)
 
 
                                     var dynamicPictures = DynamicPictures {
 
                                         it.dynamicId = item.data!!.dynamic_id_str?.toLong()
-                                        it.pictureSrc = it.toString()
+                                        it.pictureSrc = url.toString()
                                         it.userId = options.host_uid
                                     }
                                     println(dynamicPictures)
