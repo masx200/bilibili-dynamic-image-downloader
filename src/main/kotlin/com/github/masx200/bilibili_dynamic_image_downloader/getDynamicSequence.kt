@@ -44,7 +44,11 @@ fun getDynamicSequence(
                     }
                 } catch (e: BiliRequestException) {
                     if (e.message == "由于触发哔哩哔哩安全风控策略，该次访问请求被拒绝。") {
+//                        println("由于触发哔哩哔哩安全风控策略，该次访问请求被拒绝。")
                         val seconds = 30
+                        println(
+                            "由于触发哔哩哔哩安全风控策略，该次访问请求被拒绝。" + "等待${seconds}秒后重试"
+                        )
                         delay(seconds * 1000L)
                         var sequence = getDynamicSequence(
                             offset_dynamic_id,
