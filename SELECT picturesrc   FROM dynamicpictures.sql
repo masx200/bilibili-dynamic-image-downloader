@@ -1,0 +1,4 @@
+SELECT
+    picturesrc
+FROM
+    dynamicpictures;

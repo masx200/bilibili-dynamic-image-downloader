@@ -17,11 +17,17 @@ gradle shadowJar
 #### 使用说明
 
 [//]: # (```shell)
+
 [//]: # (java   -jar "bilibili-dynamic-image-downloader-all.jar" "--cookie=*****=****" "--host_uid=********" -o "*****")
+
 [//]: # (```)
+
 [//]: # ()
+
 [//]: # (```shell)
+
 [//]: # (java   -jar "bilibili-dynamic-image-downloader-all.jar"    -c "*****=*****"  -u "*********" -d "./file_dynamic_ids.txt" -i "./file_dynamic_images.txt")
+
 [//]: # (```)
 
 ```shell
@@ -68,11 +74,17 @@ optional arguments:
 ```
 
 [//]: # (         [-d FILE_DYNAMIC_IDS])
+
 [//]: # (                                         [-i FILE_DYNAMIC_IMAGES])
+
 [//]: # (  -d FILE_DYNAMIC_IDS,                        file_dynamic_ids)
+
 [//]: # (  --file_dynamic_ids FILE_DYNAMIC_IDS)
+
 [//]: # ()
+
 [//]: # (  -i FILE_DYNAMIC_IMAGES,                     file_dynamic_images)
+
 [//]: # (  --file_dynamic_images FILE_DYNAMIC_IMAGES)
 
 参数 `COOKIE` 是bilibili账号的cookie
@@ -86,7 +98,9 @@ optional arguments:
 参数 `endwith_dynamic_id`是指定到此id之前的动态，不包含此id的动态
 
 [//]: # (参数 `file_dynamic_ids`是指定一个文件，文件中每行一个动态id，在文件中写入动态id)
+
 [//]: # ()
+
 [//]: # (参数 `file_dynamic_images`是指定一个文件，文件中每行一个动态图片，在文件中写入动态图片地址)
 
 参数
@@ -114,24 +128,22 @@ https://github.com/lengpucheng/BilibiliClient
 
 ## 如何导出数据和下载
 
-1.使用sqlite studio等sqlite管理软件,
+1.使用python脚本读取sqlite数据库中的数据并导出到文件中.
 
-打开数据库文件,执行下列的sql语句,然后复制全部数据.
+```
+usage: sqlite3runsql.py [-h] --output_file OUTPUT_FILE --database DATABASE --sql_file SQL_FILE                                                                                                                                      
+Process some SQL file with a database and output the result to a file.
 
-```sql
-SELECT picturesrc
-  FROM dynamicpictures;
+options:
+  -h, --help            show this help message and exit
+  --output_file OUTPUT_FILE
+                        The path to the output file where the results will be saved.
+  --database DATABASE   The database connection string or name.
+  --sql_file SQL_FILE   The path to the SQL file that contains the query to execute.
 ```
 
-2.使用sqlite3执行脚本.
-
-```sql
-.open "***/**/***.db"
-.output "***/**/***.txt"
-SELECT picturesrc   FROM dynamicpictures;
-.exit
+```shell
+python sqlite3runsql.py  --output_file  "bilibili-dynamic-image-downloader测试数据库-286509323.txt"  --database "bilibili-dynamic-image-downloader测试数据库-286509323.db"  --sql_file  "SELECT picturesrc   FROM dynamicpictures.sql"
 ```
 
-3.如何下载
-
-然后复制全部数据到motrix等下载器进行下载即可.
+2.如何下载?复制全部数据到motrix等下载器进行下载即可.
