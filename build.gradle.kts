@@ -120,7 +120,7 @@ dependencies {
 dependencies {
 
     implementation("com.alibaba.fastjson2:fastjson2:2.0.53")
-    implementation("com.alibaba.fastjson2:fastjson2-codegen:2.0.53") {
+    implementation("com.alibaba.fastjson2:fastjson2-codegen:2.0.54") {
         //exclude group: "com.alibaba.fastjson2", module: "fastjson2"
     }
     implementation("com.alibaba.fastjson2:fastjson2-kotlin:2.0.53") {
