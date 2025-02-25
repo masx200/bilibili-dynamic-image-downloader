@@ -119,11 +119,11 @@ dependencies {
 }
 dependencies {
 
-    implementation("com.alibaba.fastjson2:fastjson2:2.0.53")
-    implementation("com.alibaba.fastjson2:fastjson2-codegen:2.0.53") {
+    implementation("com.alibaba.fastjson2:fastjson2:2.0.54")
+    implementation("com.alibaba.fastjson2:fastjson2-codegen:2.0.54") {
         //exclude group: "com.alibaba.fastjson2", module: "fastjson2"
     }
-    implementation("com.alibaba.fastjson2:fastjson2-kotlin:2.0.53") {
+    implementation("com.alibaba.fastjson2:fastjson2-kotlin:2.0.54") {
         //exclude group: "com.alibaba.fastjson2", module: "fastjson2"
     }
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
@@ -158,11 +158,11 @@ dependencies {
 //<<<<<<< sqlite保存状态
 //    implementation("org.xerial:sqlite-jdbc:3.36.0.3")
 //=======
-    implementation("org.xerial:sqlite-jdbc:3.47.1.0")
+    implementation("org.xerial:sqlite-jdbc:3.48.0.0")
 //>>>>>>> master
     // https://mvnrepository.com/artifact/com.xenomachina/kotlin-argparser
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
-    implementation("ch.qos.logback:logback-core:1.5.15")
+    implementation("ch.qos.logback:logback-core:1.5.16")
 
 }
 tasks.named<JavaExec>("run") {
@@ -203,7 +203,7 @@ allprojects {
     configurations.all {
         resolutionStrategy {
             // 强制使用特定版本的依赖
-            force("ch.qos.logback:logback-core:1.5.15")
+            force("ch.qos.logback:logback-core:1.5.16")
 
             // 或者你可以使用每个依赖的 group 和 version
             eachDependency {
