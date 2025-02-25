@@ -60,22 +60,27 @@ suspend fun getDynamicSequenceWithDOWNLOAD_STATE_FILE(options: MyArgs, cookie_st
                     strings1
                 )
             }
-            var strings2 = recreateColumnsOnSchemaChangeInColumnTypes(
-                db, DynamicRanges::class.java, DynamicPictures::class.java, DynamicRanges::class.java
-            )
-            if (strings2.isNotEmpty()) {
-                println(
-                    strings2
-                )
-            }
-            var strings3 = recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement(
-                db, SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
-            )
 
-            if (strings3.isNotEmpty()) {
-                println(
-                    strings3
+
+            if (options.force_recreate) {
+                var strings2 = recreateColumnsOnSchemaChangeInColumnTypes(
+                    db, DynamicRanges::class.java, DynamicPictures::class.java, DynamicRanges::class.java
                 )
+                if (strings2.isNotEmpty()) {
+                    println(
+                        strings2
+                    )
+                }
+                var strings3 = recreateTablesOnSchemaChangeInPrimaryKeyAndAutoIncrement(
+                    db, SpaceHistory::class.java, DynamicPictures::class.java, DynamicRanges::class.java
+                )
+
+                if (strings3.isNotEmpty()) {
+                    println(
+                        strings3
+                    )
+                }
+
             }
 
             var earliestDynamicIdinoldranges: Long? = null
